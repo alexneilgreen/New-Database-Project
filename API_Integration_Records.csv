@@ -1,0 +1,39 @@
+API_NAME,CREATION_STATUS,TESTING,INTEGRATION CREATION_STATUS
+
+# STATUS TYPES:
+# 0 = Not started
+# 1 = Finised
+# X = Underway
+# U = Undetermined
+
+login                       ,   1,   1,   0
+register-user               ,   1,   1,   0
+register-superadmin         ,   1,   1,   0
+add-university              ,   1,   1,   0
+delete-user                 ,   1,   1,   0
+add-rso-admin               ,   1,   0,   0
+remove-rso-admin            ,   1,   0,   0
+join-rso-board              ,   1,   0,   0
+check-last-admin            ,   1,   0,   0
+leave-rso-board             ,   1,   0,   0
+follow-rso                  ,   1,   0,   0
+unfollow-rso                ,   1,   0,   0
+create-rso-event            ,   1,   0,   0
+delete-rso-event            ,   1,   0,   0
+propose-university-event    ,   1,   0,   0
+approve-university-event    ,   1,   0,   0
+disapprove-university-event ,   1,   0,   0
+schedule-event              ,   1,   0,   0
+unschedule-event            ,   1,   0,   0
+autoload-scheduled-events   ,   1,   U,   U
+autoload-all                ,   U,   U,   U
+autoload-public-uni         ,   U,   U,   U
+autoload-private-uni        ,   U,   U,   U
+autoload-rso                ,   U,   U,   U
+search-events               ,   1,   U,   U
+search-rsos                 ,   1,   U,   U
+search-superadmins          ,   1,   U,   U
+edit-rso                    ,   0,   0,   0
+edit-university             ,   U,   U,   U
+edit-event                  ,   0,   0,   0
+edit-user                   ,   U,   U,   U
