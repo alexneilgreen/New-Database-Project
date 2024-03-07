@@ -1,0 +1,1466 @@
+const express = require("express");
+const mysql = require("mysql");
+const cors = require("cors");
+
+const app = express();
+const port = 3001;
+
+const TESTING = true;
+
+let db = null;
+
+if (!TESTING) {
+  // MySQL connection configuration
+  db = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "admin",
+    database: "cop4710db",
+  });
+} else {
+  // MySQL connection configuration
+  db = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "admin",
+    database: "cop4710db_test",
+  });
+}
+
+db.connect((err) => {
+  if (err) {
+    console.error("Error connecting to MySQL:", err);
+  } else {
+    console.log("Connected to MySQL database");
+  }
+});
+
+// Use cors middleware to enable CORS
+app.use(cors());
+
+// Middleware to parse JSON in the request body
+app.use(express.json());
+
+//=======================================
+
+//////////////////////////////
+//////////////////// Login API
+//////////////////////////////
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+
+  console.log("User logging in: ", username, password);
+  let userFound = false;
+  let userID = -1;
+  let userInfo = {};
+
+  // Check if user exists with the given username and password
+  const query = "SELECT * FROM Users WHERE username = ? AND password = ?";
+  db.query(query, [username, password], (err, userResults) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Internal Server Error");
+      return;
+    } else if (userResults.length > 0) {
+      // User found and password is correct
+      userFound = true;
+      userID = userResults[0].userID;
+      userInfo = {
+        userID: userID,
+        username: userResults[0].username,
+        phone: userResults[0].phone,
+        email: userResults[0].email,
+        university: userResults[0].university,
+      };
+    } else {
+      userFound = false;
+      res.status(404).json({ message: "Invalid username/password" });
+      return;
+    }
+
+    if (userFound) {
+      let isAdmin = false;
+      let isSuperadmin = false;
+      let rsoAdminID = -1;
+      let superAdminID = -1;
+
+      const rsoAdminQuery = "SELECT adminID FROM RSO_Admins WHERE userID = ?";
+      db.query(rsoAdminQuery, [userID], (rsoErr, rsoAdminResults) => {
+        if (rsoErr) {
+          console.error(rsoErr);
+          res.status(500).send("Internal Server Error");
+          return;
+        } else if (rsoAdminResults.length > 0) {
+          isAdmin = true;
+          rsoAdminID = rsoAdminResults[0].adminID;
+        } else {
+          isAdmin = false;
+        }
+      });
+
+      const superAdminQuery =
+        "SELECT superID FROM Superadmins WHERE userID = ?";
+      db.query(superAdminQuery, [userID], (superErr, superAdminResults) => {
+        if (superErr) {
+          console.error(superErr);
+          res.status(500).send("Internal Server Error");
+          return;
+        } else if (superAdminResults.length > 0) {
+          isSuperadmin = true;
+          superAdminID = superAdminResults[0].superID;
+        } else {
+          isSuperadmin = false;
+        }
+      });
+
+      if (isAdmin && isSuperadmin) {
+        res.status(200).json({
+          userInfo: userInfo,
+          adminID: rsoAdminID,
+          superadminID: superAdminID,
+        });
+        return;
+      } else if (!isAdmin && isSuperadmin) {
+        res.status(200).json({ userInfo: userInfo, superadminID: superAdminID });
+        return;
+      } else if (isAdmin && !isSuperadmin) {
+        res.status(200).json({ userInfo: userInfo, adminID: rsoAdminID });
+        return;
+      } else {
+        res.status(200).json({ userInfo: userInfo });
+        return;
+      }
+    } else {
+      res.status(404).json({
+        message: "User not found or invalid credentials [FALLTHROUGH]",
+      });
+      return;
+    }
+  });
+});
+
+//////////////////////////////
+///////Basic User Register API
+//////////////////////////////
+app.post("/register-user", (req, res) => {
+  const { username, password, phone, email, university } = req.body;
+
+  console.log(
+    "User registering: ",
+    username,
+    password,
+    phone,
+    email,
+    university
+  );
+
+  // Check if username and email already exist
+  const checkQuery = "SELECT * FROM Users WHERE username = ? OR email = ?";
+  db.query(checkQuery, [username, email], (err, checkResults) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else if (checkResults.length > 0) {
+      // User with the given username or email already exists
+      res.status(409).json({ message: "Username or email already exists" });
+      return;
+    } else {
+      // Insert the new user into the database
+      const insertQuery =
+        "INSERT INTO Users (username, password, phone, email, university) VALUES (?, ?, ?, ?, ?)";
+      db.query(
+        insertQuery,
+        [username, password, phone, email, university],
+        (insertErr, insertResults) => {
+          if (insertErr) {
+            console.error(insertErr);
+            res.status(500).json({ message: "Internal Server Error" });
+            return;
+          } else {
+            const userID = insertResults.insertId;
+            res.status(201).json({
+              message: "User registered successfully",
+              userID: userID,
+            });
+            return;
+          }
+        }
+      );
+    }
+  });
+});
+
+//////////////////////////////
+///////Superadmin Register API
+//////////////////////////////
+app.post("/register-superadmin", (req, res) => {
+  const {
+    username,
+    password,
+    phone,
+    email,
+    university,
+    uniDescr,
+    uniLat,
+    uniLong,
+  } = req.body;
+
+  console.log(
+    "Superadmin registering: ",
+    username,
+    password,
+    phone,
+    email,
+    university,
+    uniDescr,
+    uniLat,
+    uniLong
+  );
+
+  // Check if username and email already exist
+  const checkQuery = "SELECT * FROM Users WHERE username = ? OR email = ?";
+  db.query(checkQuery, [username, email], (err, checkResults) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else if (checkResults.length > 0) {
+      // User with the given username or email already exists
+      res.status(409).json({ message: "Username or email already exists" });
+      return;
+    } else {
+      // Insert the new user into the Users table
+      const insertUserQuery =
+        "INSERT INTO Users (username, password, phone, email, university) VALUES (?, ?, ?, ?, ?)";
+      db.query(
+        insertUserQuery,
+        [username, password, phone, email, university],
+        (insertUserErr, insertUserResults) => {
+          if (insertUserErr) {
+            console.error(insertUserErr);
+            res.status(500).json({ message: "Internal Server Error" });
+            return;
+          } else {
+            // Get the userID of the newly registered user
+            const userID = insertUserResults.insertId;
+
+            // Insert the superadmin into the Superadmins table
+            const insertSuperadminQuery =
+              "INSERT INTO Superadmins (userID, uniDescr, uniLat, uniLong) VALUES (?, ?, ?, ?)";
+            db.query(
+              insertSuperadminQuery,
+              [userID, uniDescr, uniLat, uniLong],
+              (insertSuperadminErr, insertSuperadminResults) => {
+                if (insertSuperadminErr) {
+                  console.error(insertSuperadminErr);
+                  res.status(500).json({ message: "Internal Server Error" });
+                  return;
+                } else {
+                  const superadminID = insertSuperadminResults.insertId;
+                  res.status(201).json({
+                    message: "Superadmin registered successfully",
+                    userID: userID,
+                    superID: superadminID,
+                  });
+                  return;
+                }
+              }
+            );
+          }
+        }
+      );
+    }
+  });
+});
+
+// Insert University API
+// Used when superadmin registers
+app.post("/add-university", (req, res) => {
+  const { universityName } = req.body;
+
+  console.log("Inserting university: ", universityName);
+
+  // Check if the university already exists
+  const checkQuery = "SELECT * FROM Universities WHERE university = ?";
+  db.query(checkQuery, [universityName], (checkErr, checkResults) => {
+    if (checkErr) {
+      console.error(checkErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else if (checkResults.length > 0) {
+      // University already exists
+      res.status(409).json({ message: "University already exists" });
+      return;
+    } else {
+      // Insert the new university into the Universities table
+      const insertQuery = "INSERT INTO Universities (university) VALUES (?)";
+      db.query(insertQuery, [universityName], (insertErr, insertResults) => {
+        if (insertErr) {
+          console.error(insertErr);
+          res.status(500).json({ message: "Internal Server Error" });
+          return;
+        } else {
+          // University successfully inserted
+          const uniID = insertResults.insertId;
+          res.status(201).json({
+            message: "University inserted successfully",
+            uniID: uniID,
+          });
+          return;
+        }
+      });
+    }
+  });
+});
+
+//////////////////////////////
+//////////// User Deletion API
+//////////////////////////////
+app.delete("/delete-user/:userID", (req, res) => {
+  const userID = req.params.userID;
+
+  console.log("Deleting user with userID: ", userID);
+
+  // Check if the user exists
+  const checkQuery = "SELECT * FROM Users WHERE userID = ?";
+  db.query(checkQuery, [userID], (checkErr, checkResults) => {
+    if (checkErr) {
+      console.error(checkErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else if (checkResults.length === 0) {
+      // User not found
+      res.status(404).json({ message: "User not found" });
+      return;
+    } else {
+      // Delete the user from the Users table
+      const deleteQuery = "DELETE FROM Users WHERE userID = ?";
+      db.query(deleteQuery, [userID], (deleteErr, deleteResults) => {
+        if (deleteErr) {
+          console.error(deleteErr);
+          res.status(500).json({ message: "Internal Server Error" });
+          return;
+        } else {
+          // User successfully deleted
+          res.status(200).json({ message: "User deleted successfully", userID: userID });
+            return;
+        }
+      });
+    }
+  });
+});
+
+//////////////////////////////
+///////////// RSO CREATION API
+//////////////////////////////
+app.post("/create-rso", (req, res) => {
+  const { rsoCode, adminCode, rsoName, rsoDescr, university } = req.body;
+
+  console.log("Creating RSO: ", rsoName);
+
+  // Insert the RSO into the RSOs table
+  const insertQuery =
+    "INSERT INTO RSOs (rsoCode, adminCode, rsoName, rsoDescr, university) VALUES (?, ?, ?, ?, ?)";
+  db.query(
+    insertQuery,
+    [rsoCode, adminCode, rsoName, rsoDescr, university],
+    (insertErr, insertResults) => {
+      if (insertErr) {
+        console.error(insertErr);
+        res.status(500).json({ message: "Internal Server Error" });
+        return;
+      } else {
+        // RSO successfully created
+        const rsoID = insertResults.insertId;
+        res.status(201).json({ message: "RSO created successfully", rsoID: rsoID });
+        return;
+      }
+    }
+  );
+});
+
+//////////////////////////////
+///////////// RSO DELETION API
+//////////////////////////////
+app.post("/delete-rso", (req, res) => {
+  const { adminID, rsoID } = req.body;
+
+  console.log("Deleting RSO: ", rsoID);
+
+  // Check if the admin is the only admin of the RSO
+  const checkAdminQuery =
+    "SELECT COUNT(*) AS adminCount FROM RSO_Admins WHERE rsoID = ?";
+  db.query(checkAdminQuery, [rsoID], (checkErr, checkResults) => {
+    if (checkErr) {
+      console.error(checkErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else if (checkResults.length > 0) {
+      const adminCount = checkResults[0].adminCount;
+      if (adminCount === 1) {
+        // Admin is the only admin of the RSO, proceed to delete RSO
+        const deleteQuery = "DELETE FROM RSOs WHERE rsoID = ?";
+        db.query(deleteQuery, [rsoID], (deleteErr, deleteResults) => {
+          if (deleteErr) {
+            console.error(deleteErr);
+            res.status(500).json({ message: "Internal Server Error" });
+            return;
+          } else {
+            // RSO deleted successfully
+            res.status(200).json({ message: "RSO deleted successfully" });
+            return;
+          }
+        });
+      } else {
+        // Admin is not the only admin of the RSO
+        res.status(403).json({
+          message: "RSO can only be deleted if admin is the only admin",
+        });
+        return;
+      }
+    } else {
+      // No RSO found with the provided rsoID
+      res.status(404).json({ message: "RSO not found" });
+      return;
+    }
+  });
+});
+
+//////////////////////////////
+//////////// ADD RSO ADMIN API
+//////////////////////////////
+app.post("/add-rso-admin", (req, res) => {
+  const { userID } = req.body;
+
+  console.log("Making user an RSO admin: ", userID);
+
+  // Insert the user into the RSO_Admins table
+  const insertQuery = "INSERT INTO RSO_Admins (userID) VALUES (?)";
+  db.query(insertQuery, [userID], (insertErr, insertResults) => {
+    if (insertErr) {
+      console.error(insertErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      // User successfully added as an RSO admin
+      const adminID = insertResults.insertId;
+      res.status(201).json({
+        message: "User successfully added as RSO admin",
+        adminID: adminID,
+      });
+      return;
+    }
+  });
+});
+
+//////////////////////////////
+///////// REMOVE RSO ADMIN API
+//////////////////////////////
+app.delete("/remove-rso-admin/:adminID", (req, res) => {
+  const adminID = req.params.adminID;
+
+  console.log("Removing user from RSO admins: ", adminID);
+
+  // Delete the user from the RSO_Admins table
+  const deleteQuery = "DELETE FROM RSO_Admins WHERE adminID = ?";
+  db.query(deleteQuery, [adminID], (deleteErr, deleteResults) => {
+    if (deleteErr) {
+      console.error(deleteErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else if (deleteResults.affectedRows === 0) {
+      res.status(404).json({ message: "RSO admin not found" });
+      return;
+    } else {
+      // User successfully removed from RSO admins
+      res.status(200).json({ message: "User successfully removed from RSO admins" });
+      return;
+    }
+  });
+});
+
+//////////////////////////////
+/////////// JOIN RSO BOARD API
+//////////////////////////////
+app.post("/join-rso-board", (req, res) => {
+  const { adminID, rsoID, adminCode } = req.body;
+
+  console.log("Admin joining RSO board: ", adminID, rsoID);
+
+  // Check if the provided admin code matches the admin code for the given RSO
+  const codeQuery = "SELECT adminCode FROM RSOs WHERE rsoID = ?";
+  db.query(codeQuery, [rsoID], (codeErr, codeResults) => {
+    if (codeErr) {
+      console.error(codeErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else if (codeResults.length === 0) {
+      res.status(404).json({ message: "RSO not found" });
+      return;
+    } else {
+      const correctCode = codeResults[0].adminCode;
+      if (adminCode === correctCode) {
+        // Provided admin code matches the RSO's admin code
+        // Add the admin to the RSO board
+        const insertQuery =
+          "INSERT INTO RSO_Board (rsoID, adminID) VALUES (?, ?)";
+        db.query(insertQuery, [rsoID, adminID], (insertErr, insertResults) => {
+          if (insertErr) {
+            console.error(insertErr);
+            res.status(500).json({ message: "Internal Server Error" });
+            return;
+          } else {
+            // Admin successfully added to the RSO board
+            res.status(200).json({ message: "Admin successfully joined RSO board" });
+            return;
+          }
+        });
+      } else {
+        // Provided admin code does not match the RSO's admin code
+        res.status(403).json({ message: "Incorrect admin code" });
+        return;
+      }
+    }
+  });
+});
+
+// API call to check if an admin is the last admin of the RSO
+// Used when leaving RSO
+app.post("/check-last-admin", (req, res) => {
+  const { adminID, rsoID } = req.body;
+
+  console.log(
+    "Checking if admin is the last admin of the RSO: ",
+    adminID,
+    rsoID
+  );
+
+  // Count the number of admins for the given RSO
+  const countQuery =
+    "SELECT COUNT(*) AS adminCount FROM RSO_Admins WHERE rsoID = ?";
+  db.query(countQuery, [rsoID], (countErr, countResults) => {
+    if (countErr) {
+      console.error(countErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      const adminCount = countResults[0].adminCount;
+
+      // Check if the provided admin is the last admin of the RSO
+      if (adminCount === 1) {
+        // The provided admin is the last admin of the RSO
+        res.status(200).json({ lastAdmin: true });
+        return;
+      } else {
+        // There are other admins for the RSO
+        res.status(200).json({ lastAdmin: false });
+        return;
+      }
+    }
+  });
+});
+
+//////////////////////////////
+////////// LEAVE RSO BOARD API
+//////////////////////////////
+app.post("/leave-rso-board", (req, res) => {
+  const { adminID, rsoID } = req.body;
+
+  console.log("Admin leaving RSO board: ", adminID, rsoID);
+
+  // Delete the admin from the RSO_Board table
+  const deleteQuery = "DELETE FROM RSO_Board WHERE adminID = ? AND rsoID = ?";
+  db.query(deleteQuery, [adminID, rsoID], (deleteErr, deleteResults) => {
+    if (deleteErr) {
+      console.error(deleteErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (deleteResults.affectedRows > 0) {
+        // Admin successfully left the RSO board
+        res.status(200).json({ message: "Admin successfully left the RSO board" });
+        return;
+      } else {
+        // Admin not found on the RSO board
+        res.status(404).json({ message: "Admin not found on the RSO board" });
+        return;
+      }
+    }
+  });
+});
+
+//////////////////////////////
+/////////////// FOLLOW RSO API
+//////////////////////////////
+// API for a regular user to follow an RSO
+app.post("/follow-rso", (req, res) => {
+  const { userID, rsoID, rsoCode } = req.body;
+
+  console.log("User following RSO: ", userID, rsoID, rsoCode);
+
+  // Check if the provided RSO code is correct
+  const checkRsoQuery = "SELECT * FROM RSOs WHERE rsoID = ? AND rsoCode = ?";
+  db.query(checkRsoQuery, [rsoID, rsoCode], (checkErr, checkResults) => {
+    if (checkErr) {
+      console.error(checkErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (checkResults.length > 0) {
+        // RSO code is correct, insert the user into RSO_Members table
+        const insertQuery =
+          "INSERT INTO RSO_Members (rsoID, userID) VALUES (?, ?)";
+        db.query(insertQuery, [rsoID, userID], (insertErr, insertResults) => {
+          if (insertErr) {
+            console.error(insertErr);
+            res.status(500).json({ message: "Internal Server Error" });
+            return;
+          } else {
+            res.status(200).json({ message: "User successfully followed the RSO" });
+            return;
+          }
+        });
+      } else {
+        // RSO code is incorrect
+        res.status(404).json({ message: "Invalid RSO code" });
+        return;
+      }
+    }
+  });
+});
+
+//////////////////////////////
+///////////// UNFOLLOW RSO API
+//////////////////////////////
+app.post("/unfollow-rso", (req, res) => {
+  const { userID, rsoID } = req.body;
+
+  console.log("User unfollowing RSO: ", userID, rsoID);
+
+  // Delete the user from the RSO_Members table
+  const deleteQuery = "DELETE FROM RSO_Members WHERE userID = ? AND rsoID = ?";
+  db.query(deleteQuery, [userID, rsoID], (deleteErr, deleteResults) => {
+    if (deleteErr) {
+      console.error(deleteErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (deleteResults.affectedRows > 0) {
+        // User successfully unfollowed the RSO
+        res.status(200).json({ message: "User successfully unfollowed the RSO" });
+        return;
+      } else {
+        // User not found in the RSO
+        res.status(404).json({ message: "User not found in the RSO" });
+        return;
+      }
+    }
+  });
+});
+
+//////////////////////////////
+///////// CREATE RSO EVENT API
+//////////////////////////////
+app.post("/create-rso-event", (req, res) => {
+  const {
+    adminID,
+    rsoID,
+    eventName,
+    eventDescr,
+    eventTime,
+    eventLat,
+    eventLong,
+    eventAddress,
+    eventPhone,
+    eventEmail,
+  } = req.body;
+
+  console.log(
+    "RSO board member creating RSO event: ",
+    adminID,
+    rsoID,
+    eventName,
+    eventDescr,
+    eventTime,
+    eventLat,
+    eventLong,
+    eventAddress,
+    eventPhone,
+    eventEmail
+  );
+
+  // Check if the provided admin ID is an RSO admin and board member
+  const checkAdminQuery =
+    "SELECT * FROM RSO_Admins WHERE adminID = ? AND EXISTS (SELECT * FROM RSO_Board WHERE rsoID = ? AND adminID = ?)";
+  db.query(
+    checkAdminQuery,
+    [adminID, rsoID, adminID],
+    (checkErr, checkResults) => {
+      if (checkErr) {
+        console.error(checkErr);
+        res.status(500).json({ message: "Internal Server Error" });
+        return;
+      } else {
+        if (checkResults.length > 0) {
+          // Admin is an RSO admin and board member, proceed to create the RSO event
+          const insertEventQuery =
+            "INSERT INTO Events (eventName, eventDescr, eventTime, eventLat, eventLong, eventAddress, eventPhone, eventEmail) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+          db.query(
+            insertEventQuery,
+            [
+              eventName,
+              eventDescr,
+              eventTime,
+              eventLat,
+              eventLong,
+              eventAddress,
+              eventPhone,
+              eventEmail,
+            ],
+            (insertErr, insertResults) => {
+              if (insertErr) {
+                console.error(insertErr);
+                res.status(500).json({ message: "Internal Server Error" });
+                return;
+              } else {
+                const eventID = insertResults.insertId;
+                // Insert the event into the RSO_Events table
+                const insertRsoEventQuery =
+                  "INSERT INTO RSO_Events (eventID, rsoID) VALUES (?, ?)";
+                db.query(
+                  insertRsoEventQuery,
+                  [eventID, rsoID],
+                  (insertRsoErr, insertRsoResults) => {
+                    if (insertRsoErr) {
+                      console.error(insertRsoErr);
+                      // Rollback the event creation in the Events table if the RSO event insertion fails
+                      const deleteEventQuery =
+                        "DELETE FROM Events WHERE eventID = ?";
+                      db.query(
+                        deleteEventQuery,
+                        [eventID],
+                        (deleteErr, deleteResults) => {
+                          if (deleteErr) {
+                            console.error(deleteErr);
+                          }
+                        }
+                      );
+                      res.status(500).json({ message: "Internal Server Error" });return;
+                    } else {
+                      res.status(200).json({
+                        message: "RSO event created successfully",
+                        eventID: eventID,
+                      });
+                      return;
+                    }
+                  }
+                );
+              }
+            }
+          );
+        } else {
+          // Admin is not an RSO admin or board member
+          res.status(403).json({
+            message:
+              "You are not authorized to create an RSO event for this RSO",
+          });
+          return;
+        }
+      }
+    }
+  );
+});
+
+//////////////////////////////
+///////// DELETE RSO EVENT API
+//////////////////////////////
+app.delete("/delete-rso-event/:eventID/:adminID", (req, res) => {
+  const { eventID, adminID } = req.params;
+
+  console.log("RSO board member deleting RSO event: ", eventID, adminID);
+
+  // Check if the provided admin ID is an RSO admin and board member
+  const checkAdminQuery =
+    "SELECT * FROM RSO_Admins WHERE adminID = ? AND EXISTS (SELECT * FROM RSO_Board WHERE rsoID = (SELECT rsoID FROM RSO_Events WHERE eventID = ?) AND adminID = ?)";
+  db.query(
+    checkAdminQuery,
+    [adminID, eventID, adminID],
+    (checkErr, checkResults) => {
+      if (checkErr) {
+        console.error(checkErr);
+        res.status(500).json({ message: "Internal Server Error" });
+        return;
+      } else {
+        if (checkResults.length > 0) {
+          // Admin is an RSO admin and board member, proceed to delete the RSO event
+          const deleteEventQuery = "DELETE FROM Events WHERE eventID = ?";
+          db.query(deleteEventQuery, [eventID], (deleteErr, deleteResults) => {
+            if (deleteErr) {
+              console.error(deleteErr);
+              res.status(500).json({ message: "Internal Server Error" });
+              return;
+            } else {
+              res.status(200).json({ message: "RSO event deleted successfully" });
+              return;
+            }
+          });
+        } else {
+          // Admin is not an RSO admin or board member
+          res.status(403).json({
+            message: "You are not authorized to delete this RSO event",
+          });
+          return;
+        }
+      }
+    }
+  );
+});
+
+//////////////////////////////
+//////// PROPOSE UNI EVENT API
+//////////////////////////////
+app.post("/propose-university-event", (req, res) => {
+  const {
+    adminID,
+    eventName,
+    eventDescr,
+    eventTime,
+    eventLat,
+    eventLong,
+    eventAddress,
+    eventPhone,
+    eventEmail,
+    university,
+    isPrivate,
+  } = req.body;
+
+  console.log(
+    "RSO board member proposing university event: ",
+    eventName,
+    adminID
+  );
+
+  // Check if the provided admin ID is an RSO admin and board member
+  const checkAdminQuery =
+    "SELECT * FROM RSO_Admins WHERE adminID = ? AND EXISTS (SELECT * FROM RSO_Board WHERE adminID = ?)";
+  db.query(checkAdminQuery, [adminID, adminID], (checkErr, checkResults) => {
+    if (checkErr) {
+      console.error(checkErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (checkResults.length > 0) {
+        // Admin is an RSO admin and board member, proceed to propose the university event
+        const insertEventQuery =
+          "INSERT INTO Events (eventName, eventDescr, eventTime, eventLat, eventLong, eventAddress, eventPhone, eventEmail) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        db.query(
+          insertEventQuery,
+          [
+            eventName,
+            eventDescr,
+            eventTime,
+            eventLat,
+            eventLong,
+            eventAddress,
+            eventPhone,
+            eventEmail,
+          ],
+          (insertErr, insertResults) => {
+            if (insertErr) {
+              console.error(insertErr);
+              res.status(500).json({ message: "Internal Server Error" });
+              return;
+            } else {
+              const eventID = insertResults.insertId;
+              // Insert the proposed university event into the University_Events table
+              const insertUniversityEventQuery =
+                "INSERT INTO University_Events (eventID, university, isPrivate) VALUES (?, ?, ?)";
+              db.query(
+                insertUniversityEventQuery,
+                [eventID, university, isPrivate],
+                (universityInsertErr, universityInsertResults) => {
+                  if (universityInsertErr) {
+                    console.error(universityInsertErr);
+                    res.status(500).json({ message: "Internal Server Error" });
+                    return;
+                  } else {
+                    res.status(200).json({
+                      message: "University event proposed successfully",
+                    });
+                    return;
+                  }
+                }
+              );
+            }
+          }
+        );
+      } else {
+        // Admin is not an RSO admin or board member
+        res.status(403).json({
+          message: "You are not authorized to propose a university event",
+        });
+        return;
+      }
+    }
+  });
+});
+
+//////////////////////////////
+//////// APPROVE UNI EVENT API
+//////////////////////////////
+app.post("/approve-university-event", (req, res) => {
+  const { superadminID, eventID } = req.body;
+
+  console.log("Superadmin approving university event: ", eventID);
+
+  // Check if the provided superadmin ID exists and is a superadmin
+  const checkSuperadminQuery = "SELECT * FROM Superadmins WHERE superID = ?";
+  db.query(checkSuperadminQuery, [superadminID], (checkErr, checkResults) => {
+    if (checkErr) {
+      console.error(checkErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (checkResults.length > 0) {
+        // Superadmin found, proceed to check the university of the superadmin
+        const superadminUniversityQuery =
+          "SELECT university FROM Users WHERE userID = ?";
+        db.query(
+          superadminUniversityQuery,
+          [superadminID],
+          (uniErr, uniResults) => {
+            if (uniErr) {
+              console.error(uniErr);
+              res.status(500).json({ message: "Internal Server Error" });
+              return;
+            } else {
+              const superadminUniversity = uniResults[0].university;
+              // Check if the university of the superadmin matches the university of the event
+              const eventUniversityQuery =
+                "SELECT university FROM Events WHERE eventID = ?";
+              db.query(
+                eventUniversityQuery,
+                [eventID],
+                (eventUniErr, eventUniResults) => {
+                  if (eventUniErr) {
+                    console.error(eventUniErr);
+                    res.status(500).json({ message: "Internal Server Error" });
+                    return;
+                  } else {
+                    const eventUniversity = eventUniResults[0].university;
+                    if (superadminUniversity === eventUniversity) {
+                      // Superadmin's university matches, proceed to approve the university event
+                      const updateEventQuery =
+                        "UPDATE University_Events SET isApproved = 1 WHERE eventID = ?";
+                      db.query(
+                        updateEventQuery,
+                        [eventID],
+                        (updateErr, updateResults) => {
+                          if (updateErr) {
+                            console.error(updateErr);
+                            res.status(500).json({ message: "Internal Server Error" });
+                            return;
+                          } else {
+                            res.status(200).json({
+                              message: "University event approved successfully",
+                            });
+                            return;
+                          }
+                        }
+                      );
+                    } else {
+                      // Superadmin's university does not match the event's university
+                      res.status(403).json({
+                        message:
+                          "Superadmin's university does not match the event's university",
+                      });
+                      return;
+                    }
+                  }
+                }
+              );
+            }
+          }
+        );
+      } else {
+        // Superadmin not found or unauthorized
+        res.status(403).json({
+          message: "You are not authorized to approve university events",
+        });
+        return;
+      }
+    }
+  });
+});
+
+//////////////////////////////
+///// DISAPPROVE UNI EVENT API
+//////////////////////////////
+app.delete("/disapprove-university-event/:eventID", (req, res) => {
+  const { adminID, superadminID } = req.body;
+  const eventID = req.params.eventID;
+
+  console.log("Admin or superadmin disapproving university event: ", eventID);
+
+  // Check if the provided adminID or superadminID exists and is authorized
+  const checkUserQuery = `
+      SELECT CASE
+        WHEN EXISTS (SELECT * FROM RSO_Admins WHERE adminID = ?) THEN 'admin'
+        WHEN EXISTS (SELECT * FROM Superadmins WHERE superID = ?) THEN 'superadmin'
+        ELSE 'none'
+      END AS userType;
+    `;
+  db.query(
+    checkUserQuery,
+    [adminID, superadminID],
+    (checkErr, checkResults) => {
+      if (checkErr) {
+        console.error(checkErr);
+        res.status(500).json({ message: "Internal Server Error" });
+        return;
+      } else {
+        if (checkResults.length > 0) {
+          const userType = checkResults[0].userType;
+          if (userType === "admin" || userType === "superadmin") {
+            // Admin or superadmin found, proceed to check if the admin is a board member
+            const userRSOQuery =
+              "SELECT rsoID FROM RSO_Admins WHERE adminID = ?";
+            db.query(userRSOQuery, [adminID], (userRSOErr, userRSOResults) => {
+              if (userRSOErr) {
+                console.error(userRSOErr);
+                res.status(500).json({ message: "Internal Server Error" });
+                return;
+              } else {
+                if (userRSOResults.length > 0) {
+                  const rsoID = userRSOResults[0].rsoID;
+                  // Check if the admin's university matches the event's university
+                  const eventUniversityQuery = `
+                    SELECT university 
+                    FROM Events 
+                    WHERE eventID = ?;
+                  `;
+                  db.query(
+                    eventUniversityQuery,
+                    [eventID],
+                    (eventUniErr, eventUniResults) => {
+                      if (eventUniErr) {
+                        console.error(eventUniErr);
+                        res.status(500).json({ message: "Internal Server Error" });
+                        return;
+                      } else {
+                        const eventUniversity = eventUniResults[0].university;
+                        if (userType === "admin") {
+                          // Check if the admin is a member of the RSO's board
+                          const checkBoardQuery = `
+                          SELECT * 
+                          FROM RSO_Board 
+                          WHERE rsoID = ? AND adminID = ?;
+                        `;
+                          db.query(
+                            checkBoardQuery,
+                            [rsoID, adminID],
+                            (checkBoardErr, checkBoardResults) => {
+                              if (checkBoardErr) {
+                                console.error(checkBoardErr);
+                                res.status(500).json({ message: "Internal Server Error" });
+                                return;
+                              } else {
+                                if (checkBoardResults.length > 0) {
+                                  // Admin is a board member and university matches, proceed to delete the event
+                                  const deleteEventQuery =
+                                    "DELETE FROM Events WHERE eventID = ?";
+                                  db.query(
+                                    deleteEventQuery,
+                                    [eventID],
+                                    (deleteErr, deleteResults) => {
+                                      if (deleteErr) {
+                                        console.error(deleteErr);
+                                        res.status(500).json({
+                                          message: "Internal Server Error",
+                                        });
+                                        return;
+                                      } else {
+                                        res.status(200).json({
+                                          message:
+                                            "University event disapproved and deleted successfully",
+                                        });
+                                        return;
+                                      }
+                                    }
+                                  );
+                                } else {
+                                  res.status(403).json({
+                                    message:
+                                      "Admin is not a member of the RSO's board",
+                                  });
+                                  return;
+                                }
+                              }
+                            }
+                          );
+                        } else if (userType === "superadmin") {
+                          // Check if the superadmin's university matches the event's university
+                          const superadminUniQuery = `
+                          SELECT university 
+                          FROM Users 
+                          WHERE userID = ?;
+                        `;
+                          db.query(
+                            superadminUniQuery,
+                            [superadminID],
+                            (superadminUniErr, superadminUniResults) => {
+                              if (superadminUniErr) {
+                                console.error(superadminUniErr);
+                                res.status(500).json({ message: "Internal Server Error" });
+                                return;
+                              } else {
+                                const superadminUniversity =
+                                  superadminUniResults[0].university;
+                                if (eventUniversity === superadminUniversity) {
+                                  // Superadmin's university matches, proceed to delete the event
+                                  const deleteEventQuery =
+                                    "DELETE FROM Events WHERE eventID = ?";
+                                  db.query(
+                                    deleteEventQuery,
+                                    [eventID],
+                                    (deleteErr, deleteResults) => {
+                                      if (deleteErr) {
+                                        console.error(deleteErr);
+                                        res.status(500).json({
+                                          message: "Internal Server Error",
+                                        });
+                                        return;
+                                      } else {
+                                        res.status(200).json({
+                                          message:
+                                            "University event disapproved and deleted successfully",
+                                        });
+                                        return;
+                                      }
+                                    }
+                                  );
+                                } else {
+                                  res.status(403).json({
+                                    message:
+                                      "Superadmin's university does not match the event's university",
+                                  });
+                                  return;
+                                }
+                              }
+                            }
+                          );
+                        }
+                      }
+                    }
+                  );
+                } else {
+                  res.status(404).json({ message: "Admin is not associated with any RSO" });
+                  return;
+                }
+              }
+            });
+          } else {
+            // Unauthorized user
+            res.status(403).json({
+              message: "You are not authorized to disapprove university events",
+            });
+            return;
+          }
+        } else {
+          // No matching adminID or superadminID found
+          res.status(404).json({ message: "User not found or invalid credentials" });
+          return;
+        }
+      }
+    }
+  );
+});
+
+//////////////////////////////
+/////////// SCHEDULE EVENT API
+//////////////////////////////
+app.post("/schedule-event", (req, res) => {
+  const { eventID, userID } = req.body;
+
+  console.log("Scheduling event for user: ", eventID);
+
+  // Check if the provided user ID exists
+  const checkUserQuery = "SELECT * FROM Users WHERE userID = ?";
+  db.query(checkUserQuery, [userID], (checkErr, checkResults) => {
+    if (checkErr) {
+      console.error(checkErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (checkResults.length > 0) {
+        // User found, proceed to schedule the event for the user
+        const scheduleEventQuery =
+          "INSERT INTO Scheduled_Events (userID, eventID) VALUES (?, ?)";
+        db.query(
+          scheduleEventQuery,
+          [userID, eventID],
+          (scheduleErr, scheduleResults) => {
+            if (scheduleErr) {
+              console.error(scheduleErr);
+              res.status(500).json({ message: "Internal Server Error" });
+              return;
+            } else {
+              res.status(200).json({ message: "Event scheduled successfully for user" });
+              return;
+            }
+          }
+        );
+      } else {
+        // User not found
+        res.status(404).json({ message: "User not found" });
+        return;
+      }
+    }
+  });
+});
+
+//////////////////////////////
+///////// UNSCHEDULE EVENT API
+//////////////////////////////
+app.post("/unschedule-event", (req, res) => {
+  const { eventID, userID } = req.body;
+
+  console.log("Unscheduling event for user: ", eventID);
+
+  // Check if the provided user ID exists
+  const checkUserQuery = "SELECT * FROM Users WHERE userID = ?";
+  db.query(checkUserQuery, [userID], (checkErr, checkResults) => {
+    if (checkErr) {
+      console.error(checkErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (checkResults.length > 0) {
+        // User found, proceed to unschedule the event for the user
+        const unscheduleEventQuery =
+          "DELETE FROM Scheduled_Events WHERE userID = ? AND eventID = ?";
+        db.query(
+          unscheduleEventQuery,
+          [userID, eventID],
+          (unscheduleErr, unscheduleResults) => {
+            if (unscheduleErr) {
+              console.error(unscheduleErr);
+              res.status(500).json({ message: "Internal Server Error" });
+              return;
+            } else {
+              res.status(200).json({ message: "Event unscheduled successfully for user" });
+              return;
+            }
+          }
+        );
+      } else {
+        // User not found
+        res.status(404).json({ message: "User not found" });
+        return;
+      }
+    }
+  });
+});
+
+//////////////////////////////
+//AUTOLOAD SCHEDULED EVENT API
+//////////////////////////////
+app.post("/autoload-scheduled-events", (req, res) => {
+  const { userID, startIndex, count } = req.body;
+
+  console.log("Autoloading scheduled events for user: ", userID);
+
+  // Check if the provided user ID exists
+  const checkUserQuery = "SELECT * FROM Users WHERE userID = ?";
+  db.query(checkUserQuery, [userID], (checkErr, checkResults) => {
+    if (checkErr) {
+      console.error(checkErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (checkResults.length > 0) {
+        // User found, proceed to load scheduled events within the specified range
+        const loadEventsQuery =
+          "SELECT * FROM Scheduled_Events WHERE userID = ? LIMIT ?, ?";
+        db.query(
+          loadEventsQuery,
+          [userID, startIndex, count],
+          (loadErr, loadResults) => {
+            if (loadErr) {
+              console.error(loadErr);
+              res.status(500).json({ message: "Internal Server Error" });
+              return;
+            } else {
+              res.status(200).json({ events: loadResults });
+              return;
+            }
+          }
+        );
+      } else {
+        // User not found
+        res.status(404).json({ message: "User not found" });
+        return;
+      }
+    }
+  });
+});
+
+// Search events API call
+app.post("/search-events", (req, res) => {
+  const { userID, searchString } = req.body;
+
+  console.log("Searching events with string: ", searchString);
+
+  // Check if the provided user ID exists
+  const checkUserQuery = "SELECT * FROM Users WHERE userID = ?";
+  db.query(checkUserQuery, [userID], (checkErr, checkResults) => {
+    if (checkErr) {
+      console.error(checkErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (checkResults.length > 0) {
+        // User found, proceed to search events
+        const searchEventsQuery = `
+            SELECT * FROM (
+                SELECT *, 'RSO' AS eventType FROM RSO_Events
+                UNION ALL
+                SELECT *, 'University' AS eventType FROM University_Events
+            ) AS CombinedEvents
+            WHERE (
+                eventName LIKE ? OR
+                eventDescr LIKE ? OR
+                eventTime LIKE ? OR
+                eventAddress LIKE ? OR
+                eventPhone LIKE ? OR
+                eventEmail LIKE ? OR
+                eventType = 'RSO' AND rsoID IN (
+                    SELECT rsoID FROM RSO_Members WHERE userID = ? 
+                ) OR
+                eventType = 'University' AND university = (
+                    SELECT university FROM Users WHERE userID = ?
+                )
+            )
+          `;
+        const searchStr = `%${searchString}%`;
+        db.query(
+          searchEventsQuery,
+          [
+            searchStr,
+            searchStr,
+            searchStr,
+            searchStr,
+            searchStr,
+            searchStr,
+            userID,
+            userID,
+          ],
+          (searchErr, searchResults) => {
+            if (searchErr) {
+              console.error(searchErr);
+              res.status(500).json({ message: "Internal Server Error" });
+              return;
+            } else {
+              res.status(200).json({ events: searchResults });
+              return;
+            }
+          }
+        );
+      } else {
+        // User not found
+        res.status(404).json({ message: "User not found" });
+        return;
+      }
+    }
+  });
+});
+
+// Search RSOs API call
+app.post("/search-rsos", (req, res) => {
+  const { userID, searchString } = req.body;
+
+  console.log("Searching RSOs with string: ", searchString);
+
+  // Check if the provided user ID exists
+  const checkUserQuery = "SELECT * FROM Users WHERE userID = ?";
+  db.query(checkUserQuery, [userID], (checkErr, checkResults) => {
+    if (checkErr) {
+      console.error(checkErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (checkResults.length > 0) {
+        // User found, proceed to search RSOs
+        const searchRSOsQuery = `
+            SELECT * FROM RSOs
+            WHERE university = (
+                SELECT university FROM Users WHERE userID = ?
+            ) AND (
+                rsoName LIKE ? OR
+                rsoDescr LIKE ?
+            )
+          `;
+        const searchStr = `%${searchString}%`;
+        db.query(
+          searchRSOsQuery,
+          [userID, searchStr, searchStr],
+          (searchErr, searchResults) => {
+            if (searchErr) {
+              console.error(searchErr);
+              res.status(500).json({ message: "Internal Server Error" });
+              return;
+            } else {
+              res.status(200).json({ rsos: searchResults });
+              return;
+            }
+          }
+        );
+      } else {
+        // User not found
+        res.status(404).json({ message: "User not found" });
+        return;
+      }
+    }
+  });
+});
+
+// Search Superadmins API call
+app.post("/search-superadmins", (req, res) => {
+  const { searchString } = req.body;
+
+  console.log("Searching Superadmins with string: ", searchString);
+
+  // Search superadmins matching the search string
+  const searchSuperadminsQuery = `
+        SELECT S.userID, S.uniDescr, S.uniLat, S.uniLong 
+        FROM Superadmins AS S
+        INNER JOIN Users AS U ON S.userID = U.userID
+        WHERE S.uniDescr LIKE ? OR
+              S.uniLat LIKE ? OR
+              S.uniLong LIKE ? OR
+              U.university LIKE ?
+    `;
+  const searchStr = `%${searchString}%`;
+  db.query(
+    searchSuperadminsQuery,
+    [searchStr, searchStr, searchStr, searchStr],
+    (searchErr, searchResults) => {
+      if (searchErr) {
+        console.error(searchErr);
+        res.status(500).json({ message: "Internal Server Error" });
+        return;
+      } else {
+        res.status(200).json({ superadmins: searchResults });
+        return;
+      }
+    }
+  );
+});
+
+//=======================================
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
