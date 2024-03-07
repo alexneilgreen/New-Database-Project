@@ -995,13 +995,13 @@ app.post("/approve-university-event", (req, res) => {
 });
 
 //////////////////////////////
-///// DISAPPROVE UNI EVENT API
+///////// DELETE UNI EVENT API
 //////////////////////////////
-app.delete("/disapprove-university-event/:eventID", (req, res) => {
+app.delete("/delete-university-event/:eventID", (req, res) => {
   const { adminID, superadminID } = req.body;
   const eventID = req.params.eventID;
 
-  console.log("Admin or superadmin disapproving university event: ", eventID);
+  console.log("Admin or superadmin deleting university event: ", eventID);
 
   // Check if the provided adminID or superadminID exists and is authorized
   const checkUserQuery = `
@@ -1083,7 +1083,7 @@ app.delete("/disapprove-university-event/:eventID", (req, res) => {
                                       } else {
                                         res.status(200).json({
                                           message:
-                                            "University event disapproved and deleted successfully",
+                                            "University event deleted successfully",
                                         });
                                         return;
                                       }

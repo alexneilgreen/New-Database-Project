@@ -22,7 +22,7 @@ create-rso-event            ,   1,   0,   0
 delete-rso-event            ,   1,   0,   0
 propose-university-event    ,   1,   0,   0
 approve-university-event    ,   1,   0,   0
-disapprove-university-event ,   1,   0,   0
+delete-university-event     ,   1,   0,   0
 schedule-event              ,   1,   0,   0
 unschedule-event            ,   1,   0,   0
 autoload-scheduled-events   ,   1,   U,   U
