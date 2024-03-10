@@ -111,6 +111,7 @@ const testDeleteUser = (userID) => {
 const runTests = async () => {
     let testCase = 1;
   try {
+    //1
     await testRegisterUser({
       username: "new_user",
       password: "testpassword",
@@ -119,8 +120,12 @@ const runTests = async () => {
       university: "Test University",
     });
     testCase = testCase+1;
+
+    //2
     await testLogin("new_user", "testpassword");
     testCase = testCase+1;
+
+    //3
     await testRegisterSuperadmin({
       username: "new_superadmin",
       password: "testpassword",
@@ -132,18 +137,28 @@ const runTests = async () => {
       uniLong: 123.456,
     });
     testCase = testCase+1;
+
+    //4
     await testAddUniversity({
       universityName: "Test University",
     });
     testCase = testCase+1;
+
+    //5
     await testDeleteUniversity({
       uniID: testUniversityId,
     });
     testCase = testCase+1;
+
+    //6
     await testDeleteUser({userID: testUserId});
     testCase = testCase+1;
+    //7
     await testDeleteUser({userID: testSuperadminUserId});
+
+    console.log('\x1b[32m%s\x1b[0m', 'ALL TESTS PASSED');
   } catch (error) {
+    console.log('\x1b[31m%s\x1b[0m', 'TEST CASE FAILED');
     console.error("Test case failed at test: ", testCase);
   }
 };
