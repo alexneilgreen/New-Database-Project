@@ -105,11 +105,11 @@ CREATE TABLE Scheduled_Events (
 
 -- Event_Reviews table
 CREATE TABLE Event_Reviews (
-    reviewID INT AUTO_INCREMENT PRIMARY KEY,
     userID INT NOT NULL,
     eventID INT NOT NULL,
     comment VARCHAR(200),
     reviewRating INT CHECK (reviewRating >= 1 AND reviewRating <= 5),
+    PRIMARY KEY (userID, eventID),
     FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE,
     FOREIGN KEY (eventID) REFERENCES Events(eventID) ON DELETE CASCADE
 );

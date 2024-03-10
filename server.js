@@ -317,8 +317,8 @@ app.post("/add-university", (req, res) => {
 //////////////////////////////
 //////////// User Deletion API
 //////////////////////////////
-app.delete("/delete-user/:userID", (req, res) => {
-  const userID = req.params.userID;
+app.post("/delete-user", (req, res) => {
+  const userID = req.body.userID; // Assuming userID is sent in the request body
 
   console.log("Deleting user with userID: ", userID);
 
@@ -344,7 +344,7 @@ app.delete("/delete-user/:userID", (req, res) => {
         } else {
           // User successfully deleted
           res.status(200).json({ message: "User deleted successfully", userID: userID });
-            return;
+          return;
         }
       });
     }
@@ -383,29 +383,43 @@ app.post("/create-rso", (req, res) => {
 //////////////////////////////
 ///////////////// RSO EDIT API
 //////////////////////////////
-app.post("/edit-rso", (req, res) => {
-  const { rsoID, rsoCode, adminCode, rsoName, rsoDescr } = req.body;
+app.put("/edit-rso", (req, res) => {
+  const { adminID, rsoID, rsoName, rsoDescr } = req.body;
 
-  console.log("Editing RSO: ", rsoName);
+  console.log("User editing RSO with ID: ", rsoID);
 
-  // Update the details of the RSO in the RSOs table
-  const updateQuery =
-    "UPDATE RSOs SET rsoCode = ?, adminCode = ?, rsoName = ?, rsoDescr = ? WHERE rsoID = ?";
-  db.query(
-    updateQuery,
-    [rsoCode, adminCode, rsoName, rsoDescr, rsoID],
-    (updateErr, updateResults) => {
-      if (updateErr) {
-        console.error(updateErr);
-        res.status(500).json({ message: "Internal Server Error" });
+  // Check if the user "owns" the RSO
+  const checkOwnershipQuery = "SELECT * FROM RSOs WHERE rsoID = ? AND adminID = ?";
+  db.query(checkOwnershipQuery, [rsoID, adminID], (checkOwnershipErr, checkOwnershipResults) => {
+    if (checkOwnershipErr) {
+      console.error(checkOwnershipErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (checkOwnershipResults.length === 0) {
+        res.status(403).json({ message: "You are not authorized to edit this RSO" });
         return;
       } else {
-        // RSO details successfully updated
-        res.status(200).json({ message: "RSO details updated successfully" });
-        return;
+        // User owns the RSO, proceed to update the RSO
+        const updateRSOQuery = "UPDATE RSOs SET rsoName = ?, rsoDescr = ? WHERE rsoID = ?";
+        db.query(
+          updateRSOQuery,
+          [rsoName, rsoDescr, rsoID],
+          (updateRSOErr, updateRSOResults) => {
+            if (updateRSOErr) {
+              console.error(updateRSOErr);
+              res.status(500).json({ message: "Internal Server Error" });
+              return;
+            } else {
+              // RSO successfully updated
+              res.status(200).json({ message: "RSO updated successfully" });
+              return;
+            }
+          }
+        );
       }
     }
-  );
+  });
 });
 
 //////////////////////////////
@@ -485,8 +499,8 @@ app.post("/add-rso-admin", (req, res) => {
 //////////////////////////////
 ///////// REMOVE RSO ADMIN API
 //////////////////////////////
-app.delete("/remove-rso-admin/:adminID", (req, res) => {
-  const adminID = req.params.adminID;
+app.post("/remove-rso-admin", (req, res) => {
+  const adminID = req.body.adminID; // Assuming adminID is sent in the request body
 
   console.log("Removing user from RSO admins: ", adminID);
 
@@ -803,36 +817,65 @@ app.post("/create-rso-event", (req, res) => {
 //////////////////////////////
 /////////////// EDIT EVENT API
 //////////////////////////////
-app.post("/edit-event", (req, res) => {
-  const { eventId, eventName, eventDescr, eventTime, eventLat, eventLong, eventAddress, eventPhone, eventEmail } = req.body;
+app.put("/edit-event", (req, res) => {
+  const { eventId, adminId, eventName, eventDescr, eventTime, eventLat, eventLong, eventAddress, eventPhone, eventEmail } = req.body;
 
-  console.log("Editing event with ID: ", eventId);
+  console.log("Admin editing event with ID: ", eventId);
 
-  // Update the details of the event in the Events table
-  const updateQuery =
-    "UPDATE Events SET eventName = ?, eventDescr = ?, eventTime = ?, eventLat = ?, eventLong = ?, eventAddress = ?, eventPhone = ?, eventEmail = ? WHERE eventID = ?";
-  db.query(
-    updateQuery,
-    [eventName, eventDescr, eventTime, eventLat, eventLong, eventAddress, eventPhone, eventEmail, eventId],
-    (updateErr, updateResults) => {
-      if (updateErr) {
-        console.error(updateErr);
-        res.status(500).json({ message: "Internal Server Error" });
+  // Check if the provided admin ID matches the admin associated with the event
+  const checkAdminQuery = "SELECT rsoID FROM RSO_Events WHERE eventID = ?";
+  db.query(checkAdminQuery, [eventId], (checkAdminErr, checkAdminResults) => {
+    if (checkAdminErr) {
+      console.error(checkAdminErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (checkAdminResults.length === 0) {
+        res.status(404).json({ message: "Event not found" });
         return;
       } else {
-        // Event details successfully updated
-        res.status(200).json({ message: "Event details updated successfully" });
-        return;
+        const rsoID = checkAdminResults[0].rsoID;
+
+        // Check if the provided admin is a board member of the associated RSO
+        const checkAdminBoardQuery = "SELECT * FROM RSO_Board WHERE rsoID = ? AND adminID = ?";
+        db.query(checkAdminBoardQuery, [rsoID, adminId], (checkAdminBoardErr, checkAdminBoardResults) => {
+          if (checkAdminBoardErr) {
+            console.error(checkAdminBoardErr);
+            res.status(500).json({ message: "Internal Server Error" });
+            return;
+          } else {
+            if (checkAdminBoardResults.length === 0) {
+              res.status(403).json({ message: "You are not authorized to edit this event" });
+              return;
+            } else {
+              // Update the event details
+              const updateEventQuery =
+                "UPDATE Events SET eventName = ?, eventDescr = ?, eventTime = ?, eventLat = ?, eventLong = ?, eventAddress = ?, eventPhone = ?, eventEmail = ? WHERE eventID = ?";
+              db.query(updateEventQuery, [eventName, eventDescr, eventTime, eventLat, eventLong, eventAddress, eventPhone, eventEmail, eventId], (updateEventErr, updateEventResults) => {
+                if (updateEventErr) {
+                  console.error(updateEventErr);
+                  res.status(500).json({ message: "Internal Server Error" });
+                  return;
+                } else {
+                  // Event successfully updated
+                  res.status(200).json({ message: "Event updated successfully" });
+                  return;
+                }
+              });
+            }
+          }
+        });
       }
     }
-  );
+  });
 });
+
 
 //////////////////////////////
 ///////// DELETE RSO EVENT API
 //////////////////////////////
-app.delete("/delete-rso-event/:eventID/:adminID", (req, res) => {
-  const { eventID, adminID } = req.params;
+app.post("/delete-rso-event", (req, res) => {
+  const { eventID, adminID } = req.body;
 
   console.log("RSO board member deleting RSO event: ", eventID, adminID);
 
@@ -1053,9 +1096,11 @@ app.post("/approve-university-event", (req, res) => {
 //////////////////////////////
 ///////// DELETE UNI EVENT API
 //////////////////////////////
-app.delete("/delete-university-event/:eventID", (req, res) => {
-  const { adminID, superadminID } = req.body;
-  const eventID = req.params.eventID;
+//////////////////////////////
+//// Delete University Event API
+//////////////////////////////
+app.post("/delete-university-event", (req, res) => {
+  const { eventID, adminID, superadminID } = req.body;
 
   console.log("Admin or superadmin deleting university event: ", eventID);
 
@@ -1233,6 +1278,7 @@ app.delete("/delete-university-event/:eventID", (req, res) => {
   );
 });
 
+
 //////////////////////////////
 /////////// SCHEDULE EVENT API
 //////////////////////////////
@@ -1320,8 +1366,128 @@ app.post("/unschedule-event", (req, res) => {
 });
 
 //////////////////////////////
-///////////// EVENT REVIEW API
+///////////// WRITE REVIEW API
 //////////////////////////////
+app.post("/review-event", (req, res) => {
+  const { userID, eventID, comment, reviewRating } = req.body;
+
+  console.log("User writing review for event with ID: ", eventID);
+
+  // Check if the event exists
+  const checkEventQuery = "SELECT * FROM Events WHERE eventID = ?";
+  db.query(checkEventQuery, [eventID], (checkEventErr, checkEventResults) => {
+    if (checkEventErr) {
+      console.error(checkEventErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (checkEventResults.length === 0) {
+        res.status(404).json({ message: "Event not found" });
+        return;
+      } else {
+        // Event found, proceed to write the review
+        const insertReviewQuery =
+          "INSERT INTO Event_Reviews (userID, eventID, comment, reviewRating) VALUES (?, ?, ?, ?)";
+        db.query(
+          insertReviewQuery,
+          [userID, eventID, comment, reviewRating],
+          (insertReviewErr, insertReviewResults) => {
+            if (insertReviewErr) {
+              console.error(insertReviewErr);
+              res.status(500).json({ message: "Internal Server Error" });
+              return;
+            } else {
+              // Review successfully written
+              res.status(201).json({ message: "Review written successfully" });
+              return;
+            }
+          }
+        );
+      }
+    }
+  });
+});
+
+//////////////////////////////
+////////////// EDIT REVIEW API
+//////////////////////////////
+app.put("/edit-review", (req, res) => {
+  const { userID, eventID, comment, reviewRating } = req.body;
+
+  console.log("User editing review for event with ID: ", eventID);
+
+  // Check if the user "owns" the review
+  const checkOwnershipQuery = "SELECT * FROM Event_Reviews WHERE userID = ? AND eventID = ?";
+  db.query(checkOwnershipQuery, [userID, eventID], (checkOwnershipErr, checkOwnershipResults) => {
+    if (checkOwnershipErr) {
+      console.error(checkOwnershipErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (checkOwnershipResults.length === 0) {
+        res.status(403).json({ message: "You are not authorized to edit this review" });
+        return;
+      } else {
+        // User owns the review, proceed to update the review
+        const updateReviewQuery =
+          "UPDATE Event_Reviews SET comment = ?, reviewRating = ? WHERE userID = ? AND eventID = ?";
+        db.query(
+          updateReviewQuery,
+          [comment, reviewRating, userID, eventID],
+          (updateReviewErr, updateReviewResults) => {
+            if (updateReviewErr) {
+              console.error(updateReviewErr);
+              res.status(500).json({ message: "Internal Server Error" });
+              return;
+            } else {
+              // Review successfully updated
+              res.status(200).json({ message: "Review updated successfully" });
+              return;
+            }
+          }
+        );
+      }
+    }
+  });
+});
+
+//////////////////////////////
+//////////// DELETE REVIEW API
+//////////////////////////////
+app.post("/delete-review", (req, res) => {
+  const { userID, eventID } = req.body;
+
+  console.log("User deleting review for event with ID: ", eventID);
+
+  // Check if the user "owns" the review
+  const checkOwnershipQuery = "SELECT * FROM Event_Reviews WHERE userID = ? AND eventID = ?";
+  db.query(checkOwnershipQuery, [userID, eventID], (checkOwnershipErr, checkOwnershipResults) => {
+    if (checkOwnershipErr) {
+      console.error(checkOwnershipErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (checkOwnershipResults.length === 0) {
+        res.status(403).json({ message: "You are not authorized to delete this review" });
+        return;
+      } else {
+        // User owns the review, proceed to delete the review
+        const deleteReviewQuery = "DELETE FROM Event_Reviews WHERE userID = ? AND eventID = ?";
+        db.query(deleteReviewQuery, [userID, eventID], (deleteReviewErr, deleteReviewResults) => {
+          if (deleteReviewErr) {
+            console.error(deleteReviewErr);
+            res.status(500).json({ message: "Internal Server Error" });
+            return;
+          } else {
+            // Review successfully deleted
+            res.status(200).json({ message: "Review deleted successfully" });
+            return;
+          }
+        });
+      }
+    }
+  });
+});
 
 //////////////////////////////
 //AUTOLOAD SCHEDULED EVENT API
@@ -1365,6 +1531,8 @@ app.post("/autoload-scheduled-events", (req, res) => {
     }
   });
 });
+
+// TODO: Create other autoload api calls
 
 // Search events API call
 app.post("/search-events", (req, res) => {
