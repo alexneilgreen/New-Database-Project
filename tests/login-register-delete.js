@@ -12,6 +12,7 @@ const handleError = (error) => {
 
 let testUserId;
 let testSuperadminUserId;
+let testUniversityId;
 
 const testLogin = (username, password) => {
   return new Promise(async (resolve, reject) => {
@@ -67,6 +68,24 @@ const testAddUniversity = (universityData) => {
       const response = await axios.post("http://localhost:3001/add-university", universityData);
       console.log("Add University API Response:", response.data);
 
+      console.log("university ID:", response.data.uniID);
+
+      testUniversityId = response.data.uniID;
+
+      resolve();
+    } catch (error) {
+      handleError(error);
+      reject();
+    }
+  });
+};
+
+const testDeleteUniversity = (universityData) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios.put("http://localhost:3001/delete-university", universityData);
+      console.log("Add University API Response:", response.data);
+
       resolve();
     } catch (error) {
       handleError(error);
@@ -78,7 +97,7 @@ const testAddUniversity = (universityData) => {
 const testDeleteUser = (userID) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await axios.delete("http://localhost:3001/delete-user", userID);
+      const response = await axios.put("http://localhost:3001/delete-user", userID);
       console.log("Delete User API Response:", response.data);
 
       resolve();
@@ -117,9 +136,13 @@ const runTests = async () => {
       universityName: "Test University",
     });
     testCase = testCase+1;
-    await testDeleteUser({UserID: testUserId});
+    await testDeleteUniversity({
+      uniID: testUniversityId,
+    });
     testCase = testCase+1;
-    await testDeleteUser({UserID: testSuperadminUserId});
+    await testDeleteUser({userID: testUserId});
+    testCase = testCase+1;
+    await testDeleteUser({userID: testSuperadminUserId});
   } catch (error) {
     console.error("Test case failed at test: ", testCase);
   }
