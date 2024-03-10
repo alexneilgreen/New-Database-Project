@@ -295,7 +295,7 @@ const runTests = async () => {
       adminID: testAdminId_1,
       rsoID: testRSOId,
       rsoName: "NEW_RSO_Name",
-      rsoDescr: "Test RSO description"
+      rsoDescr: "Test RSO description",
     });
     testCase = testCase + 1;
 
@@ -355,10 +355,10 @@ const runTests = async () => {
     //17
     await testDeleteUser({ userID: testUserId_2 });
 
-    console.log('\x1b[32m%s\x1b[0m', 'ALL TESTS PASSED');
-    } catch (error) {
-      console.log('\x1b[31m%s\x1b[0m', 'TEST CASE FAILED');
-      console.error("Test case failed at test: ", testCase);
+    console.log("\x1b[32m%s\x1b[0m", "ALL TESTS PASSED");
+  } catch (error) {
+    console.log("\x1b[31m%s\x1b[0m", "TEST CASE FAILED");
+    console.error("Test case failed at test: ", testCase);
   }
 };
 

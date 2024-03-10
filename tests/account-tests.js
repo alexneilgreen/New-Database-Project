@@ -1,14 +1,14 @@
 const axios = require("axios");
 
 const handleError = (error) => {
-    if (error.response && error.response.data) {
-      console.error("Error:", error.response.data);
-    } else if (error.message) {
-      console.error("Error:", error.message);
-    } else {
-      console.error("An unknown error occurred");
-    }
-  };
+  if (error.response && error.response.data) {
+    console.error("Error:", error.response.data);
+  } else if (error.message) {
+    console.error("Error:", error.message);
+  } else {
+    console.error("An unknown error occurred");
+  }
+};
 
 let testUserId;
 let testSuperadminUserId;
@@ -35,7 +35,10 @@ const testLogin = (username, password) => {
 const testRegisterUser = (userData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await axios.post("http://localhost:3001/register-user", userData);
+      const response = await axios.post(
+        "http://localhost:3001/register-user",
+        userData
+      );
       console.log("Register User API Response:", response.data);
       testUserId = response.data.userID;
 
@@ -50,7 +53,10 @@ const testRegisterUser = (userData) => {
 const testRegisterSuperadmin = (superadminData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await axios.post("http://localhost:3001/register-superadmin", superadminData);
+      const response = await axios.post(
+        "http://localhost:3001/register-superadmin",
+        superadminData
+      );
       console.log("Register Superadmin API Response:", response.data);
       testSuperadminUserId = response.data.userID;
 
@@ -65,7 +71,10 @@ const testRegisterSuperadmin = (superadminData) => {
 const testAddUniversity = (universityData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await axios.post("http://localhost:3001/add-university", universityData);
+      const response = await axios.post(
+        "http://localhost:3001/add-university",
+        universityData
+      );
       console.log("Add University API Response:", response.data);
 
       console.log("university ID:", response.data.uniID);
@@ -83,7 +92,10 @@ const testAddUniversity = (universityData) => {
 const testDeleteUniversity = (universityData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await axios.put("http://localhost:3001/delete-university", universityData);
+      const response = await axios.put(
+        "http://localhost:3001/delete-university",
+        universityData
+      );
       console.log("Add University API Response:", response.data);
 
       resolve();
@@ -97,7 +109,10 @@ const testDeleteUniversity = (universityData) => {
 const testDeleteUser = (userID) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await axios.put("http://localhost:3001/delete-user", userID);
+      const response = await axios.put(
+        "http://localhost:3001/delete-user",
+        userID
+      );
       console.log("Delete User API Response:", response.data);
 
       resolve();
@@ -109,7 +124,7 @@ const testDeleteUser = (userID) => {
 };
 
 const runTests = async () => {
-    let testCase = 1;
+  let testCase = 1;
   try {
     //1
     await testRegisterUser({
@@ -119,11 +134,11 @@ const runTests = async () => {
       email: "new_user@example.com",
       university: "Test University",
     });
-    testCase = testCase+1;
+    testCase = testCase + 1;
 
     //2
     await testLogin("new_user", "testpassword");
-    testCase = testCase+1;
+    testCase = testCase + 1;
 
     //3
     await testRegisterSuperadmin({
@@ -136,29 +151,29 @@ const runTests = async () => {
       uniLat: -78.901,
       uniLong: 123.456,
     });
-    testCase = testCase+1;
+    testCase = testCase + 1;
 
     //4
     await testAddUniversity({
       universityName: "Test University",
     });
-    testCase = testCase+1;
+    testCase = testCase + 1;
 
     //5
     await testDeleteUniversity({
       uniID: testUniversityId,
     });
-    testCase = testCase+1;
+    testCase = testCase + 1;
 
     //6
-    await testDeleteUser({userID: testUserId});
-    testCase = testCase+1;
+    await testDeleteUser({ userID: testUserId });
+    testCase = testCase + 1;
     //7
-    await testDeleteUser({userID: testSuperadminUserId});
+    await testDeleteUser({ userID: testSuperadminUserId });
 
-    console.log('\x1b[32m%s\x1b[0m', 'ALL TESTS PASSED');
+    console.log("\x1b[32m%s\x1b[0m", "ALL TESTS PASSED");
   } catch (error) {
-    console.log('\x1b[31m%s\x1b[0m', 'TEST CASE FAILED');
+    console.log("\x1b[31m%s\x1b[0m", "TEST CASE FAILED");
     console.error("Test case failed at test: ", testCase);
   }
 };
