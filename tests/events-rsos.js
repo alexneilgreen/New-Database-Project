@@ -5,11 +5,13 @@
 // RSO joining
 // RSO leaving
 // RSO following
-// RSO deletion
-// RSO deletion
+// RSO editing
 // RSO admin checking
 // RSO event creation
+// RSO event review
+// RSO event review edit
 // RSO event deletion
+// RSO deletion
 // Univ event proposal
 // Univ event acceptance
 // Univ event deletion

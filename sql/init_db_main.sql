@@ -103,6 +103,17 @@ CREATE TABLE Scheduled_Events (
     PRIMARY KEY (userID, eventID)
 );
 
+-- Event_Reviews table
+CREATE TABLE Event_Reviews (
+    reviewID INT AUTO_INCREMENT PRIMARY KEY,
+    userID INT NOT NULL,
+    eventID INT NOT NULL,
+    comment VARCHAR(200),
+    reviewRating INT CHECK (reviewRating >= 1 AND reviewRating <= 5),
+    FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE,
+    FOREIGN KEY (eventID) REFERENCES Events(eventID) ON DELETE CASCADE
+);
+
 DELIMITER //
 CREATE TRIGGER SetRSOActive AFTER INSERT ON RSO_Members
 FOR EACH ROW

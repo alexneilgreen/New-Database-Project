@@ -381,6 +381,34 @@ app.post("/create-rso", (req, res) => {
 });
 
 //////////////////////////////
+///////////////// RSO EDIT API
+//////////////////////////////
+app.post("/edit-rso", (req, res) => {
+  const { rsoID, rsoCode, adminCode, rsoName, rsoDescr } = req.body;
+
+  console.log("Editing RSO: ", rsoName);
+
+  // Update the details of the RSO in the RSOs table
+  const updateQuery =
+    "UPDATE RSOs SET rsoCode = ?, adminCode = ?, rsoName = ?, rsoDescr = ? WHERE rsoID = ?";
+  db.query(
+    updateQuery,
+    [rsoCode, adminCode, rsoName, rsoDescr, rsoID],
+    (updateErr, updateResults) => {
+      if (updateErr) {
+        console.error(updateErr);
+        res.status(500).json({ message: "Internal Server Error" });
+        return;
+      } else {
+        // RSO details successfully updated
+        res.status(200).json({ message: "RSO details updated successfully" });
+        return;
+      }
+    }
+  );
+});
+
+//////////////////////////////
 ///////////// RSO DELETION API
 //////////////////////////////
 app.post("/delete-rso", (req, res) => {
@@ -767,6 +795,34 @@ app.post("/create-rso-event", (req, res) => {
           });
           return;
         }
+      }
+    }
+  );
+});
+
+//////////////////////////////
+/////////////// EDIT EVENT API
+//////////////////////////////
+app.post("/edit-event", (req, res) => {
+  const { eventId, eventName, eventDescr, eventTime, eventLat, eventLong, eventAddress, eventPhone, eventEmail } = req.body;
+
+  console.log("Editing event with ID: ", eventId);
+
+  // Update the details of the event in the Events table
+  const updateQuery =
+    "UPDATE Events SET eventName = ?, eventDescr = ?, eventTime = ?, eventLat = ?, eventLong = ?, eventAddress = ?, eventPhone = ?, eventEmail = ? WHERE eventID = ?";
+  db.query(
+    updateQuery,
+    [eventName, eventDescr, eventTime, eventLat, eventLong, eventAddress, eventPhone, eventEmail, eventId],
+    (updateErr, updateResults) => {
+      if (updateErr) {
+        console.error(updateErr);
+        res.status(500).json({ message: "Internal Server Error" });
+        return;
+      } else {
+        // Event details successfully updated
+        res.status(200).json({ message: "Event details updated successfully" });
+        return;
       }
     }
   );
@@ -1262,6 +1318,10 @@ app.post("/unschedule-event", (req, res) => {
     }
   });
 });
+
+//////////////////////////////
+///////////// EVENT REVIEW API
+//////////////////////////////
 
 //////////////////////////////
 //AUTOLOAD SCHEDULED EVENT API
