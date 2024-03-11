@@ -3,7 +3,8 @@ const axios = require("axios");
 let testUserId;
 let testAdminId;
 let testSuperadminId;
-let testUniversityId;
+let testProposedEventId;
+let testEventId;
 
 const handleError = (error) => {
   if (error.response && error.response.data) {
@@ -24,6 +25,23 @@ const testRegisterUser = (userData) => {
       );
       console.log("Register User API Response:", response.data);
       testUserId = response.data.userID;
+
+      resolve();
+    } catch (error) {
+      handleError(error);
+      reject();
+    }
+  });
+};
+
+const testDeleteUser = (userID) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios.put(
+        "http://localhost:3001/delete-user",
+        userID
+      );
+      console.log("Delete User API Response:", response.data);
 
       resolve();
     } catch (error) {
@@ -128,7 +146,8 @@ const testCreateRSOEvent = (eventData) => {
         "http://localhost:3001/create-rso-event",
         eventData
       );
-      console.log("Event creation API Response:", response.data);
+      console.log("RSO event creation API Response:", response.data);
+      testEventId = response.data.eventID;
 
       resolve();
     } catch (error) {
@@ -162,7 +181,8 @@ const testProposeEvent = (eventData) => {
         "http://localhost:3001/propose-university-event",
         eventData
       );
-      console.log("Event creation API Response:", response.data);
+      console.log("RSO event creation API Response:", response.data);
+      testProposedEventId = response.data.eventID;
 
       resolve();
     } catch (error) {
@@ -311,9 +331,172 @@ const testDeleteReview = (data) => {
 const runTests = async () => {
   let testCase = 1;
   try {
-    //1
+    // 1
+    await testRegisterUser({
+      username: "new_user",
+      password: "testpassword",
+      phone: "1234567890",
+      email: "new_user@example.com",
+      university: "Test University",
+    });
+    testCase++;
 
-    testCase = testCase + 1;
+    // 2
+    await testRegisterSuperadmin({
+      username: "new_superadmin",
+      password: "testpassword",
+      phone: "1112223333",
+      email: "new_superadmin@example.com",
+      university: "Test University",
+      uniDescr: "Test University Description",
+      uniLat: -78.901,
+      uniLong: 123.456,
+    });
+    testCase++;
+
+    // 3
+    await testCreateRSO({
+      rsoCode: "rso123",
+      adminCode: "admin123",
+      rsoName: "Test RSO",
+      description: "Test RSO Description",
+      university: "Test University",
+    });
+    testCase++;
+
+    // 4
+    await testMakeRSOAdmin({
+      userID: testUserId,
+    });
+    testCase++;
+
+    // 5
+    await testJoinRSO({
+      adminID: testAdminId,
+      rsoID: testRSOId,
+      adminCode: "admin123",
+    });
+    testCase++;
+
+    // 6
+    await testCreateRSOEvent({
+      adminID: testAdminId,
+      rsoID: testRSOId,
+      eventName: "Test RSO event",
+      eventDescr: "Unit testing event",
+      eventTime: "19:00 12-1-24",
+      eventLat: 10,
+      eventLong: 10,
+      eventAddress: "123 Test Street",
+      eventPhone: "0120120123",
+      eventEmail: "RSO_Event@example.com",
+    });
+    testCase++;
+
+    // 7
+    await testProposeEvent({
+      adminID: testAdminId,
+      eventName: "Test event",
+      eventDescr: "Unit testing event",
+      eventTime: "19:00 12-1-24",
+      eventLat: 10,
+      eventLong: 10,
+      eventAddress: "123 Test Street",
+      eventPhone: "0120120123",
+      eventEmail: "RSO_Event@example.com",
+      university: "Test University",
+      isPrivate: 1,
+    });
+    testCase++;
+
+    // 8
+    await testApproveEvent({
+      superID: testSuperadminId,
+      eventID: testProposedEventId,
+    });
+    testCase++;
+
+    // 9
+    await testEditEvent({
+      eventID: testEventId,
+      adminID: testAdminId,
+      eventName: "New test event name",
+      eventDescr: "Unit testing event",
+      eventTime: "19:00 12-1-24",
+      eventLat: 10,
+      eventLong: 10,
+      eventAddress: "123 Test Street",
+      eventPhone: "0120120123",
+      eventEmail: "RSO_Event@example.com",
+      university: "Test University",
+    });
+    testCase++;
+
+    // 10
+    await testDeleteUniEvent({
+      eventID: testProposedEventId,
+      adminID: testAdminId,
+      superID: null,
+    });
+    testCase++;
+
+    // 11
+    await testScheduleEvent({
+      userID: testUserId,
+      eventID: testEventId,
+    });
+    testCase++;
+
+    // 12
+    await testUnscheduleEvent({
+      userID: testUserId,
+      eventID: testEventId,
+    });
+    testCase++;
+
+    // 13
+    await testReviewEvent({
+      userID: testUserId,
+      eventID: testEventId,
+      comment: "Test comment",
+      reviewRating: 1,
+    });
+    testCase++;
+
+    // 14
+    await testEditReview({
+      userID: testUserId,
+      eventID: testEventId,
+      comment: "New test comment",
+      reviewRating: 5,
+    });
+    testCase++;
+
+    // 15
+    await testDeleteReview({
+      userID: testUserId,
+      eventID: testEventId,
+    });
+    testCase++;
+
+    // 16
+    await testDeleteRSOEvent({
+      adminID: testAdminId,
+      eventID: testEventId,
+    });
+    testCase++;
+
+    // 17
+    await testDeleteRSO({
+      adminID: testAdminId,
+      rsoID: testRSOId,
+    });
+    testCase++;
+
+    // 18
+    await testDeleteUser({
+      userID: testUserId,
+    });
 
     console.log("\x1b[32m%s\x1b[0m", "ALL TESTS PASSED");
   } catch (error) {
