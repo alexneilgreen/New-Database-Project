@@ -2,7 +2,7 @@ import React from "react";
 
 import FormBox from "../components/LoginRegisterComp/FormBox.js";
 
-const LoginPage = () => {
+const LoginRegisterPage = () => {
 	return (
 		<div className="log-hero">
 			<FormBox />
@@ -10,4 +10,4 @@ const LoginPage = () => {
 	);
 };
 
-export default LoginPage;
+export default LoginRegisterPage;

@@ -7,8 +7,7 @@
 .log-hero {
 	height: 100vh; /* Set height to 100% of the viewport height */
 	width: 100%;
-	background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4)),
-		url(../images/UCF_1.jpg);
+	background-image: linear-gradient(to top, #8360c3, #2ebf91);
 	background-position: center;
 	background-size: cover;
 	display: flex; /* Use flexbox */

@@ -3,7 +3,7 @@ import "./App.css";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import LoginPage from "./pages/LoginPage";
+import LoginRegisterPage from "./pages/LoginRegisterPage";
 // import MainPage from "./pages/MainPage";
 // import CreateEventPage from "./pages/CreateEventPage";
 // import EditEventPage from "./pages/EditEventPage";
@@ -23,7 +23,7 @@ function App() {
 	return (
 		<BrowserRouter>
 			<Routes>
-				<Route path="/" index element={<LoginPage />} />
+				<Route path="/" index element={<LoginRegisterPage />} />
 			</Routes>
 		</BrowserRouter>
 	);
