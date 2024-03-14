@@ -99,15 +99,20 @@
 	background: transparent;
 }
 
+.checkbox-row {
+	display: flex;
+	align-items: center;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
 .log-check-box {
-	margin: 30px 10px 30px 0;
+	margin-right: 10px;
 }
 
 span {
 	color: #777;
 	font-size: 12px;
-	margin: 30px 0 30px 0;
-	position: absolute;
 }
 
 .log-submit-btn {
@@ -118,6 +123,7 @@ span {
 	cursor: pointer;
 	display: block;
 	margin: auto;
+	margin-top: 20px;
 	background: lightgray;
 	outline: none;
 	border-radius: 30px;

@@ -113,7 +113,7 @@ const loginForm = () => {
 	const y = document.getElementById("register");
 	const z = document.getElementById("log-btn");
 
-	form.style.height = "350px";
+	form.style.height = "400px"; // Adjusted height to accommodate the second checkbox
 	x.style.left = "50px";
 	y.style.left = "450px";
 	z.style.left = "0px";
@@ -147,8 +147,14 @@ function RegisterForm() {
 				placeholder="Enter Email"
 				required
 			/>
-			<input type="checkbox" className="log-check-box" />
-			<span>Are you an RSO Owner?</span>
+			<div className="checkbox-row">
+				<input type="checkbox" className="log-check-box" />
+				<span>Are you an RSO Owner?</span>
+			</div>
+			<div className="checkbox-row">
+				<input type="checkbox" className="log-check-box" />
+				<span>Are you a University Admin?</span>
+			</div>
 			<button type="submit" className="log-submit-btn">
 				Register
 			</button>
