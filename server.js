@@ -85,55 +85,64 @@ app.post("/login", (req, res) => {
       let superAdminID = -1;
 
       const rsoAdminQuery = "SELECT adminID FROM RSO_Admins WHERE userID = ?";
-      db.query(rsoAdminQuery, [userID], (rsoErr, rsoAdminResults) => {
-        if (rsoErr) {
-          console.error(rsoErr);
-          res.status(500).send("Internal Server Error");
-          return;
-        } else if (rsoAdminResults.length > 0) {
-          isAdmin = true;
-          rsoAdminID = rsoAdminResults[0].adminID;
-        } else {
-          isAdmin = false;
-        }
+      const rsoAdminPromise = new Promise((resolve, reject) => {
+        db.query(rsoAdminQuery, [userID], (rsoErr, rsoAdminResults) => {
+          if (rsoErr) {
+            reject(rsoErr);
+          } else {
+            if (rsoAdminResults.length > 0) {
+              console.log(rsoAdminResults);
+              isAdmin = true;
+              rsoAdminID = rsoAdminResults[0].adminID;
+              console.log("RSO admin found: ", rsoAdminID);
+            }
+            resolve();
+          }
+        });
       });
 
       const superAdminQuery =
         "SELECT superID FROM Superadmins WHERE userID = ?";
-      db.query(superAdminQuery, [userID], (superErr, superAdminResults) => {
-        if (superErr) {
-          console.error(superErr);
-          res.status(500).send("Internal Server Error");
-          return;
-        } else if (superAdminResults.length > 0) {
-          isSuperadmin = true;
-          superID = superAdminResults[0].superID;
-        } else {
-          isSuperadmin = false;
-        }
+      const superAdminPromise = new Promise((resolve, reject) => {
+        db.query(superAdminQuery, [userID], (superErr, superAdminResults) => {
+          if (superErr) {
+            reject(superErr);
+          } else {
+            if (superAdminResults.length > 0) {
+              console.log(superAdminResults);
+              isSuperadmin = true;
+              superAdminID = superAdminResults[0].superID;
+              console.log("Superadmin found: ", superAdminID);
+            }
+            resolve();
+          }
+        });
       });
 
-      if (isAdmin && isSuperadmin) {
-        res.status(200).json({
-          userInfo: userInfo,
-          adminID: rsoAdminID,
-          superID: superAdminID,
+      Promise.all([rsoAdminPromise, superAdminPromise])
+        .then(() => {
+          console.log(
+            "Is admin: " + isAdmin + " Is superadmin: " + isSuperadmin
+          );
+
+          if (isAdmin && isSuperadmin) {
+            res.status(203).json({
+              userInfo: userInfo,
+              adminID: rsoAdminID,
+              superID: superAdminID,
+            });
+          } else if (!isAdmin && isSuperadmin) {
+            res.status(202).json({ userInfo: userInfo, superID: superAdminID });
+          } else if (isAdmin && !isSuperadmin) {
+            res.status(201).json({ userInfo: userInfo, adminID: rsoAdminID });
+          } else {
+            res.status(200).json({ userInfo: userInfo });
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          res.status(500).send("Internal Server Error");
         });
-        return;
-      } else if (!isAdmin && isSuperadmin) {
-        res.status(200).json({ userInfo: userInfo, superID: superAdminID });
-        return;
-      } else if (isAdmin && !isSuperadmin) {
-        res.status(200).json({ userInfo: userInfo, adminID: rsoAdminID });
-        return;
-      } else {
-        res.status(200).json({ userInfo: userInfo });
-        return;
-      }
-    } else {
-      res.status(404).json({
-        message: "User not found or invalid credentials [FALLTHROUGH]",
-      });
       return;
     }
   });
@@ -1273,22 +1282,18 @@ app.put("/delete-university-event", (req, res) => {
                           .json({ message: "Internal Server Error" });
                         return;
                       } else {
-                        res
-                          .status(200)
-                          .json({
-                            message: "University event deleted successfully",
-                          });
+                        res.status(200).json({
+                          message: "University event deleted successfully",
+                        });
                         return;
                       }
                     }
                   );
                 } else {
-                  res
-                    .status(403)
-                    .json({
-                      message:
-                        "Superadmin is not permitted to delete the university event",
-                    });
+                  res.status(403).json({
+                    message:
+                      "Superadmin is not permitted to delete the university event",
+                  });
                   return;
                 }
               } else {
@@ -1333,11 +1338,9 @@ app.put("/delete-university-event", (req, res) => {
             }
           });
         } else {
-          res
-            .status(403)
-            .json({
-              message: "Admin is not the proposer of the university event",
-            });
+          res.status(403).json({
+            message: "Admin is not the proposer of the university event",
+          });
           return;
         }
       }
@@ -1715,7 +1718,6 @@ app.post("/search-rsos", (req, res) => {
     }
   );
 });
-
 
 // Search Superadmins API call
 app.post("/search-superadmins", (req, res) => {

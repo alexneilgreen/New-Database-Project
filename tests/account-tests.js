@@ -14,7 +14,7 @@ let testUserId;
 let testSuperadminUserId;
 let testUniversityId;
 
-const testLogin = (username, password) => {
+const testLoginBase = (username, password) => {
   return new Promise(async (resolve, reject) => {
     try {
       const response = await axios.post("http://localhost:3001/login", {
@@ -23,6 +23,24 @@ const testLogin = (username, password) => {
       });
       console.log("Login API Response:", response.data);
       testUserId = response.data.userInfo.userID;
+
+      resolve();
+    } catch (error) {
+      handleError(error);
+      reject();
+    }
+  });
+};
+
+const testLoginAdmin = (username, password) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios.post("http://localhost:3001/login", {
+        username,
+        password,
+      });
+      console.log("Superadmin login API Response:", response.data);
+      console.log("Superadmin login status:", response.status);
 
       resolve();
     } catch (error) {
@@ -137,7 +155,7 @@ const runTests = async () => {
     testCase = testCase + 1;
 
     //2
-    await testLogin("new_user", "testpassword");
+    await testLoginBase("new_user", "testpassword");
     testCase = testCase + 1;
 
     //3
@@ -154,21 +172,26 @@ const runTests = async () => {
     testCase = testCase + 1;
 
     //4
+    await testLoginAdmin("new_superadmin", "testpassword");
+    testCase = testCase + 1;
+
+    //5
     await testAddUniversity({
       universityName: "Test University",
     });
     testCase = testCase + 1;
 
-    //5
+    //6
     await testDeleteUniversity({
       uniID: testUniversityId,
     });
     testCase = testCase + 1;
 
-    //6
+    //7
     await testDeleteUser({ userID: testUserId });
     testCase = testCase + 1;
-    //7
+
+    //8
     await testDeleteUser({ userID: testSuperadminUserId });
 
     console.log("\x1b[32m%s\x1b[0m", "ALL TESTS PASSED");

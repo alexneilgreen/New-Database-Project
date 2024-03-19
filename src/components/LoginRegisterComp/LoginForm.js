@@ -77,32 +77,85 @@
 
 // export default LoginForm;
 
-// import React from "react";
 import React, { useState } from "react";
+import axios from 'axios';
+
+async function loginUser(username, password) {
+  try {
+    const response = await axios.post("/login", {
+      username: username,
+      password: password,
+    });
+
+    if (response.status === 200) {
+      const userData = response.data;
+      console.log("User data:", userData);
+
+      // Check if the user is an admin or superadmin
+      let isAdmin = false;
+      let isSuperadmin = false;
+      let adminID = -1;
+      let superID = -1;
+
+      if (userData.adminID) {
+        isAdmin = true;
+        adminID = userData.adminID;
+      }
+
+      if (userData.superID) {
+        isSuperadmin = true;
+        superID = userData.superID;
+      }
+
+      // Save user data and admin/superadmin IDs if needed
+      const userInfo = {
+        userID: userData.userInfo.userID,
+        username: userData.userInfo.username,
+        phone: userData.userInfo.phone,
+        email: userData.userInfo.email,
+        university: userData.userInfo.university,
+        isAdmin: isAdmin,
+        isSuperadmin: isSuperadmin,
+        adminID: adminID,
+        superID: superID,
+      };
+
+      // Now you can use userInfo in your application
+      console.log("User info:", userInfo);
+      return userInfo;
+    } else {
+      console.error("Error:", response.data.message);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    return null;
+  }
+}
 
 function LoginForm() {
-	return (
-		<form id="login" className="log-input-group">
-			<input
-				type="text"
-				className="log-input-field"
-				placeholder="Enter Username"
-				required
-			/>
-			<input
-				type="password"
-				className="log-input-field"
-				placeholder="Enter Password"
-				required
-			/>
-			{/* <input type="checkbox" className="log-check-box" />
+  return (
+    <form id="login" className="log-input-group">
+      <input
+        type="text"
+        className="log-input-field"
+        placeholder="Enter Username"
+        required
+      />
+      <input
+        type="password"
+        className="log-input-field"
+        placeholder="Enter Password"
+        required
+      />
+      {/* <input type="checkbox" className="log-check-box" />
 			<span>Remember Password</span> */}
-			<br />
-			<button type="submit" className="log-submit-btn">
-				Log In
-			</button>
-		</form>
-	);
+      <br />
+      <button type="submit" className="log-submit-btn">
+        Log In
+      </button>
+    </form>
+  );
 }
 
 export default LoginForm;
