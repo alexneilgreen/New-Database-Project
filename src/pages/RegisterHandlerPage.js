@@ -1,11 +1,11 @@
 import React from "react";
 
-import FormBox from "../components/LoginRegisterComp/FormBox.js";
+import RegisterHandlerPage from "../components/LoginRegisterComp/RegisterHandlerPage.js";
 
 const LoginRegisterPage = () => {
 	return (
 		<div className="log-hero">
-			<FormBox />
+			<RegisterHandlerPage />
 		</div>
 	);
 };

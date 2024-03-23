@@ -1,29 +1,28 @@
 import React from "react";
-import "./App.css";
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-import LoginRegisterPage from "./pages/LoginRegisterPage";
-// import MainPage from "./pages/MainPage";
-// import CreateEventPage from "./pages/CreateEventPage";
-// import EditEventPage from "./pages/EditEventPage";
-// import CreateRSOPage from "./pages/CreateRSOPage";
-// import EditRSOPage from "./pages/EditRSOPage";
-// import JoinRSOPage from "./pages/JoinRSOPage";
-/*
-				<Route path="/main" index element={<MainPage />} />
-				<Route path="/createEvent" index element={<CreateEventPage />} />
-				<Route path="/editEvent" index element={<EditEventPage />} />
-				<Route path="/createRSO" index element={<CreateRSOPage />} />
-				<Route path="/editRSO" index element={<EditRSOPage />} />
-				<Route path="/joinRSO" index element={<JoinRSOPage />} />
-*/
+import LoginPage from "./pages/LoginPage";
+import RegisterHandlerPage from "./pages/RegisterHandlerPage";
+import NewUserRegisterPage from "./pages/NewUserRegisterPage"; // Import NewUserRegisterPage
+import NewRSOUserRegisterPage from "./pages/NewRSOUserRegisterPage"; // Import NewRSOUserRegisterPage
+import ExistingRSOUserRegisterPage from "./pages/ExistingRSOUserRegisterPage"; // Import ExistingRSOUserRegisterPage
+import UniversityUserRegisterPage from "./pages/UniversityUserRegisterPage"; // Import UniversityUserRegisterPage
 
 function App() {
 	return (
 		<BrowserRouter>
 			<Routes>
-				<Route path="/" index element={<LoginRegisterPage />} />
+				<Route path="/" element={<LoginPage />} />
+				<Route path="/RegHandler" element={<RegisterHandlerPage />} />
+				<Route path="/new-user" element={<NewUserRegisterPage />} />
+				<Route path="/new-rso-user" element={<NewRSOUserRegisterPage />} />
+				<Route
+					path="/existing-rso-user"
+					element={<ExistingRSOUserRegisterPage />}
+				/>
+				<Route
+					path="/university-user"
+					element={<UniversityUserRegisterPage />}
+				/>
 			</Routes>
 		</BrowserRouter>
 	);
