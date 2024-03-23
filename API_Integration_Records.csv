@@ -1,4 +1,4 @@
-API_NAME,CREATION_STATUS,TESTING,INTEGRATION CREATION_STATUS
+API_NAME,CREATION_STATUS,TESTING,INTEGRATION
 
 # STATUS TYPES:
 # 0 = Not started
@@ -6,27 +6,35 @@ API_NAME,CREATION_STATUS,TESTING,INTEGRATION CREATION_STATUS
 # X = Underway
 # U = Undetermined
 
-login                       ,   1,   1,   0
-register-user               ,   1,   1,   0
-register-superadmin         ,   1,   1,   0
-add-university              ,   1,   1,   0
+login                       ,   1,   1,   X
+register-user               ,   1,   1,   X
+register-superadmin         ,   1,   1,   X
+add-university              ,   1,   1,   X
 delete-user                 ,   1,   1,   0
-add-rso-admin               ,   1,   X,   0
-remove-rso-admin            ,   1,   X,   0
-join-rso-board              ,   1,   X,   0
-check-last-admin            ,   1,   X,   0
-leave-rso-board             ,   1,   X,   0
-follow-rso                  ,   1,   X,   0
-unfollow-rso                ,   1,   X,   0
-create-rso-event            ,   1,   0,   0
-delete-rso-event            ,   1,   0,   0
-propose-university-event    ,   1,   0,   0
-approve-university-event    ,   1,   0,   0
-delete-university-event     ,   1,   0,   0
-schedule-event              ,   1,   0,   0
-unschedule-event            ,   1,   0,   0
-review-event                ,   1,   0,   0
-edit-event-review           ,   1,   0,   0
+
+add-rso-admin               ,   1,   1,   X
+remove-rso-admin            ,   1,   1,   0
+join-rso-board              ,   1,   1,   X
+check-last-admin            ,   1,   1,   0
+leave-rso-board             ,   1,   1,   0
+create-rso                  ,   1,   1,   X
+edit-rso                    ,   1,   1,   0
+delete-rso                  ,   1,   1,   0
+follow-rso                  ,   1,   1,   0
+unfollow-rso                ,   1,   1,   0
+
+create-rso-event            ,   1,   1,   0
+delete-rso-event            ,   1,   1,   0
+propose-university-event    ,   1,   1,   0
+approve-university-event    ,   1,   1,   0
+delete-university-event     ,   1,   1,   0
+edit-event                  ,   1,   1,   0
+schedule-event              ,   1,   1,   0
+unschedule-event            ,   1,   1,   0
+review-event                ,   1,   1,   0
+edit-event-review           ,   1,   1,   0
+delete-event-review         ,   1,   1,   0
+
 autoload-scheduled-events   ,   1,   U,   U
 autoload-all                ,   U,   U,   U
 autoload-public-uni         ,   U,   U,   U
@@ -35,5 +43,4 @@ autoload-rso                ,   U,   U,   U
 search-events               ,   1,   U,   U
 search-rsos                 ,   1,   U,   U
 search-superadmins          ,   1,   U,   U
-edit-rso                    ,   1,   U,   U
-edit-event                  ,   1,   U,   U
+
