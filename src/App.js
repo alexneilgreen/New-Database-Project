@@ -7,6 +7,7 @@ import NewRSOUserRegisterPage from "./pages/NewRSOUserRegisterPage";
 import ExistingRSOUserRegisterPage from "./pages/ExistingRSOUserRegisterPage";
 import UniversityUserRegisterPage from "./pages/UniversityUserRegisterPage";
 import MainPage from "./pages/MainPage";
+import FeedbackPage from "./pages/FeedbackPage";
 import CreateEventPage from "./pages/CreateEventPage";
 import EditEventPage from "./pages/EditEventPage";
 
@@ -27,6 +28,7 @@ function App() {
 					element={<UniversityUserRegisterPage />}
 				/>
 				<Route path="/main" index element={<MainPage />} />
+				<Route path="/feedback" index element={<FeedbackPage />} />
 				<Route path="/createEvent" index element={<CreateEventPage />} />
 				<Route path="/editEvent" index element={<EditEventPage />} />
 			</Routes>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import { Link } from "react-router-dom"; // Import Link for navigation
 import "../../css/MainPageStyles.css";
 
 function Feed() {
@@ -10,7 +10,7 @@ function Feed() {
 		setActiveTab(tabNumber);
 	};
 
-	const handleRSONameClick = (postId) => {
+	const handleHostNameClick = (postId) => {
 		setModalPost(postId); // Store the post-box ID when RSO name is clicked
 		console.log("Modal of " + postId);
 	};
@@ -86,11 +86,14 @@ function Feed() {
 						</div>
 						<div className="post-footer">
 							<p>
-								RSO:{" "}
-								<strong onClick={() => handleRSONameClick("post1")}>
-									RSO Name
+								Host:{" "}
+								<strong onClick={() => handleHostNameClick("post1")}>
+									RSO/UNI Name
 								</strong>
 							</p>
+							<Link to="/feedback">
+								<button>Feedback</button>
+							</Link>
 							<button onClick={editEvent}>Edit</button>
 							<button onClick={populateMap}>Map</button>
 						</div>
@@ -101,17 +104,17 @@ function Feed() {
 				<div className="modal-background">
 					<div className="modal">
 						<div className="modal-content">
-							<h2 className="modal-header">RSO Name</h2>
+							<h2 className="modal-header">RSO/UNI Name</h2>
 							<p className="modal-description">
-								Description of the RSO goes here. Description of the RSO goes
-								here. Description of the RSO goes here. Description of the RSO
-								goes here. Description of the RSO goes here. Description of the
-								RSO goes here. Description of the RSO goes here. Description of
-								the RSO goes here.
+								Description of the host goes here. Description of the host goes
+								here. Description of the host goes here. Description of the host
+								goes here. Description of the host goes here. Description of the
+								host goes here. Description of the host goes here. Description
+								of the host goes here.
 							</p>
 							<div className="modal-buttons">
 								<button className="modal-follow">Follow</button>
-								<button className="modal-join">Join as Admin</button>
+								{/* <button className="modal-join">Join as Admin</button> */}
 							</div>
 						</div>
 					</div>

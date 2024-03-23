@@ -1,0 +1,94 @@
+* {
+	margin: 0;
+	padding: 0;
+	font-family: Helvetica;
+}
+
+.feedback-hero {
+	height: 100vh; /* Set height to 100% of the viewport height */
+	width: 100%;
+	background-image: linear-gradient(to top, #8360c3, #2ebf91);
+	background-position: center;
+	background-size: cover;
+}
+
+.feedback-page {
+	padding: 20px;
+	overflow: hidden; /* Prevent overflow */
+}
+
+.feedback-header {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+.feedback-form {
+	padding: 25px;
+	text-align: center;
+	margin: 0 auto; /* Center horizontally */
+	margin-top: 30px;
+	margin-bottom: 20px;
+	width: 80%;
+	max-width: 600px; /* Limit maximum width */
+	background-color: #fff;
+	border-radius: 10px;
+}
+
+.form-group {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 10px;
+}
+
+.feedback-input {
+	width: calc(90% - 5px);
+	padding: 8px;
+	box-sizing: border-box;
+}
+
+.feedback-rating {
+	width: calc(10% - 5px);
+	padding: 8px;
+	box-sizing: border-box;
+}
+
+.submit-btn {
+	font-weight: 600;
+	width: 100%;
+	padding: 10px;
+	background-color: #a391c3;
+	color: #fff;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: 0.5s;
+}
+
+.submit-btn:hover {
+	background: #aa9ec0;
+	box-shadow: 0 0 8px 4px #dadada;
+}
+
+.feedback-feed {
+	padding: 25px;
+	text-align: center;
+	margin: 0 auto; /* Center horizontally */
+	width: 80%;
+	max-width: 600px; /* Limit maximum width */
+	background-color: #fff;
+	border-radius: 10px;
+	overflow-y: auto; /* Enable vertical scrolling */
+	max-height: 60dvh; /* Set maximum height */
+}
+
+.feedback-feed ul {
+	list-style-type: none;
+	padding: 0;
+}
+
+.feedback-feed li {
+	margin-bottom: 10px;
+	padding: 10px;
+	background-color: #f5f5f5;
+	border-radius: 5px;
+}
