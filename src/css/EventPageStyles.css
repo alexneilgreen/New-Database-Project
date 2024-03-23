@@ -1,0 +1,136 @@
+* {
+	margin: 0;
+	padding: 0;
+	font-family: Helvetica;
+}
+
+.event-hero {
+	height: 100%;
+	width: 100%;
+	background-image: linear-gradient(to top, #8360c3, #2ebf91);
+	background-position: center;
+	background-size: cover;
+	position: absolute;
+}
+
+.event-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+}
+
+.event-logo {
+	height: 8dvh;
+	display: block;
+	margin: 0 auto 20px auto;
+}
+
+.event-form-box {
+	display: flex;
+	flex-direction: column; /* Stack items vertically */
+	align-items: center; /* Center items horizontally */
+	justify-content: center; /* Center items vertically */
+	width: 300px;
+	height: fit-content; /* Adjust height to content */
+	padding: 20px; /* Add padding for spacing */
+	border-radius: 10px; /* Rounded corners */
+	background-color: #f0f0f0; /* Background color */
+}
+
+.event-form-box input,
+.event-form-box textarea {
+	width: calc(100% - 16px); /* Adjusting width to accommodate for padding */
+	margin-bottom: 10px; /* Add margin at the bottom of each input field */
+	padding: 8px; /* Adjust padding */
+	box-sizing: border-box;
+}
+
+.event-form-box textarea {
+	height: 100px;
+	resize: vertical; /* Allow vertical resizing of textarea */
+}
+
+.event-create-btn {
+	font-weight: 600;
+	width: 85%;
+	height: 30px;
+	cursor: pointer;
+	display: block;
+	margin: auto;
+	background: lightgray;
+	outline: none;
+	border-radius: 30px;
+	border-color: #bdbdbd;
+	transition: 0.5s;
+	color: rgb(100, 100, 100);
+}
+
+.event-create-btn:hover {
+	color: rgb(40, 40, 40);
+	background: #bdbdbd;
+	box-shadow: 0 0 8px 4px #dadada;
+}
+
+.event-edit-btn {
+	font-weight: 600;
+	width: 48%;
+	height: 30px;
+	cursor: pointer;
+	margin: auto;
+	background: lightgray;
+	outline: none;
+	border-radius: 30px;
+	border-color: #bdbdbd;
+	transition: 0.5s;
+	color: rgb(100, 100, 100);
+	text-shadow: 0 0 3px darkgray;
+}
+
+.event-edit-btn:hover {
+	color: rgb(40, 40, 40);
+	background: #bdbdbd;
+	box-shadow: 0 0 8px 4px #dadada;
+}
+
+.event-delete-btn {
+	font-weight: 600;
+	width: 48%;
+	height: 30px;
+	cursor: pointer;
+	margin: auto;
+	margin-left: 4%;
+	background: lightcoral;
+	outline: none;
+	border-radius: 30px;
+	border-color: #bdbdbd;
+	transition: 0.5s;
+	color: rgb(100, 100, 100);
+}
+
+.event-delete-btn:hover {
+	color: rgb(40, 40, 40);
+	background: rgb(235, 54, 54);
+	box-shadow: 0 0 8px 4px #dadada;
+}
+
+.event-btn-span {
+	width: 10%;
+}
+
+.event-link-btn {
+	font-weight: 600;
+	margin-bottom: 10px;
+	width: 75%;
+	color: #fff;
+	padding: 10px 30px;
+	border-radius: 10px;
+	background-color: #999;
+	text-decoration: none;
+	transition: 0.5s;
+}
+
+.event-link-btn:hover {
+	background: #bdbdbd;
+	box-shadow: 0 0 8px 4px #dadada;
+}

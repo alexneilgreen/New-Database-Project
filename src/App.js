@@ -2,10 +2,13 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import RegisterHandlerPage from "./pages/RegisterHandlerPage";
-import NewUserRegisterPage from "./pages/NewUserRegisterPage"; // Import NewUserRegisterPage
-import NewRSOUserRegisterPage from "./pages/NewRSOUserRegisterPage"; // Import NewRSOUserRegisterPage
-import ExistingRSOUserRegisterPage from "./pages/ExistingRSOUserRegisterPage"; // Import ExistingRSOUserRegisterPage
-import UniversityUserRegisterPage from "./pages/UniversityUserRegisterPage"; // Import UniversityUserRegisterPage
+import NewUserRegisterPage from "./pages/NewUserRegisterPage";
+import NewRSOUserRegisterPage from "./pages/NewRSOUserRegisterPage";
+import ExistingRSOUserRegisterPage from "./pages/ExistingRSOUserRegisterPage";
+import UniversityUserRegisterPage from "./pages/UniversityUserRegisterPage";
+import MainPage from "./pages/MainPage";
+import CreateEventPage from "./pages/CreateEventPage";
+import EditEventPage from "./pages/EditEventPage";
 
 function App() {
 	return (
@@ -23,6 +26,9 @@ function App() {
 					path="/university-user"
 					element={<UniversityUserRegisterPage />}
 				/>
+				<Route path="/main" index element={<MainPage />} />
+				<Route path="/createEvent" index element={<CreateEventPage />} />
+				<Route path="/editEvent" index element={<EditEventPage />} />
 			</Routes>
 		</BrowserRouter>
 	);

@@ -1,0 +1,372 @@
+body {
+	margin: 0;
+	padding: 0;
+	font-family: Helvetica;
+	display: flex;
+	flex-direction: column; /* Make the layout vertical */
+	height: 100vh;
+}
+
+#mapbtn {
+	top: 0;
+	right: 0;
+	margin-top: 9px;
+	margin-right: 9px;
+	position: absolute;
+	width: 22px;
+	height: 22px;
+	background: white;
+	transition: 0.5s;
+}
+
+.header-banner {
+	background: black;
+	height: 10dvh; /* 10% of the viewport height */
+	display: flex;
+	align-items: center; /* Center items vertically */
+	padding: 0 20px; /* Add padding on the sides */
+}
+
+.header-logo {
+	height: 8vh; /* Adjust height of logo */
+	margin-right: 20px; /* Add some spacing between logo and buttons */
+}
+
+.header-button-container {
+	display: flex;
+	flex-grow: 1; /* Allow buttons to take up remaining space */
+	justify-content: flex-end; /* Align buttons to the right */
+	align-items: center; /* Center items vertically */
+}
+
+.header-button,
+.header-link {
+	background-color: gray;
+	height: 2dvh;
+	font-weight: 500;
+	color: white;
+	padding: 10px 20px;
+	border-radius: 10px;
+	margin-left: 10px;
+	cursor: pointer;
+	transition: 0.5s;
+}
+
+.header-button:hover,
+.header-link:hover {
+	background-color: #2ebf91;
+}
+
+.main-container {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	height: 90dvh; /* 90% of the viewport height */
+}
+
+.feed-section {
+	width: 40%;
+	padding: 5%;
+	background: linear-gradient(to top, #a597c1, #8fb3a6);
+	position: relative;
+}
+
+.map-section {
+	width: 60%;
+	padding: 5%;
+	background-color: white;
+	position: relative;
+}
+
+#map {
+	width: 100%;
+	height: 100%;
+}
+
+.map-content-box {
+	position: relative;
+	border-radius: 15px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	height: 75dvh;
+	overflow-y: auto;
+}
+
+/* Combine with mapbtn later */
+.map-button {
+	position: absolute;
+	max-height: 10dvh;
+	padding: 4px;
+	border-width: 1px;
+	border-color: transparent;
+	border-radius: 3px;
+	cursor: pointer;
+	transition: 0s;
+}
+
+.map-button:hover {
+	border-color: black;
+}
+
+.map-button img {
+	height: 100%;
+}
+
+.feed-content-box {
+	background-color: #fff;
+	border-radius: 15px;
+	box-shadow: 0 2px 4px rgba(175, 26, 26, 0.1);
+	padding: 20px;
+	height: 70dvh;
+	width: 90%;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+}
+
+.search-bar {
+	display: flex;
+	align-items: center; /* Align items vertically */
+	background-color: #2ebf91;
+	padding: 10px;
+	margin-bottom: 10px;
+	border-radius: 0px 0px 5px 5px;
+}
+
+.search-bar-text {
+	width: 80%;
+	padding: 5px;
+	margin-right: 5%;
+	border-radius: 5px;
+}
+
+.search-bar-button {
+	width: 15%;
+	padding: 5px;
+	border-radius: 5px;
+}
+
+.posts-container {
+	max-height: calc(100% - 60px); /* Adjust as needed */
+	overflow-y: auto;
+}
+
+.post-box {
+	margin: 5px 5px 5px 10px;
+	padding: 5px;
+	border-radius: 10px;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+	background-color: white;
+}
+
+.post-header {
+	display: flex;
+	justify-content: space-between; /* Evenly space the elements */
+	background-color: #daf8ff;
+	color: black;
+	border-radius: 10px;
+	padding: 5px 10px 5px 10px;
+	margin-bottom: 10px;
+}
+.post-footer {
+	display: flex;
+	justify-content: space-between; /* Place elements at the ends */
+	align-items: center; /* Center items vertically */
+	background-color: #daf8ff;
+	color: black;
+	border-radius: 10px;
+	padding: 5px 10px 5px 10px;
+	margin-top: 10px;
+}
+
+.post-footer p {
+	margin: 0; /* Remove default margin */
+}
+
+.post-footer button {
+	background-color: #3498db;
+	color: #fff;
+	padding: 5px 10px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.post-description {
+	padding: 5px;
+}
+
+@media screen and (max-width: 800px) {
+	.main-container {
+		flex-direction: column;
+	}
+
+	.feed-section,
+	.map-section {
+		width: 96dvw;
+		height: 45dvh;
+		padding: 2dvh 0dvw 2dvw 4dvw;
+	}
+
+	.feed-content-box {
+		height: 90%;
+	}
+
+	.map-button {
+		margin: 5%;
+	}
+
+	.map-content-box {
+		width: 95%;
+		height: 100%;
+	}
+}
+
+/* Tabs at the top of content-box */
+.tabs {
+	display: flex;
+}
+
+.tab {
+	flex: 1;
+	padding: 10px 20px;
+	cursor: pointer;
+	border: 2px solid #2ebf91;
+	border-bottom: none;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	background-color: transparent; /* Remove default background */
+	text-align: center; /* Center the text within each tab */
+	transition: ease-in 0.1s;
+}
+
+.tab.active {
+	background-color: #2ebf91;
+}
+
+.tab-content {
+	background-color: white;
+	border: 1px solid #ffca00;
+	border-radius: 5px;
+	padding: 20px;
+	margin-top: -1px;
+	flex-grow: 1;
+}
+
+.tab-container {
+	display: flex;
+	width: 100%; /* Make the tab container span the full width */
+	border-bottom: 1px solid transparent; /* Add a bottom border for separation */
+}
+
+/* Modal background */
+.modal-background {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5); /* Light gray translucent background */
+	z-index: 999; /* Ensure it's on top of other elements */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/* Modal */
+.modal {
+	max-width: 80%;
+	background-color: white;
+	border-radius: 10px; /* Rounded corners */
+	padding: 20px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Box shadow for depth */
+	position: relative; /* Required for absolute positioning of the close button */
+}
+
+.modal-content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.modal-header {
+	margin-bottom: 15px;
+}
+
+.modal-description {
+	max-width: 85%;
+}
+
+.modal-buttons {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top: 15px;
+}
+
+.modal-follow {
+	font-weight: 600;
+	width: 20%;
+	height: 30px;
+	cursor: pointer;
+	background: lightgray;
+	outline: none;
+	border-radius: 30px;
+	border-color: #bdbdbd;
+	transition: 0.5s;
+	color: rgb(100, 100, 100);
+	text-shadow: 0 0 3px darkgray;
+}
+
+.modal-follow:hover {
+	color: rgb(40, 40, 40);
+	background: #bdbdbd;
+	box-shadow: 0 0 8px 4px #dadada;
+}
+
+.modal-join {
+	font-weight: 600;
+	width: 20%;
+	height: 30px;
+	cursor: pointer;
+	margin-left: 5%;
+	background: lightgreen;
+	outline: none;
+	border-radius: 30px;
+	border-color: #bdbdbd;
+	transition: 0.5s;
+	color: rgb(100, 100, 100);
+}
+
+.modal-join:hover {
+	color: rgb(40, 40, 40);
+	background: rgb(20, 150, 50);
+	box-shadow: 0 0 8px 4px #dadada;
+}
+
+/*Drop Down Tab*/
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+.dropdown-content {
+	display: block;
+	position: absolute;
+	background-color: #f9f9f9;
+	min-width: 160px;
+	box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+	z-index: 1;
+	top: calc(100%); /* Shift dropdown below the button */
+	left: calc(10px); /* Align with the left edge of the button */
+}
+
+.dropdown-content .dropdown-link {
+	display: block;
+	padding: 10px;
+	text-decoration: none;
+	color: #000;
+}
+
+.dropdown-content .dropdown-link:hover {
+	background-color: #f1f1f1;
+}
