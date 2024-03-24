@@ -47,17 +47,23 @@ function Feed() {
 						className={`tab ${activeTab === 1 && "active"}`}
 						onClick={() => handleTabClick(1)}
 					>
-						Discover
+						Public Events
 					</div>
 					<div
 						className={`tab ${activeTab === 2 && "active"}`}
 						onClick={() => handleTabClick(2)}
 					>
-						Followed Events
+						University Events
 					</div>
 					<div
 						className={`tab ${activeTab === 3 && "active"}`}
 						onClick={() => handleTabClick(3)}
+					>
+						Followed Events
+					</div>
+					<div
+						className={`tab ${activeTab === 4 && "active"}`}
+						onClick={() => handleTabClick(4)}
 					>
 						Followed RSOs
 					</div>

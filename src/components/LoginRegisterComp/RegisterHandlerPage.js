@@ -13,13 +13,13 @@ const RegisterHandlerPage = () => {
 					Normal User
 				</Link>
 				<Link to="/new-rso-user" className="link-btn-alt">
-					New RSO User
+					New RSO Admin
 				</Link>
 				<Link to="/existing-rso-user" className="link-btn-alt">
-					Existing RSO User
+					Existing RSO Admin
 				</Link>
 				<Link to="/university-user" className="link-btn-alt">
-					University User
+					University Account
 				</Link>
 			</div>
 		</div>

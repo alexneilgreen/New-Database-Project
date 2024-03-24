@@ -10,6 +10,7 @@ import MainPage from "./pages/MainPage";
 import FeedbackPage from "./pages/FeedbackPage";
 import CreateEventPage from "./pages/CreateEventPage";
 import EditEventPage from "./pages/EditEventPage";
+import ReviewEventPage from "./pages/ReviewEventPage";
 
 function App() {
 	return (
@@ -31,6 +32,7 @@ function App() {
 				<Route path="/feedback" index element={<FeedbackPage />} />
 				<Route path="/createEvent" index element={<CreateEventPage />} />
 				<Route path="/editEvent" index element={<EditEventPage />} />
+				<Route path="/reviewEvent" index element={<ReviewEventPage />} />
 			</Routes>
 		</BrowserRouter>
 	);

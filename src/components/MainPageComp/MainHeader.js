@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
+import logo from "../../images/Campus Connect Logo.png";
 import "../../css/MainPageStyles.css";
 
 function MainHeader() {
@@ -16,7 +16,7 @@ function MainHeader() {
 
 	return (
 		<div className="header-banner">
-			{/* <img src={logo} className="header-logo" alt="Logo" /> */}
+			<img src={logo} className="header-logo" alt="Logo" />
 			<div className="header-button-container">
 				<div className="dropdown">
 					<div
@@ -34,6 +34,13 @@ function MainHeader() {
 								onClick={toggleDropdown}
 							>
 								Create Event
+							</Link>
+							<Link
+								to="/reviewEvent"
+								className="dropdown-link"
+								onClick={toggleDropdown}
+							>
+								Review Events
 							</Link>
 							{/* <Link
 								to="/createRSO"

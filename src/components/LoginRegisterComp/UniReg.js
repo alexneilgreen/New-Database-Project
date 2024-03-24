@@ -1,37 +1,36 @@
 import React from "react";
 import { Link } from "react-router-dom"; // Import Link for navigation
 import "../../css/LoginRegisterStyles.css";
+import logo from "../../images/Campus Connect Logo.png";
 
 function UniReg() {
 	return (
 		<div className="page-container">
 			<div className="log-form-box" id="log-formBox">
-				<Link to="/" className="link-btn">
-					Return to Login Page
-				</Link>
+				<img src={logo} alt="Logo" className="logo-image" />
 				<form id="register" className="log-input-group">
 					<input
 						type="text"
 						className="log-input-field"
-						placeholder="Enter Username"
+						placeholder="Enter University Username"
 						required
 					/>
 					<input
 						type="password"
 						className="log-input-field"
-						placeholder="Enter Password"
+						placeholder="Enter University Password"
 						required
 					/>
 					<input
 						type="phone"
 						className="log-input-field"
-						placeholder="Enter Phone Number"
+						placeholder="Enter University Phone Number"
 						required
 					/>
 					<input
 						type="email"
 						className="log-input-field"
-						placeholder="Enter Email"
+						placeholder="Enter University Email"
 						required
 					/>
 					<select className="log-input-field" required>
@@ -57,6 +56,9 @@ function UniReg() {
 						Register
 					</button>
 				</form>
+				<Link to="/" className="reg-link-btn">
+					Return to Login Page
+				</Link>
 			</div>
 		</div>
 	);

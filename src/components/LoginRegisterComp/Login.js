@@ -1,14 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom"; // Import Link from React Router
 import "../../css/LoginRegisterStyles.css";
+import logo from "../../images/Campus Connect Logo.png";
 
 const LoginPage = () => {
 	return (
 		<div className="page-container">
 			<div className="log-form-box" id="log-formBox">
-				<Link to="/RegHandler" className="link-btn">
-					Register
-				</Link>
+				<img src={logo} alt="Logo" className="logo-image" />
 				<div className="log-social-icons">{/* Social media icons */}</div>
 				<form id="login" className="log-input-group">
 					<input
@@ -28,6 +27,9 @@ const LoginPage = () => {
 						Log In
 					</button>
 				</form>
+				<Link to="/RegHandler" className="reg-link-btn">
+					Don't have an account? Register
+				</Link>
 			</div>
 		</div>
 	);

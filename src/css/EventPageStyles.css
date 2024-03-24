@@ -74,7 +74,7 @@
 
 .event-edit-btn {
 	font-weight: 600;
-	width: 48%;
+	width: 40%;
 	height: 30px;
 	cursor: pointer;
 	margin: auto;
@@ -95,11 +95,11 @@
 
 .event-delete-btn {
 	font-weight: 600;
-	width: 48%;
+	width: 40%;
 	height: 30px;
 	cursor: pointer;
 	margin: auto;
-	margin-left: 4%;
+	margin-left: 5%;
 	background: lightcoral;
 	outline: none;
 	border-radius: 30px;
@@ -118,19 +118,30 @@
 	width: 10%;
 }
 
+.event-edit-btn-holder {
+	width: 100%;
+	display: flex;
+	justify-content: space-between; /* Space buttons evenly */
+	margin-bottom: 10px; /* Add margin at the bottom of the button holder */
+}
+
 .event-link-btn {
 	font-weight: 600;
-	margin-bottom: 10px;
-	width: 75%;
-	color: #fff;
-	padding: 10px 30px;
-	border-radius: 10px;
-	background-color: #999;
-	text-decoration: none;
-	transition: 0.5s;
+	width: fit-content;
+	margin-top: 20px;
+	color: #007bff; /* Blue color for link */
+	text-decoration: none; /* Remove underline */
+	border: none;
+	background: none;
+	cursor: pointer;
+	transition: color 0.3s; /* Smooth color transition */
 }
 
 .event-link-btn:hover {
-	background: #bdbdbd;
-	box-shadow: 0 0 8px 4px #dadada;
+	color: #0056b3; /* Darker blue color on hover */
+}
+
+.event-logo {
+	width: 100%;
+	height: auto;
 }

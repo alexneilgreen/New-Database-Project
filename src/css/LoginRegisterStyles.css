@@ -35,6 +35,12 @@
 	background-color: #f0f0f0; /* Background color */
 }
 
+.log-form-box img {
+	width: 100%; /* Make the logo the same width as the form */
+	max-width: 280px; /* Limit maximum width for the logo */
+	margin-bottom: 20px; /* Add margin at the bottom of the logo */
+}
+
 .log-input-group {
 	margin-top: 20px; /* Add margin at the top of the form */
 }
@@ -107,6 +113,22 @@ select.log-input-field {
 .link-btn-alt:hover {
 	background: #aa9ec0;
 	box-shadow: 0 0 8px 4px #dadada;
+}
+
+.reg-link-btn {
+	font-weight: 600;
+	width: fit-content;
+	margin-top: 20px;
+	color: #007bff; /* Blue color for link */
+	text-decoration: none; /* Remove underline */
+	border: none;
+	background: none;
+	cursor: pointer;
+	transition: color 0.3s; /* Smooth color transition */
+}
+
+.reg-link-btn:hover {
+	color: #0056b3; /* Darker blue color on hover */
 }
 
 .log-submit-btn {
