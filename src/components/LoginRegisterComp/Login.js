@@ -14,11 +14,6 @@ const LoginPage = () => {
   let superadminId = -1;
   let university = null;
 
-  // Function to handle errors
-  const handleError = (error) => {
-    console.error("Error:", error.response.data);
-  };
-
   const login = async (e) => {
 	console.log("Logging in with credentials: ", username, password);
     try {
