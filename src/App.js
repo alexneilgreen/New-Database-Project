@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Cookies from 'js-cookie'
 import LoginPage from "./pages/LoginPage";
 import RegisterHandlerPage from "./pages/RegisterHandlerPage";
 import NewUserRegisterPage from "./pages/NewUserRegisterPage";

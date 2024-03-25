@@ -1,6 +1,6 @@
 -- Insert Superadmin
-INSERT INTO Users (username, password, email, university)
-VALUES ('superadmin', 'superadminpassword', 'superadmin@example.com', 'Test University');
+INSERT INTO Users (username, password, phone, email, university)
+VALUES ('superadmin', 'superadminpassword', '012-345-6789','superadmin@example.com', 'Test University');
 
 SET @superadmin_id = LAST_INSERT_ID();
 
@@ -8,8 +8,8 @@ INSERT INTO Superadmins (userID, uniDescr, uniLat, uniLong)
 VALUES (@superadmin_id, 'Test University Description', 0.0, 0.0);
 
 -- Insert RSO Admin
-INSERT INTO Users (username, password, email, university)
-VALUES ('rsoadmin', 'rsoadminpassword', 'rsoadmin@example.com', 'Test University');
+INSERT INTO Users (username, password, phone, email, university)
+VALUES ('rsoadmin', 'rsoadminpassword', '0987-654-321', 'rsoadmin@example.com', 'Test University');
 
 SET @rsoadmin_userid = LAST_INSERT_ID();
 
@@ -33,17 +33,17 @@ INSERT INTO RSO_Members (rsoID, userID)
 VALUES (@rso_id, @rsoadmin_id);
 
 -- Insert Normal Users
-INSERT INTO Users (username, password, email, university)
-VALUES ('user1', 'user1password', 'user1@example.com', 'Test University');
+INSERT INTO Users (username, password, phone, email, university)
+VALUES ('user1', 'user1password', '111-111-1111', 'user1@example.com', 'Test University');
 
-INSERT INTO Users (username, password, email, university)
-VALUES ('user2', 'user2password', 'user2@example.com', 'Test University');
+INSERT INTO Users (username, password, phone, email, university)
+VALUES ('user2', 'user2password', '222-222-2222', 'user2@example.com', 'Test University');
 
-INSERT INTO Users (username, password, email, university)
-VALUES ('user3', 'user3password', 'user3@example.com', 'Test University');
+INSERT INTO Users (username, password, phone, email, university)
+VALUES ('user3', 'user3password', '333-333-3333', 'user3@example.com', 'Test University');
 
-INSERT INTO Users (username, password, email, university)
-VALUES ('user4', 'user4password', 'user4@example.com', 'Test University');
+INSERT INTO Users (username, password, phone, email, university)
+VALUES ('user4', 'user4password', '444-444-4444', 'user4@example.com', 'Test University');
 
 SET @rso_id = (SELECT rsoID FROM RSOs WHERE rsoCode = 'rso123');
 
