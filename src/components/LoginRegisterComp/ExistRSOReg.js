@@ -4,6 +4,9 @@ import axios from "axios";
 import "../../css/LoginRegisterStyles.css";
 import logo from "../../images/Campus Connect Logo.png";
 
+//TODO: Error reporting and redirect
+//      Consider wiping registration attempt on the database if registration fails at any step
+
 function ExistRSOUserReg() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -29,22 +32,26 @@ function ExistRSOUserReg() {
       rsoCode,
       selectedUniversity
     );
-
+    
+    //Check if RSO code is correct
     try {
-      const response = await axios.post('http://localhost:3001/check-admin-code', { adminCode });
+      const response = await axios.post(
+        "http://localhost:3001/check-admin-code",
+        { adminCode }
+      );
       if (response.status == 200) {
-          console.log('Admin code exists for RSO with ID: ', response.data.rsoID);
-          rsoId = response.data.rsoID;
+        console.log("Admin code exists for RSO with ID: ", response.data.rsoID);
+        rsoId = response.data.rsoID;
       } else {
-        console.error('Error: RSO with code does not exit');
+        console.error("Error: RSO with code does not exit");
         return;
       }
     } catch (error) {
-      console.error('Error:', error.message);
+      console.error("Error:", error.message);
       return;
     }
 
-	  //register user
+    //Register user
     try {
       const response = await axios.post("http://localhost:3001/register-user", {
         username,
@@ -57,54 +64,52 @@ function ExistRSOUserReg() {
       if (response.status == 200) {
         //Get message if needed
         userId = response.data.userID;
-      }
-      else {
+      } else {
         console.error("Registration error: ", response.data.message);
       }
     } catch (error) {
-      console.error('Error:', error.message);
+      console.error("Error:", error.message);
       return;
     }
 
-    //now try to make the user an admin
+    //Now try to make the user an admin
     try {
       const response = await axios.post("http://localhost:3001/add-rso-admin", {
-        userId
+        userId,
       });
       console.log("Admin addition response:", response);
       if (response.status == 200) {
         //Get message if needed
         adminId = response.data.adminID;
-      }
-      else {
+      } else {
         console.error("Admin addition error: ", response.data.message);
       }
     } catch (error) {
-      console.error('Error:', error.message);
+      console.error("Error:", error.message);
       return;
     }
 
-	//now try to have the user join the rso
+    //Now try to have the user join the rso
     try {
-		const response = await axios.post("http://localhost:3001/join-rso-board", {
-      adminId,
-      rsoId,
-      rsoCode
-		});
-    console.log("Admin joining RSO response:", response);
-	  if (response.status == 200) {
-      //Get message if needed
-
-      //Move back to login?
+      const response = await axios.post(
+        "http://localhost:3001/join-rso-board",
+        {
+          adminId,
+          rsoId,
+          rsoCode,
+        }
+      );
+      console.log("Admin joining RSO response:", response);
+      if (response.status == 200) {
+        //Get message if needed
+        //Move back to login?
+      } else {
+        console.error("RSO join error: ", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
+      return;
     }
-    else {
-      console.error("RSO join error: ", response.data.message);
-    }
-  } catch (error) {
-    console.error('Error:', error.message);
-    return;
-  }
-
   };
 
   return (
@@ -164,7 +169,7 @@ function ExistRSOUserReg() {
             <option value="UNF">University of North Florida</option>
             <option value="USF">University of South Florida</option>
           </select>
-          <button type="submit" className="log-submit-btn">
+          <button type="submit" className="log-submit-btn" onClick={register_ExistingRSO}>
             Register
           </button>
         </form>
