@@ -188,7 +188,7 @@ app.post("/register-user", (req, res) => {
             return;
           } else {
             const userID = insertResults.insertId;
-            res.status(201).json({
+            res.status(200).json({
               message: "User registered successfully",
               userID: userID,
             });
@@ -535,7 +535,7 @@ app.post("/add-rso-admin", (req, res) => {
     } else {
       // User successfully added as an RSO admin
       const adminID = insertResults.insertId;
-      res.status(201).json({
+      res.status(200).json({
         message: "User successfully added as RSO admin",
         adminID: adminID,
       });
@@ -614,6 +614,26 @@ app.post("/join-rso-board", (req, res) => {
         // Provided admin code does not match the RSO's admin code
         res.status(403).json({ message: "Incorrect admin code" });
         return;
+      }
+    }
+  });
+});
+
+// API endpoint to check if an admin code exists
+app.post('/check-admin-code', (req, res) => {
+  const { adminCode } = req.body;
+
+  // Check if the provided admin code exists in the RSOs table
+  const query = 'SELECT * FROM RSOs WHERE adminCode = ?';
+  db.query(query, [adminCode], (err, results) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Internal Server Error' });
+    } else {
+      if (results.length > 0) {
+        res.status(200).json({ exists: true, rsoID: results[0].rsoID });
+      } else {
+        res.status(404).json({ exists: false });
       }
     }
   });

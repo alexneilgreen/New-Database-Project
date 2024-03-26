@@ -5,6 +5,9 @@ import "../../css/LoginRegisterStyles.css";
 import logo from "../../images/Campus Connect Logo.png";
 import Cookies from "js-cookie";
 
+//TODO: REDIRECT ON SUCCESS
+//      FAILURE REPORTING
+
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -15,7 +18,7 @@ const LoginPage = () => {
   let university = null;
 
   const login = async (e) => {
-	console.log("Logging in with credentials: ", username, password);
+    console.log("Logging in with credentials: ", username, password);
     try {
       const response = await axios.post("http://localhost:3001/login", {
         username,
@@ -44,7 +47,7 @@ const LoginPage = () => {
         Cookies.set("aID", adminId);
         Cookies.set("sID", superadminId);
         Cookies.set("uni", university);
-		console.log("Response: ", response.data);
+        console.log("Response: ", response.data);
       }
       //Superadmin
       else if (response.status == 202) {
@@ -55,7 +58,7 @@ const LoginPage = () => {
         Cookies.set("aID", adminId);
         Cookies.set("sID", superadminId);
         Cookies.set("uni", university);
-		console.log("Response: ", response.data);
+        console.log("Response: ", response.data);
       }
       //RSO admin
       else if (response.status == 201) {
@@ -66,7 +69,7 @@ const LoginPage = () => {
         Cookies.set("aID", adminId);
         Cookies.set("sID", superadminId);
         Cookies.set("uni", university);
-		console.log("Response: ", response.data);
+        console.log("Response: ", response.data);
       }
       //Reg user
       else if (response.status == 200) {
@@ -76,7 +79,7 @@ const LoginPage = () => {
         Cookies.set("aID", adminId);
         Cookies.set("sID", superadminId);
         Cookies.set("uni", university);
-		console.log("Response: ", response.data);
+        console.log("Response: ", response.data);
       } else {
         console.log("Login API error:", response.status);
         //HANDLE ERROR, SUCH AS BAD LOGIN INFO
