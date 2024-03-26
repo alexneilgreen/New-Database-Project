@@ -73,24 +73,24 @@ function NewRSOUserReg() {
 
     //Now try to create the RSO
     try {
-		const response = await axios.post("http://localhost:3001/create-rso", {
-		  rsoCode,
-		  adminCode,
-		  rsoName,
-		  rsoDescr,
-		  selectedUniversity
-		});
-		console.log("RSO creation response:", response);
-		if (response.status == 200) {
-		  //Get message if needed
-		  rsoId = response.data.rsoID;
-		} else {
-		  console.error("RSO creation error: ", response.data.message);
-		}
-	  } catch (error) {
-		console.error("Error:", error.message);
-		return;
-	  }	
+      const response = await axios.post("http://localhost:3001/create-rso", {
+        rsoCode,
+        adminCode,
+        rsoName,
+        rsoDescr,
+        selectedUniversity,
+      });
+      console.log("RSO creation response:", response);
+      if (response.status == 200) {
+        //Get message if needed
+        rsoId = response.data.rsoID;
+      } else {
+        console.error("RSO creation error: ", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
+      return;
+    }
 
     //Now try to have the user join the rso
     try {
@@ -186,7 +186,11 @@ function NewRSOUserReg() {
             <option value="UNF">University of North Florida</option>
             <option value="USF">University of South Florida</option>
           </select>
-          <button type="submit" className="log-submit-btn" onClick={register_NewRSO}>
+          <button
+            type="submit"
+            className="log-submit-btn"
+            onClick={register_NewRSO}
+          >
             Register
           </button>
         </form>

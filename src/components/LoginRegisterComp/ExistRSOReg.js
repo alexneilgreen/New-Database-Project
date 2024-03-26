@@ -32,7 +32,7 @@ function ExistRSOUserReg() {
       rsoCode,
       selectedUniversity
     );
-    
+
     //Check if RSO code is correct
     try {
       const response = await axios.post(
@@ -169,7 +169,11 @@ function ExistRSOUserReg() {
             <option value="UNF">University of North Florida</option>
             <option value="USF">University of South Florida</option>
           </select>
-          <button type="submit" className="log-submit-btn" onClick={register_ExistingRSO}>
+          <button
+            type="submit"
+            className="log-submit-btn"
+            onClick={register_ExistingRSO}
+          >
             Register
           </button>
         </form>

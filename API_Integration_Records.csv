@@ -4,12 +4,13 @@ API_NAME,CREATION_STATUS,TESTING,INTEGRATION
 # 0 = Not started
 # 1 = Finised
 # X = Underway
+# A = Awaiting finalization
 # U = Undetermined
 
-login                       ,   1,   1,   X
-register-user               ,   1,   1,   X
-register-superadmin         ,   1,   1,   X
-add-university              ,   1,   1,   X
+login                       ,   1,   1,   A
+register-user               ,   1,   1,   A
+register-superadmin         ,   1,   1,   A
+add-university              ,   1,   1,   U
 delete-user                 ,   1,   1,   0
 
 add-rso-admin               ,   1,   1,   X
@@ -17,7 +18,7 @@ remove-rso-admin            ,   1,   1,   0
 join-rso-board              ,   1,   1,   X
 check-last-admin            ,   1,   1,   0
 leave-rso-board             ,   1,   1,   0
-create-rso                  ,   1,   1,   X
+create-rso                  ,   1,   1,   A
 edit-rso                    ,   1,   1,   0
 delete-rso                  ,   1,   1,   0
 follow-rso                  ,   1,   1,   0
