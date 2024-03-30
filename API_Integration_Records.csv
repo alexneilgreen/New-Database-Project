@@ -37,11 +37,8 @@ edit-event-review           ,   1,   1,   0
 delete-event-review         ,   1,   1,   0
 
 autoload-scheduled-events   ,   1,   U,   U
-autoload-all                ,   U,   U,   U
-autoload-public-uni         ,   U,   U,   U
-autoload-private-uni        ,   U,   U,   U
-autoload-rso                ,   U,   U,   U
-search-events               ,   1,   U,   U
-search-rsos                 ,   1,   U,   U
-search-superadmins          ,   1,   U,   U
+autoload-public-uni         ,   1,   U,   U
+autoload-user-uni           ,   1,   U,   U
+autoload-rso                ,   1,   U,   U
+search                      ,   1,   U,   U
 

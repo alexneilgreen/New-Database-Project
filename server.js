@@ -620,15 +620,15 @@ app.post("/join-rso-board", (req, res) => {
 });
 
 // API endpoint to check if an admin code exists
-app.post('/check-admin-code', (req, res) => {
+app.post("/check-admin-code", (req, res) => {
   const { adminCode } = req.body;
 
   // Check if the provided admin code exists in the RSOs table
-  const query = 'SELECT * FROM RSOs WHERE adminCode = ?';
+  const query = "SELECT * FROM RSOs WHERE adminCode = ?";
   db.query(query, [adminCode], (err, results) => {
     if (err) {
       console.error(err);
-      res.status(500).json({ message: 'Internal Server Error' });
+      res.status(500).json({ message: "Internal Server Error" });
     } else {
       if (results.length > 0) {
         res.status(200).json({ exists: true, rsoID: results[0].rsoID });
@@ -1654,120 +1654,116 @@ app.post("/autoload-scheduled-events", (req, res) => {
   });
 });
 
-// TODO: Create other autoload api calls
+//////////////////////////////
+////AUTOLOAD PUBLIC EVENTS API
+//////////////////////////////
+app.post("/autoload-public-events", (req, res) => {
+  const query = `
+  SELECT events.*, university_events.isPrivate, university_events.isApproved
+  FROM Events events
+  INNER JOIN University_Events university_events ON events.eventID = university_events.eventID
+  WHERE university_events.isPrivate = 0 AND university_events.isApproved = 1
+  `;
 
-// Search events API call
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    }
+    res.status(200).json({ events: results });
+  });
+});
+
+//////////////////////////////
+///////AUTOLOAD UNI EVENTS API
+//////////////////////////////
+app.post("/autoload-university-events", (req, res) => {
+  const { university } = req.body;
+
+  const query = `
+    SELECT events.*
+    FROM Events events
+    INNER JOIN University_Events university_events ON events.eventID = university_events.eventID
+    WHERE university_events.university = ? AND university_events.isApproved = 1
+  `;
+
+  db.query(query, [university], (err, results) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    }
+    res.status(200).json({ universityEvents: results });
+  });
+});
+
+//////////////////////////////
+///////AUTOLOAD RSO EVENTS API
+//////////////////////////////
+app.post("/autoload-rso-events", (req, res) => {
+  const { userID } = req.body;
+
+  // SQL query to select all events of all RSOs that the user follows
+  const query = `
+    SELECT e.*
+    FROM Events e
+    INNER JOIN RSO_Events rsoe ON e.eventID = rsoe.eventID
+    INNER JOIN RSO_Members rsm ON rsoe.rsoID = rsm.rsoID
+    WHERE rsm.userID = ?
+  `;
+
+  db.query(query, [userID], (err, results) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    }
+    res.status(200).json({ userRSOEvents: results });
+  });
+});
+
+//////////////////////////////
+////////////GENERAL SEARCH API
+//////////////////////////////
 app.post("/search-events", (req, res) => {
-  const { searchString } = req.body;
+  const { userID, searchString } = req.body;
 
-  console.log("Searching events with string: ", searchString);
-
-  // Proceed to search events
-  const searchEventsQuery = `
-    SELECT * FROM (
-        SELECT *, 'RSO' AS eventType FROM RSO_Events
+  // SQL query to search events
+  const query = `
+    SELECT *
+    FROM (
+        SELECT e.*, ue.university, 'RSO' AS eventType, re.rsoID, re.rsoName, re.rsoDescr
+        FROM RSO_Events re
+        JOIN Events e ON re.eventID = e.eventID
+        JOIN University_Events ue ON e.eventID = ue.eventID
+        WHERE ue.university = (SELECT university FROM Users WHERE userID = ?)
         UNION ALL
-        SELECT *, 'University' AS eventType FROM University_Events
+        SELECT e.*, ue.university, 'University' AS eventType, NULL AS rsoID, NULL AS rsoName, NULL AS rsoDescr
+        FROM University_Events ue
+        JOIN Events e ON ue.eventID = e.eventID
+        WHERE ue.isPrivate = 0 AND ue.isApproved = 1
     ) AS CombinedEvents
     WHERE (
         eventName LIKE ? OR
         eventDescr LIKE ? OR
-        eventTime LIKE ? OR
-        eventAddress LIKE ? OR
-        eventPhone LIKE ? OR
-        eventEmail LIKE ? OR
-        eventType = 'RSO' AND rsoID IN (
-            SELECT rsoID FROM RSO_Members WHERE userID = ? 
-        ) OR
-        eventType = 'University' AND university = (
-            SELECT university FROM Users WHERE userID = ?
-        )
-    )
-  `;
-  const searchStr = `%${searchString}%`;
-  db.query(
-    searchEventsQuery,
-    [
-      searchStr,
-      searchStr,
-      searchStr,
-      searchStr,
-      searchStr,
-      searchStr,
-      userID,
-      userID,
-    ],
-    (searchErr, searchResults) => {
-      if (searchErr) {
-        console.error(searchErr);
-        res.status(500).json({ message: "Internal Server Error" });
-      } else {
-        res.status(200).json({ events: searchResults });
-      }
-    }
-  );
-});
-
-// Search RSOs API call
-app.post("/search-rsos", (req, res) => {
-  const { searchString } = req.body;
-
-  console.log("Searching RSOs with string: ", searchString);
-
-  // Proceed to search RSOs
-  const searchRSOsQuery = `
-    SELECT * FROM RSOs
-    WHERE university = (
-        SELECT university FROM Users WHERE userID = ?
-    ) AND (
         rsoName LIKE ? OR
-        rsoDescr LIKE ?
+        rsoDescr LIKE ? OR
+        university LIKE ?
     )
   `;
   const searchStr = `%${searchString}%`;
+
   db.query(
-    searchRSOsQuery,
-    [userID, searchStr, searchStr],
-    (searchErr, searchResults) => {
-      if (searchErr) {
-        console.error(searchErr);
-        res.status(500).json({ message: "Internal Server Error" });
-      } else {
-        res.status(200).json({ rsos: searchResults });
-      }
-    }
-  );
-});
-
-// Search Superadmins API call
-app.post("/search-superadmins", (req, res) => {
-  const { searchString } = req.body;
-
-  console.log("Searching Superadmins with string: ", searchString);
-
-  // Search superadmins matching the search string
-  const searchSuperadminsQuery = `
-        SELECT S.userID, S.uniDescr, S.uniLat, S.uniLong 
-        FROM Superadmins AS S
-        INNER JOIN Users AS U ON S.userID = U.userID
-        WHERE S.uniDescr LIKE ? OR
-              S.uniLat LIKE ? OR
-              S.uniLong LIKE ? OR
-              U.university LIKE ?
-    `;
-  const searchStr = `%${searchString}%`;
-  db.query(
-    searchSuperadminsQuery,
-    [searchStr, searchStr, searchStr, searchStr],
-    (searchErr, searchResults) => {
-      if (searchErr) {
-        console.error(searchErr);
+    query,
+    [userID, searchStr, searchStr, searchStr, searchStr],
+    (err, results) => {
+      if (err) {
+        console.error(err);
         res.status(500).json({ message: "Internal Server Error" });
         return;
-      } else {
-        res.status(200).json({ superadmins: searchResults });
-        return;
       }
+      res.status(200).json({ events: results });
     }
   );
 });
