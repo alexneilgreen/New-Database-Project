@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // Import Link for navigation
+import { Link } from "react-router-dom";
 import axios from "axios";
 import "../../css/MainPageStyles.css";
 import Cookies from "js-cookie";
@@ -7,13 +7,17 @@ import Cookies from "js-cookie";
 function Feed() {
 	const [activeTab, setActiveTab] = useState(1);
 	const [modalPost, setModalPost] = useState(null);
+	const [selectedPost, setSelectedPost] = useState(null);
 	const [posts, setPosts] = useState([]);
 
 	const generatePostBoxes = () => {
-		return posts.map((post, index) => (
-			<div className="post-box" key={index}>
+		if (!Array.isArray(posts) || posts.length === 0) {
+			return <div>No posts found.</div>;
+		}
+		return posts.map((post) => (
+			<div className="post-box" key={post.eventID}>
 				<div className="post-header">
-					<h4>{post.eventName}</h4>
+					<h4 onClick={() => handlePostNameClick(post)}>{post.eventName}</h4>
 					<h4>{post.eventTime}</h4>
 					<h4>{post.eventAddress}</h4>
 				</div>
@@ -22,16 +26,13 @@ function Feed() {
 				</div>
 				<div className="post-footer">
 					<p>
-						Host:{" "}
-						<strong onClick={() => handleHostNameClick(post.eventID)}>
-							{post.eventEmail}
-						</strong>
+						<strong>{post.eventEmail}</strong>
 					</p>
 					<Link to="/feedback">
 						<button>Feedback</button>
 					</Link>
-					<button onClick={editEvent}>Edit</button>
-					<button onClick={populateMap}>Map</button>
+					<button onClick={() => editEvent(post)}>Edit</button>
+					<button onClick={() => populateMap(post)}>Map</button>
 				</div>
 			</div>
 		));
@@ -40,8 +41,6 @@ function Feed() {
 	const handleTabClick = async (e, tabNumber) => {
 		e.preventDefault();
 		setActiveTab(tabNumber);
-		console.log("Passed tab value: ", tabNumber);
-		console.log("Active tab: ", tabNumber);
 		try {
 			let response;
 			switch (tabNumber) {
@@ -58,9 +57,10 @@ function Feed() {
 					);
 					break;
 				case 3:
+					const userID = Cookies.get("uID");
 					response = await axios.post(
 						"http://localhost:3001/autoload-scheduled-events",
-						{}
+						{ userID }
 					);
 					break;
 				case 4:
@@ -71,72 +71,52 @@ function Feed() {
 					break;
 				default:
 					console.error("Unidentified tab value active: ", activeTab);
+					return;
 			}
-			if (response && response.data) {
-				setPosts(response.data.events);
-			}
+			console.log(`Loaded results Tab ${tabNumber}: `, response.data);
+			setPosts(response.data.events || []);
 		} catch (error) {
 			console.log("API error:", error.response);
 		}
 	};
 
-	const handleHostNameClick = (postId) => {
-		setModalPost(postId); // Store the post-box ID when RSO name is clicked
-		console.log("Modal of " + postId);
+	const handlePostNameClick = (post) => {
+		setSelectedPost(post);
+		setModalPost(true);
 	};
 
-	const editEvent = () => {};
+	const editEvent = (post) => {
+		console.log("Edit event:", post);
+	};
 
-	const populateMap = () => {};
+	const populateMap = (post) => {
+		console.log("Populate map:", post);
+	};
 
 	const closeModal = () => {
-		setModalPost(null); // Reset the modal post-box ID
+		setModalPost(false);
+		setSelectedPost(null);
 	};
-
-	useEffect(() => {
-		// Add event listener to close the modal when clicking outside of the white div
-		const handleClickOutsideModal = (event) => {
-			const modal = document.querySelector(".modal");
-			if (modal && !modal.contains(event.target)) {
-				closeModal();
-			}
-		};
-
-		document.addEventListener("mousedown", handleClickOutsideModal);
-
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutsideModal);
-		};
-	}, []);
 
 	return (
 		<div className="feed-section">
 			<div className="feed-content-box">
 				<div className="tabs">
-					<div
-						className={`tab ${activeTab === 1 && "active"}`}
-						onClick={(e) => handleTabClick(e, 1)}
-					>
-						Public Events
-					</div>
-					<div
-						className={`tab ${activeTab === 2 && "active"}`}
-						onClick={(e) => handleTabClick(e, 2)}
-					>
-						University Events
-					</div>
-					<div
-						className={`tab ${activeTab === 3 && "active"}`}
-						onClick={(e) => handleTabClick(e, 3)}
-					>
-						Followed Events
-					</div>
-					<div
-						className={`tab ${activeTab === 4 && "active"}`}
-						onClick={(e) => handleTabClick(e, 4)}
-					>
-						Followed RSOs
-					</div>
+					{[1, 2, 3, 4].map((tabNumber) => (
+						<div
+							key={tabNumber}
+							className={`tab ${activeTab === tabNumber && "active"}`}
+							onClick={(e) => handleTabClick(e, tabNumber)}
+						>
+							{tabNumber === 1
+								? "Public Events"
+								: tabNumber === 2
+								? "University Events"
+								: tabNumber === 3
+								? "Followed Events"
+								: "Followed RSOs"}
+						</div>
+					))}
 				</div>
 				<div className="search-bar">
 					<input
@@ -152,18 +132,18 @@ function Feed() {
 				<div className="modal-background">
 					<div className="modal">
 						<div className="modal-content">
-							<h2 className="modal-header">RSO/UNI Name</h2>
-							<p className="modal-description">
-								Description of the host goes here. Description of the host goes
-								here. Description of the host goes here. Description of the host
-								goes here. Description of the host goes here. Description of the
-								host goes here. Description of the host goes here. Description
-								of the host goes here.
-							</p>
-							<div className="modal-buttons">
-								<button className="modal-follow">Follow</button>
-								{/* <button className="modal-join">Join as Admin</button> */}
-							</div>
+							{selectedPost && (
+								<>
+									<h2 className="modal-header">{selectedPost.eventName}</h2>
+									<p className="modal-description">{selectedPost.eventDescr}</p>
+									<div className="modal-buttons">
+										<button className="modal-follow">Follow</button>
+									</div>
+								</>
+							)}
+							<button className="modal-close" onClick={closeModal}>
+								Close
+							</button>
 						</div>
 					</div>
 				</div>
