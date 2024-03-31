@@ -22,9 +22,8 @@ function Feed() {
 
   const handleTabClick = async (e, tabNumber) => {
     e.preventDefault();
-    let currentTab = activeTab;
     setActiveTab(tabNumber);
-	console.log("Active tab: ", currentTab);
+	console.log("Active tab: ", activeTab);
     //If selected tab is first tab and if tab is not already active
     if (activeTab == 1) {
       //Autoload public events
@@ -128,7 +127,7 @@ function Feed() {
           </div>
           <div
             className={`tab ${activeTab === 4 && "active"}`}
-            onClick={(e) => handleTabClick(e)}
+            onClick={(e) => handleTabClick(e, 4)}
           >
             Followed RSOs
           </div>

@@ -400,12 +400,12 @@ app.put("/delete-user", (req, res) => {
 ///////GET USER UNIVERSITY API
 //////////////////////////////
 app.post("/get-user-university", (req, res) => {
-	const { userId } = req.body; // Assuming userId is sent in the request body
+	const { userID } = req.body; // Assuming userId is sent in the request body
   
 	// Query to fetch the user's university based on their ID
 	const query = "SELECT university FROM Users WHERE userID = ?";
   
-	db.query(query, [userId], (err, results) => {
+	db.query(query, [userID], (err, results) => {
 	  if (err) {
 		console.error(err);
 		res.status(500).json({ message: "Internal Server Error" });
