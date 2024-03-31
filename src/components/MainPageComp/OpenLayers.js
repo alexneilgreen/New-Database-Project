@@ -22,7 +22,7 @@ const OpenLayers = () => {
   const [longitude, setLongitude] = useState("");
 
   const universityCoordinates = {
-	"Test University": { lat: 28.6024, long: -81.2001 },
+    "Test University": { lat: 28.6024, long: -81.2001 },
     FAU: { lat: 26.3705, long: -80.1024 },
     FGCU: { lat: 26.4643, long: -81.7737 },
     FIU: { lat: 25.7579, long: -80.3735 },
@@ -48,21 +48,24 @@ const OpenLayers = () => {
   // Fetch data before initializing the map
   useEffect(() => {
     const fetchUserUniCoords = async () => {
-	const userID = Cookies.get('uID');
+      const userID = Cookies.get("uID");
       try {
-        const response = await axios.post("http://localhost:3001/get-user-university", {
-          userID
-        });
+        const response = await axios.post(
+          "http://localhost:3001/get-user-university",
+          {
+            userID,
+          }
+        );
         console.log("University: ", response.data.university);
-		if (response.data.university) {
-			const universityName = response.data.university;
-			const universityCoords = universityCoordinates[universityName];
-			console.log("Coords: ", universityCoords);
-			if (universityCoords) {
-			  setLatitude(universityCoords.lat);
-			  setLongitude(universityCoords.long);
-			}
-		}
+        if (response.data.university) {
+          const universityName = response.data.university;
+          const universityCoords = universityCoordinates[universityName];
+          console.log("Coords: ", universityCoords);
+          if (universityCoords) {
+            setLatitude(universityCoords.lat);
+            setLongitude(universityCoords.long);
+          }
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -73,7 +76,9 @@ const OpenLayers = () => {
 
   useLayoutEffect(() => {
     // Create the map only if it hasn't been created yet
-	console.log("Map center coords... Long " + longitude + " || Lat: " + latitude);
+    console.log(
+      "Map center coords... Long " + longitude + " || Lat: " + latitude
+    );
 
     if (!mapRef.current) {
       console.log("Generating map");
@@ -115,6 +120,9 @@ const OpenLayers = () => {
       });
 
       setMap(mainMap);
+    } else {
+      // If map exists, update its center
+      mapRef.current.getView().setCenter(fromLonLat([longitude, latitude]));
     }
   }, [iconLayer, iconFeatures, longitude, latitude]);
 
