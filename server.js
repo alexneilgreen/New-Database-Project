@@ -737,39 +737,22 @@ app.put("/leave-rso-board", (req, res) => {
 // FOLLOW RSO API/////////////
 //////////////////////////////
 app.post("/follow-rso", (req, res) => {
-	const { userID, rsoID, rsoCode } = req.body;
+	const { userID, rsoID } = req.body;
 
-	console.log("User following RSO: ", userID, rsoID, rsoCode);
+	console.log("User following RSO: ", userID, rsoID);
 
-	// Check if the provided RSO code is correct
-	const checkRsoQuery = "SELECT * FROM RSOs WHERE rsoID = ? AND rsoCode = ?";
-	db.query(checkRsoQuery, [rsoID, rsoCode], (checkErr, checkResults) => {
-		if (checkErr) {
-			console.error(checkErr);
+	// Insert the user into RSO_Members table
+	const insertQuery = "INSERT INTO RSO_Members (rsoID, userID) VALUES (?, ?)";
+	db.query(insertQuery, [rsoID, userID], (insertErr, insertResults) => {
+		if (insertErr) {
+			console.error(insertErr);
 			res.status(500).json({ message: "Internal Server Error" });
 			return;
 		} else {
-			if (checkResults.length > 0) {
-				// RSO code is correct, insert the user into RSO_Members table
-				const insertQuery =
-					"INSERT INTO RSO_Members (rsoID, userID) VALUES (?, ?)";
-				db.query(insertQuery, [rsoID, userID], (insertErr, insertResults) => {
-					if (insertErr) {
-						console.error(insertErr);
-						res.status(500).json({ message: "Internal Server Error" });
-						return;
-					} else {
-						res
-							.status(200)
-							.json({ message: "User successfully followed the RSO" });
-						return;
-					}
-				});
-			} else {
-				// RSO code is incorrect
-				res.status(404).json({ message: "Invalid RSO code" });
-				return;
-			}
+			res
+				.status(200)
+				.json({ message: "User successfully followed the RSO" });
+			return;
 		}
 	});
 });
@@ -1814,7 +1797,7 @@ app.post("/find-superadmin", (req, res) => {
 
 	// SQL query to retrieve superadmin information based on the provided university name
 	const query = `
-        SELECT u.userID, u.username, u.email, s.uniDescr, s.uniLat, s.uniLong
+        SELECT u.username, u.email, s.uniDescr, s.uniLat, s.uniLong
         FROM Superadmins s
         INNER JOIN Users u ON s.userID = u.userID
         WHERE s.university = ?
@@ -1841,17 +1824,17 @@ app.post("/find-superadmin", (req, res) => {
 ////////////////SEARCH RSO API
 //////////////////////////////
 app.post("/find-rso", (req, res) => {
-	const { rsoID } = req.body;
+	const { rsoName } = req.body;
 
-	// SQL query to retrieve RSO information based on the provided rsoID
+	// SQL query to retrieve RSO information based on the provided rsoName
 	const query = `
         SELECT *
         FROM RSOs
-        WHERE rsoID = ?
+        WHERE rsoName = ?
     `;
 
 	// Execute the SQL query
-	db.query(query, [rsoID], (err, results) => {
+	db.query(query, [rsoName], (err, results) => {
 		if (err) {
 			console.error(err);
 			res.status(500).json({ message: "Internal Server Error" });
@@ -1860,7 +1843,7 @@ app.post("/find-rso", (req, res) => {
 		if (results.length === 0) {
 			res
 				.status(404)
-				.json({ message: "RSO not found for the specified rsoID" });
+				.json({ message: "RSO not found for the specified rsoName" });
 			return;
 		}
 		res.status(200).json({ rso: results[0] });
