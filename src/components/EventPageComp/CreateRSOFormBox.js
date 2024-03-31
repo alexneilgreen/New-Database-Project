@@ -5,6 +5,7 @@ import logo from "../../images/Campus Connect Logo.png";
 import "../../css/EventPageStyles.css";
 
 function FormBox() {
+	const [adminCode, setAdminCode] = useState("");
 	const [eventName, setEventName] = useState("");
 	const [eventLocation, setEventLocation] = useState("");
 	const [eventTime, setEventTime] = useState("");
@@ -45,7 +46,7 @@ function FormBox() {
 				"http://localhost:3001/create-rso-event",
 				{
 					adminID: "adminID", // Replace with the actual admin ID
-					rsoID: "rsoID", // Replace with the actual RSO ID
+					adminCode: adminCode,
 					eventName: eventName,
 					eventDescr: eventDescription,
 					eventTime: eventTime,
@@ -110,6 +111,15 @@ function FormBox() {
 					value={eventDescription}
 					onChange={(e) => setEventDescription(e.target.value)}
 				></textarea>
+				<br />
+				<br />
+				<input
+					type="text"
+					id="adminCode"
+					placeholder="Input RSO Code to Verify"
+					value={adminCode}
+					onChange={(e) => setAdminCode(e.target.value)}
+				/>{" "}
 				<button
 					type="submit"
 					className="event-create-btn"
