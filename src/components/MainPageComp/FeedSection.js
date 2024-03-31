@@ -1,40 +1,61 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom"; // Import Link for navigation
+import axios from "axios";
 import "../../css/MainPageStyles.css";
 
 function Feed() {
   const [activeTab, setActiveTab] = useState(1);
   const [modalPost, setModalPost] = useState(null); // State to manage modal post-box
 
-  const handleTabClick = async (tabNumber) => {
+  const handleTabClick = async (e, tabNumber) => {
     e.preventDefault();
     let currentTab = activeTab;
     setActiveTab(tabNumber);
     //If selected tab is first tab and if tab is not already active
-    if (activeTab == 1 && currentTab != activeTab) {
+    if (activeTab == 1) {
       //Autoload public events
       try {
-        const response = await axios.post("http://localhost:3001/autoload-public-events", {});
-		console.log ("Loaded results: ", response.data);
-      } catch (error) {console.log("API error:", response.status);}
-    } else if (activeTab == 2 && currentTab != activeTab) {
+        const response = await axios.post(
+          "http://localhost:3001/autoload-public-events",
+          {}
+        );
+        console.log("Loaded results: ", response.data);
+      } catch (error) {
+        console.log("API error:", error.response);
+      }
+    } else if (activeTab == 2) {
       //Autoload university events
-	  try {
-        const response = await axios.post("http://localhost:3001/autoload-university-events", {});
-		console.log ("Loaded results: ", response.data);
-      } catch (error) {console.log("API error:", response.status);}
-    } else if (activeTab == 3 && currentTab != activeTab) {
+      try {
+        const response = await axios.post(
+          "http://localhost:3001/autoload-university-events",
+          {}
+        );
+        console.log("Loaded results: ", response.data);
+      } catch (error) {
+        console.log("API error:", error.response);
+      }
+    } else if (activeTab == 3) {
       //Autoload scheduled events
-	  try {
-        const response = await axios.post("http://localhost:3001/autoload-scheduled-events", {});
-		console.log ("Loaded results: ", response.data);
-      } catch (error) {console.log("API error:", response.status);}
-    } else if (activeTab == 4 && currentTab != activeTab) {
+      try {
+        const response = await axios.post(
+          "http://localhost:3001/autoload-scheduled-events",
+          {}
+        );
+        console.log("Loaded results: ", response.data);
+      } catch (error) {
+        console.log("API error:", error.response);
+      }
+    } else if (activeTab == 4) {
       //Autolad rso events
-	  try {
-        const response = await axios.post("http://localhost:3001/autoload-rso-events", {});
-		console.log ("Loaded results: ", response.data);
-      } catch (error) {console.log("API error:", response.status);}
+      try {
+        const response = await axios.post(
+          "http://localhost:3001/autoload-rso-events",
+          {}
+        );
+        console.log("Loaded results: ", response.data);
+      } catch (error) {
+        console.log("API error:", error.response);
+      }
     } else {
       console.error("Unidentified tab value active: ", activeTab);
     }
@@ -75,25 +96,25 @@ function Feed() {
         <div className="tabs">
           <div
             className={`tab ${activeTab === 1 && "active"}`}
-            onClick={() => handleTabClick(1)}
+            onClick={(e) => handleTabClick(e, 1)}
           >
             Public Events
           </div>
           <div
             className={`tab ${activeTab === 2 && "active"}`}
-            onClick={() => handleTabClick(2)}
+            onClick={(e) => handleTabClick(e, 2)}
           >
             University Events
           </div>
           <div
             className={`tab ${activeTab === 3 && "active"}`}
-            onClick={() => handleTabClick(3)}
+            onClick={(e) => handleTabClick(e, 3)}
           >
             Followed Events
           </div>
           <div
             className={`tab ${activeTab === 4 && "active"}`}
-            onClick={() => handleTabClick(4)}
+            onClick={(e) => handleTabClick(e)}
           >
             Followed RSOs
           </div>
