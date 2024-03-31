@@ -6,7 +6,7 @@ import FullScreen from "./FullScreen.js";
 
 function Map() {
 	return (
-		<div class="map-section">
+		<div className="map-section">
 			<FullScreen />
 		</div>
 	);
