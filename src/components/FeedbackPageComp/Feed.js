@@ -1,27 +1,66 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom"; // Import Link component
+import { Link } from "react-router-dom";
+import axios from "axios";
 import "../../css/FeedbackPageStyles.css";
+import Cookies from "js-cookie";
 
 const FeedbackPage = () => {
-	const [comments, setComments] = useState([]); // State to store comments
-	const [rating, setRating] = useState(0); // State to store rating
-	const [newComment, setNewComment] = useState(""); // State to store new comment
+	const [comments, setComments] = useState([]);
+	const [rating, setRating] = useState(0);
+	const [newComment, setNewComment] = useState("");
+	const [editIndex, setEditIndex] = useState(null); // State to store the index of the comment being edited
 
 	const handleCommentChange = (event) => {
-		setNewComment(event.target.value); // Update new comment state
+		setNewComment(event.target.value);
 	};
 
 	const handleRatingChange = (event) => {
-		setRating(event.target.value); // Update rating state
+		setRating(event.target.value);
 	};
 
-	const handleSubmit = (event) => {
+	const submitReview = async (event) => {
 		event.preventDefault();
-		// Add new comment and rating to the comments list
+		const userID = Cookies.get("uID");
 		setComments([...comments, { comment: newComment, rating: rating }]);
-		// Reset the input fields
 		setNewComment("");
 		setRating(0);
+
+		try {
+			const eventID = "123"; // Replace with actual event ID
+			const response = await axios.post("http://localhost:3001/review-event", {
+				userID: userID,
+				eventID: eventID,
+				comment: newComment,
+				reviewRating: rating,
+			});
+			console.log(response.data);
+		} catch (error) {
+			console.error("Error submitting review:", error);
+		}
+	};
+
+	const handleEdit = (index) => {
+		setEditIndex(index);
+	};
+
+	const handleEditSubmit = async (index) => {
+		const userID = Cookies.get("uID");
+		const eventID = "123"; // Replace with actual event ID
+		const updatedComment = comments[index].comment;
+		const updatedRating = comments[index].rating;
+
+		try {
+			const response = await axios.put("http://localhost:3001/edit-review", {
+				userID: userID,
+				eventID: eventID,
+				comment: updatedComment,
+				reviewRating: updatedRating,
+			});
+			console.log(response.data);
+			setEditIndex(null);
+		} catch (error) {
+			console.error("Error editing review:", error);
+		}
 	};
 
 	return (
@@ -34,7 +73,7 @@ const FeedbackPage = () => {
 					<h2>Event Name</h2>
 					<h3>Host Name</h3>
 				</div>
-				<form onSubmit={handleSubmit}>
+				<form onSubmit={submitReview}>
 					<div className="form-group">
 						<textarea
 							value={newComment}
@@ -66,43 +105,50 @@ const FeedbackPage = () => {
 				<ul>
 					{comments.map((item, index) => (
 						<li key={index}>
-							<p>Comment: {item.comment}</p>
-							<br />
-							<p>Rating: {item.rating}</p>
+							<div className="review-item">
+								{editIndex === index ? (
+									<>
+										<input
+											type="text"
+											value={item.comment}
+											onChange={(e) => {
+												const newComments = [...comments];
+												newComments[index].comment = e.target.value;
+												setComments(newComments);
+											}}
+										/>
+										<input
+											type="number"
+											value={item.rating}
+											onChange={(e) => {
+												const newComments = [...comments];
+												newComments[index].rating = e.target.value;
+												setComments(newComments);
+											}}
+										/>
+										<button
+											className="edit-button"
+											onClick={() => handleEditSubmit(index)}
+										>
+											Save
+										</button>
+									</>
+								) : (
+									<>
+										<div className="review-comment">{item.comment}</div>
+										<div className="review-rating">Rating: {item.rating}</div>
+										<button
+											className="edit-button"
+											onClick={() => handleEdit(index)}
+										>
+											Edit
+										</button>
+									</>
+								)}
+								<button className="delete-button">Delete</button>
+							</div>
 						</li>
 					))}
-					{/* <li>
-						<p>
-							Test yap yap yap Test yap yap yap Test yap yap yap Test yap yap
-							yap Test yap yap yap Test yap yap yap
-						</p>
-						<br />
-						<p>Rating: 1</p>
-					</li>
-					<li>
-						<p>
-							Test yap yap yap Test yap yap yap Test yap yap yap Test yap yap
-							yap Test yap yap yap Test yap yap yap
-						</p>
-						<br />
-						<p>Rating: 1</p>
-					</li>
-					<li>
-						<p>
-							Test yap yap yap Test yap yap yap Test yap yap yap Test yap yap
-							yap Test yap yap yap Test yap yap yap
-						</p>
-						<br />
-						<p>Rating: 1</p>
-					</li>
-					<li>
-						<p>
-							Test yap yap yap Test yap yap yap Test yap yap yap Test yap yap
-							yap Test yap yap yap Test yap yap yap
-						</p>
-						<br />
-						<p>Rating: 1</p>
-					</li> */}
 				</ul>
 			</div>
 		</div>

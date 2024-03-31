@@ -92,3 +92,47 @@
 	background-color: #f5f5f5;
 	border-radius: 5px;
 }
+
+/* FeedbackPageStyles.css */
+
+/* Styles for review items */
+.review-item {
+	display: flex;
+	flex-direction: row;
+	align-items: center; /* Align content from left to right */
+	margin-bottom: 10px; /* Adjust margin between review items */
+}
+
+/* Styles for comment */
+.review-comment {
+	flex: 1; /* Take up remaining space */
+}
+
+/* Styles for rating */
+.review-rating {
+	margin-left: 20px; /* Adjust spacing between comment and rating */
+}
+
+/* Styles for edit button */
+.edit-button {
+	margin-left: 40px; /* Adjust spacing between rating and edit button */
+	padding: 5px 10px; /* Add padding to button */
+	background-color: #2ebf91; /* Button background color */
+	color: #fff; /* Button text color */
+	border: none; /* Remove button border */
+	border-radius: 5px; /* Apply border radius */
+	cursor: pointer; /* Change cursor to pointer on hover */
+	font-weight: bold;
+}
+
+/* Styles for delete button */
+.delete-button {
+	margin-left: 10px; /* Adjust spacing between edit button and delete button */
+	padding: 5px 10px; /* Add padding to button */
+	background-color: #dc3545; /* Button background color */
+	color: #fff; /* Button text color */
+	border: none; /* Remove button border */
+	border-radius: 5px; /* Apply border radius */
+	cursor: pointer; /* Change cursor to pointer on hover */
+	font-weight: bold;
+}
