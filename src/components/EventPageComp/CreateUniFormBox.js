@@ -1,9 +1,20 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios"; // Import Axios for making HTTP requests
 import logo from "../../images/Campus Connect Logo.png";
 import "../../css/EventPageStyles.css";
 
 function FormBox() {
+	const [eventName, setEventName] = useState("");
+	const [eventLocation, setEventLocation] = useState("");
+	const [eventTime, setEventTime] = useState("");
+	const [eventDescription, setEventDescription] = useState("");
+	const [eventPhone, setEventPhone] = useState("");
+	const [eventEmail, setEventEmail] = useState("");
+	const [isPrivate, setIsPrivate] = useState("");
+	const [latitude, setLatitude] = useState("");
+	const [longitude, setLongitude] = useState("");
+
 	// async function geocode(location) {
 	//   try {
 	//     const response = await axios.get(
@@ -29,41 +40,96 @@ function FormBox() {
 	//}
 	//}
 
-	const [isPrivate, setIsPrivate] = useState(false);
-
 	const handleCheckboxChange = () => {
 		setIsPrivate(!isPrivate);
 	};
 
-	const handleSubmit = () => {
-		// Handle form submission here
+	const createEvent = async () => {
+		try {
+			const response = await axios.post(
+				"http://localhost:3001/create-rso-event",
+				{
+					adminID: "adminID", // Replace with the actual admin ID
+					eventName: eventName,
+					eventDescr: eventDescription,
+					eventTime: eventTime,
+					eventLat: latitude, // Add Latitude value
+					eventLong: longitude, // Add Longitude value
+					eventAddress: eventLocation,
+					eventPhone: eventPhone,
+					eventEmail: eventEmail,
+					university: "university", // Get current User University
+					isPrivate: isPrivate,
+				}
+			);
+			console.log(response.data);
+			// Handle success
+		} catch (error) {
+			console.error("Error creating event:", error);
+			// Handle error
+		}
 	};
 
 	return (
 		<div className="event-container">
 			<div className="event-form-box" id="formBox">
 				<img src={logo} alt="Logo" className="event-logo" />
-				<input type="text" id="eventName" placeholder="Event Name" />
-				<input type="text" id="eventLocation" placeholder="Event Location" />
-				<input type="text" id="eventTime" placeholder="Event Time" />
+				<input
+					type="text"
+					id="eventName"
+					placeholder="Event Name"
+					value={eventName}
+					onChange={(e) => setEventName(e.target.value)}
+				/>
+				<input
+					type="text"
+					id="eventLocation"
+					placeholder="Event Location"
+					value={eventLocation}
+					onChange={(e) => setEventLocation(e.target.value)}
+				/>
+				<input
+					type="text"
+					id="eventTime"
+					placeholder="Event Time"
+					value={eventTime}
+					onChange={(e) => setEventTime(e.target.value)}
+				/>
+				<input
+					type="text"
+					id="eventPhone"
+					placeholder="Event Phone"
+					value={eventPhone}
+					onChange={(e) => setEventPhone(e.target.value)}
+				/>{" "}
+				<input
+					type="text"
+					id="eventEmail"
+					placeholder="Event Email"
+					value={eventEmail}
+					onChange={(e) => setEventEmail(e.target.value)}
+				/>{" "}
 				<textarea
 					id="eventDescription"
 					placeholder="Event Description - 200 Character Max"
 					maxLength="200"
+					value={eventDescription}
+					onChange={(e) => setEventDescription(e.target.value)}
 				></textarea>
 				<div className="private-checkbox">
 					<input
 						type="checkbox"
 						id="privateEvent"
 						checked={isPrivate}
-						onChange={handleCheckboxChange}
+						onClick={handleCheckboxChange}
+						onChange={(e) => setEventDescription(e.target.value)}
 					/>
 					<label htmlFor="privateEvent">Private Event</label>
 				</div>
 				<button
 					type="submit"
 					className="event-create-btn"
-					onClick={handleSubmit}
+					onClick={createEvent}
 				>
 					Create
 				</button>
