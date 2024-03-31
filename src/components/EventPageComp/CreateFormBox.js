@@ -4,7 +4,7 @@ import logo from "../../images/Campus Connect Logo.png";
 import "../../css/EventPageStyles.css";
 
 function FormBox() {
-  async function geocode(location) {
+  /*async function geocode(location) {
     try {
       const response = await axios.get(
         "https://maps.googleapis.com/maps/api/geocode/json?",
@@ -27,7 +27,7 @@ function FormBox() {
     } catch (error) {
       console.log(error);
     }
-  }
+  }*/
 
   return (
     <div className="event-container">

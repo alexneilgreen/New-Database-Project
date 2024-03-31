@@ -17,16 +17,16 @@ VALUES ('University Event 1', 'Test University Event Description 1', '2024-03-06
 
 SET @uni_event1_id = LAST_INSERT_ID();
 
-INSERT INTO University_Events (eventID, university, isPrivate, isApproved)
-VALUES (@uni_event1_id, 'Test University', TRUE, FALSE);
+INSERT INTO University_Events (eventID, adminID, university, isPrivate, isApproved)
+VALUES (@uni_event1_id, @rso_admin_id, 'Test University', TRUE, FALSE);
 
 INSERT INTO Events (eventName, eventDescr, eventTime, eventLat, eventLong, eventAddress, eventPhone, eventEmail)
 VALUES ('University Event 2', 'Test University Event Description 2', '2024-03-06 13:00:00', 0.0, 0.0, 'University Event Address 2', '123456789', 'uni2@example.com');
 
 SET @uni_event2_id = LAST_INSERT_ID();
 
-INSERT INTO University_Events (eventID, university, isPrivate, isApproved)
-VALUES (@uni_event2_id, 'Test University', FALSE, FALSE);
+INSERT INTO University_Events (eventID, adminID, university, isPrivate, isApproved)
+VALUES (@uni_event2_id, @rso_admin_id, 'Test University', FALSE, FALSE);
 
 -- Change isApproved values for university events to true
 UPDATE University_Events SET isApproved = TRUE WHERE eventID = @uni_event1_id;
