@@ -326,6 +326,20 @@ body {
 	text-shadow: 0 0 3px darkgray;
 }
 
+.modal-unfollow {
+	font-weight: 600;
+	width: 20%;
+	height: 30px;
+	cursor: pointer;
+	background: lightgray;
+	outline: none;
+	border-radius: 30px;
+	border-color: #bdbdbd;
+	transition: 0.5s;
+	color: rgb(100, 100, 100);
+	text-shadow: 0 0 3px darkgray;
+}
+
 .modal-follow:hover {
 	color: rgb(40, 40, 40);
 	background: #bdbdbd;

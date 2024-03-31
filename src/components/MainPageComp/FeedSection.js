@@ -89,6 +89,14 @@ function Feed() {
     }
   };
 
+  useEffect(() => {
+    console.log("Host JSON: ", selectedHost);
+
+    if (selectedHost !== null) {
+      setModalPost(true);
+    }
+  }, [selectedHost]);
+
   const handlePostNameClick = async (post) => {
     //Note: "source" is a uniquely generated variable from the autoloading APIs
     //If it is a university event, search by superadmin
@@ -96,22 +104,26 @@ function Feed() {
       // API to return university info here
       let university = post.hostName;
       try {
-        const response = await axios.post("http://localhost:3001/superadmin", {
-          university,
-        });
+        const response = await axios.post(
+          "http://localhost:3001/find-superadmin",
+          {
+            university,
+          }
+        );
 
-		let hostInfo = {
-			name: null,
-			descr: null,
-			id: -1
-		};
+        console.log("Uni info search response: ", response.data);
+
+        let hostInfo = {
+          name: null,
+          descr: null,
+          id: -1,
+        };
 
         if (response.status == 200) {
-			hostInfo = response.data.username;
-			hostInfo.descr = response.data.uniDescr;
-			setSelectedHost(hostInfo);
+          hostInfo.name = response.data.superadmin.username;
+          hostInfo.descr = response.data.superadmin.uniDescr;
+          setSelectedHost(hostInfo);
         }
-
       } catch (error) {
         console.log("Error: ", error);
       }
@@ -121,47 +133,47 @@ function Feed() {
       // API to return RSO info here
       let rsoName = post.hostName;
       try {
-        const response = await axios.post("http://localhost:3001/superadmin", {
+        const response = await axios.post("http://localhost:3001/find-rso", {
           rsoName,
         });
 
-		let hostInfo = {
-			name: null,
-			descr: null,
-			id: -1
-		};
+        console.log("RSO info search response: ", response.data);
+
+        let hostInfo = {
+          name: null,
+          descr: null,
+          id: -1,
+        };
 
         if (response.status == 200) {
-			hostInfo = response.data.rsoName;
-			hostInfo.descr = response.data.rsoDescr;
-			hostInfo.id = response.data.rsoID;
-			setSelectedHost(hostInfo);
+          hostInfo.name = response.data.rso.rsoName;
+          hostInfo.descr = response.data.rso.rsoDescr;
+          hostInfo.id = response.data.rso.rsoID;
+          setSelectedHost(hostInfo);
         }
-
       } catch (error) {
         console.log("Error: ", error);
       }
     }
-    setModalPost(true);
+    //setModalPost(true);
   };
 
   const followRSO = async () => {
-	const userID = Cookies.get("uID");
-	const rsoID = selectedHost.id;
-	try {
-        const response = await axios.post("http://localhost:3001/follow-rso", {
-          userID,
-		  rsoID
-        });
+    const userID = Cookies.get("uID");
+    const rsoID = selectedHost.id;
+    try {
+      const response = await axios.post("http://localhost:3001/follow-rso", {
+        userID,
+        rsoID,
+      });
 
-        if (response.status == 200) {
-			console.log("User successfully followed RSO");
-        }
-
-      } catch (error) {
-        console.log("Error: ", error);
+      if (response.status == 200) {
+        console.log("User successfully followed RSO");
       }
-  }
+    } catch (error) {
+      console.log("Error: ", error);
+    }
+  };
 
   const editEvent = (post) => {
     console.log("Edit event:", post);
@@ -212,11 +224,14 @@ function Feed() {
             <div className="modal-content">
               {selectedHost && (
                 <>
-                  <h2 className="modal-header">{selectedHost.eventName}</h2>
-                  <p className="modal-description">{selectedHost.eventDescr}</p>
-                  <div className="modal-buttons">
-                    <button className="modal-follow">Follow</button>
-                  </div>
+                  <h2 className="modal-header">{selectedHost.name}</h2>
+                  <p className="modal-description">{selectedHost.descr}</p>
+                  {selectedHost.id !== -1 && (
+                    <div className="modal-buttons">
+                      <button className="modal-follow">Follow</button>
+                      <button className="modal-unfollow">Unfollow</button>
+                    </div>
+                  )}
                 </>
               )}
               <button className="modal-close" onClick={closeModal}>

@@ -1644,7 +1644,7 @@ app.post("/load-event-reviews", (req, res) => {
 app.post("/autoload-scheduled-events", (req, res) => {
 	const { userID } = req.body;
 
-	console.log("Autoloading scheduled events for user: ", userID);
+	//console.log("Autoloading scheduled events for user: ", userID);
 
 	// Check if the provided user ID exists
 	const checkUserQuery = "SELECT * FROM Users WHERE userID = ?";
@@ -1800,7 +1800,7 @@ app.post("/find-superadmin", (req, res) => {
         SELECT u.username, u.email, s.uniDescr, s.uniLat, s.uniLong
         FROM Superadmins s
         INNER JOIN Users u ON s.userID = u.userID
-        WHERE s.university = ?
+        WHERE u.university = ?
     `;
 
 	// Execute the SQL query
