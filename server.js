@@ -283,8 +283,7 @@ app.post("/register-superadmin", (req, res) => {
 	});
 });
 
-// Insert University API
-// Used when superadmin registers
+// For maintenance use only
 app.post("/add-university", (req, res) => {
 	const { universityName } = req.body;
 
@@ -323,6 +322,7 @@ app.post("/add-university", (req, res) => {
 	});
 });
 
+// For maintenance use only
 app.put("/delete-university", (req, res) => {
 	const { uniID } = req.body;
 
@@ -1655,7 +1655,6 @@ app.post("/load-event-reviews", (req, res) => {
   });
 });
 
-
 //////////////////////////////
 //AUTOLOAD SCHEDULED EVENT API
 //////////////////////////////
@@ -1677,9 +1676,9 @@ app.post("/autoload-scheduled-events", (req, res) => {
                 const loadEventsQuery = `
                     SELECT s.*, e.*, 
                     CASE 
-                        WHEN e.eventID IN (SELECT eventID FROM University_Events) THEN 'University Event'
-                        WHEN e.eventID IN (SELECT eventID FROM RSO_Events) THEN 'RSO Event'
-                    END AS eventType,
+                        WHEN e.eventID IN (SELECT eventID FROM University_Events) THEN 'university'
+                        WHEN e.eventID IN (SELECT eventID FROM RSO_Events) THEN 'RSO'
+                    END AS source,
                     CASE 
                         WHEN e.eventID IN (SELECT eventID FROM University_Events) THEN (SELECT university FROM University_Events WHERE eventID = e.eventID)
                         WHEN e.eventID IN (SELECT eventID FROM RSO_Events) THEN (SELECT rsoName FROM RSOs JOIN RSO_Events ON RSOs.rsoID = RSO_Events.rsoID WHERE RSO_Events.eventID = e.eventID)
@@ -1712,7 +1711,7 @@ app.post("/autoload-scheduled-events", (req, res) => {
 //////////////////////////////
 app.post("/autoload-public-events", (req, res) => {
 	const query = `
-	SELECT events.*, university_events.isPrivate, university_events.isApproved, universities.university AS universityName
+	SELECT events.*, university_events.isPrivate, university_events.isApproved, 'university' AS source, universities.university AS hostName
 	FROM Events events
 	INNER JOIN University_Events university_events ON events.eventID = university_events.eventID
 	INNER JOIN Universities universities ON university_events.university = universities.university
@@ -1736,16 +1735,17 @@ app.post("/autoload-university-events", (req, res) => {
 	const { university } = req.body;
 
 	const query = `
-	SELECT events.*, 'University' AS source
-        FROM Events events
-        INNER JOIN University_Events university_events ON events.eventID = university_events.eventID
-        WHERE university_events.university = ? AND university_events.isApproved = 1
+	SELECT events.*, 'university' AS source, Universities.university AS hostName
+    FROM Events events
+    INNER JOIN University_Events university_events ON events.eventID = university_events.eventID
+    INNER JOIN Universities ON university_events.university = Universities.university
+    WHERE university_events.university = ? AND university_events.isApproved = 1
     UNION
-        SELECT events.*, 'RSO' AS source
-        FROM Events events
-        INNER JOIN RSO_Events rso_events ON events.eventID = rso_events.eventID
-        INNER JOIN RSOs ON rso_events.rsoID = RSOs.rsoID
-        WHERE RSOs.university = ?
+    SELECT events.*, 'RSO' AS source, RSOs.rsoName AS hostName
+    FROM Events events
+    INNER JOIN RSO_Events rso_events ON events.eventID = rso_events.eventID
+    INNER JOIN RSOs ON rso_events.rsoID = RSOs.rsoID
+    WHERE RSOs.university = ?
   `;
 
 	db.query(query, [university, university], (err, results) => {
@@ -1766,7 +1766,7 @@ app.post("/autoload-rso-events", (req, res) => {
 
 	// SQL query to select all events of all RSOs that the user follows
 	const query = `
-    SELECT e.*, rso.rsoName AS rsoHostName
+    SELECT e.*, 'RSO' AS source, rso.rsoName AS hostName
     FROM Events e
     INNER JOIN RSO_Events rsoe ON e.eventID = rsoe.eventID
     INNER JOIN RSOs rso ON rsoe.rsoID = rso.rsoID
