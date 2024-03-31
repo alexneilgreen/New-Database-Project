@@ -10,6 +10,17 @@ const FeedbackPage = () => {
 	const [newComment, setNewComment] = useState("");
 	const [editIndex, setEditIndex] = useState(null); // State to store the index of the comment being edited
 
+	let hostName;
+	let eventName;
+	let eventID;
+
+	useEffect(() => {
+		// Read cookie data on load
+		hostName = Cookies.get("hName");
+		eventName = Cookies.get("eName");
+		eventID = Cookies.get("eID");
+	}, []);
+
 	const handleCommentChange = (event) => {
 		setNewComment(event.target.value);
 	};
@@ -26,7 +37,7 @@ const FeedbackPage = () => {
 		setRating(0);
 
 		try {
-			const eventID = "123"; // Replace with actual event ID
+			const eventID = Cookies.get("eID");
 			const response = await axios.post("http://localhost:3001/review-event", {
 				userID: userID,
 				eventID: eventID,
@@ -45,7 +56,7 @@ const FeedbackPage = () => {
 
 	const handleEditSubmit = async (index) => {
 		const userID = Cookies.get("uID");
-		const eventID = "123"; // Replace with actual event ID
+		const eventID = Cookies.get("eID");
 		const updatedComment = comments[index].comment;
 		const updatedRating = comments[index].rating;
 
@@ -63,6 +74,21 @@ const FeedbackPage = () => {
 		}
 	};
 
+	const handleDeleteReview = async () => {
+		const userID = Cookies.get("uID");
+		const eventID = Cookies.get("eID");
+
+		try {
+			const response = await axios.put("http://localhost:3001/delete-review", {
+				userID: userID,
+				eventID: eventID,
+			});
+			console.log(response.data);
+		} catch (error) {
+			console.error("Error editing review:", error);
+		}
+	};
+
 	return (
 		<div className="feedback-page">
 			<Link to="/main" className="link-btn">
@@ -70,10 +96,10 @@ const FeedbackPage = () => {
 			</Link>
 			<div className="feedback-form">
 				<div className="feedback-header">
-					<h2>Event Name</h2>
-					<h3>Host Name</h3>
+					<h2>{Cookies.get("eName")}</h2>
+					<h3>{Cookies.get("hName")}</h3>
 				</div>
-				<form onSubmit={submitReview}>
+				<form>
 					<div className="form-group">
 						<textarea
 							value={newComment}
@@ -94,7 +120,7 @@ const FeedbackPage = () => {
 							required
 						/>
 					</div>
-					<button type="submit" className="submit-btn">
+					<button type="submit" className="submit-btn" onClick={submitReview}>
 						Submit
 					</button>
 				</form>
@@ -145,12 +171,15 @@ const FeedbackPage = () => {
 										</button>
 									</>
 								)}
-								<button className="delete-button">Delete</button>
+								<button className="delete-button" onClick={handleDeleteReview}>
+									Delete
+								</button>
 							</div>
 						</li>
 					))}
 				</ul>
 			</div>
+			{console.log(Cookies.get())} {/* This encourages the cookies to update */}
 		</div>
 	);
 };
