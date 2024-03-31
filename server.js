@@ -1660,43 +1660,43 @@ app.post("/load-event-reviews", (req, res) => {
 //AUTOLOAD SCHEDULED EVENT API
 //////////////////////////////
 app.post("/autoload-scheduled-events", (req, res) => {
-	const { userID, startIndex, count } = req.body;
+    const { userID } = req.body;
 
-	console.log("Autoloading scheduled events for user: ", userID);
+    console.log("Autoloading scheduled events for user: ", userID);
 
-	// Check if the provided user ID exists
-	const checkUserQuery = "SELECT * FROM Users WHERE userID = ?";
-	db.query(checkUserQuery, [userID], (checkErr, checkResults) => {
-		if (checkErr) {
-			console.error(checkErr);
-			res.status(500).json({ message: "Internal Server Error" });
-			return;
-		} else {
-			if (checkResults.length > 0) {
-				// User found, proceed to load scheduled events within the specified range
-				const loadEventsQuery =
-					"SELECT * FROM Scheduled_Events WHERE userID = ? LIMIT ?, ?";
-				db.query(
-					loadEventsQuery,
-					[userID, startIndex, count],
-					(loadErr, loadResults) => {
-						if (loadErr) {
-							console.error(loadErr);
-							res.status(500).json({ message: "Internal Server Error" });
-							return;
-						} else {
-							res.status(200).json({ events: loadResults });
-							return;
-						}
-					}
-				);
-			} else {
-				// User not found
-				res.status(404).json({ message: "User not found" });
-				return;
-			}
-		}
-	});
+    // Check if the provided user ID exists
+    const checkUserQuery = "SELECT * FROM Users WHERE userID = ?";
+    db.query(checkUserQuery, [userID], (checkErr, checkResults) => {
+        if (checkErr) {
+            console.error(checkErr);
+            res.status(500).json({ message: "Internal Server Error" });
+            return;
+        } else {
+            if (checkResults.length > 0) {
+                // User found, proceed to load scheduled events within the specified range
+                const loadEventsQuery = `
+                    SELECT s.*, e.* 
+                    FROM Scheduled_Events s
+                    INNER JOIN events e ON s.eventID = e.eventID
+                    WHERE s.userID = ?
+                `;
+                db.query(loadEventsQuery, [userID], (loadErr, loadResults) => {
+                    if (loadErr) {
+                        console.error(loadErr);
+                        res.status(500).json({ message: "Internal Server Error" });
+                        return;
+                    } else {
+                        res.status(200).json({ events: loadResults });
+                        return;
+                    }
+                });
+            } else {
+                // User not found
+                res.status(404).json({ message: "User not found" });
+                return;
+            }
+        }
+    });
 });
 
 //////////////////////////////

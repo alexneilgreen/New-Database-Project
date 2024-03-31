@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom"; // Import Link for navigation
 import axios from "axios";
 import "../../css/MainPageStyles.css";
+import Cookies from "js-cookie";
 
 function Feed() {
   const [activeTab, setActiveTab] = useState(1);
@@ -23,9 +24,10 @@ function Feed() {
   const handleTabClick = async (e, tabNumber) => {
     e.preventDefault();
     setActiveTab(tabNumber);
-	console.log("Active tab: ", activeTab);
+    console.log("Passed tab value: ", tabNumber);
+    console.log("Active tab: ", tabNumber);
     //If selected tab is first tab and if tab is not already active
-    if (activeTab == 1) {
+    if (tabNumber == 1) {
       //Autoload public events
       try {
         const response = await axios.post(
@@ -36,7 +38,7 @@ function Feed() {
       } catch (error) {
         console.log("API error:", error.response);
       }
-    } else if (activeTab == 2) {
+    } else if (tabNumber == 2) {
       //Autoload university events
       try {
         const response = await axios.post(
@@ -47,18 +49,19 @@ function Feed() {
       } catch (error) {
         console.log("API error:", error.response);
       }
-    } else if (activeTab == 3) {
+    } else if (tabNumber == 3) {
       //Autoload scheduled events
+      const userID = Cookies.get('uID');
       try {
         const response = await axios.post(
           "http://localhost:3001/autoload-scheduled-events",
-          {}
+          { userID }
         );
         console.log("Loaded results: ", response.data);
       } catch (error) {
         console.log("API error:", error.response);
       }
-    } else if (activeTab == 4) {
+    } else if (tabNumber == 4) {
       //Autolad rso events
       try {
         const response = await axios.post(
