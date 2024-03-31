@@ -397,6 +397,33 @@ app.put("/delete-user", (req, res) => {
 });
 
 //////////////////////////////
+///////GET USER UNIVERSITY API
+//////////////////////////////
+app.post("/get-user-university", (req, res) => {
+	const { userId } = req.body; // Assuming userId is sent in the request body
+  
+	// Query to fetch the user's university based on their ID
+	const query = "SELECT university FROM Users WHERE userID = ?";
+  
+	db.query(query, [userId], (err, results) => {
+	  if (err) {
+		console.error(err);
+		res.status(500).json({ message: "Internal Server Error" });
+		return;
+	  }
+  
+	  if (results.length === 0) {
+		// User not found
+		res.status(404).json({ message: "User not found" });
+		return;
+	  }
+  
+	  const university = results[0].university;
+	  res.status(200).json({ university: university });
+	});
+  });
+
+//////////////////////////////
 ///////////// RSO CREATION API
 //////////////////////////////
 app.post("/create-rso", (req, res) => {
