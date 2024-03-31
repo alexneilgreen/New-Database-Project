@@ -10,6 +10,11 @@ function Feed() {
 	const [selectedPost, setSelectedPost] = useState(null);
 	const [posts, setPosts] = useState([]);
 
+	useEffect(() => {
+		// Set the default active tab to 1 before the first tab is clicked
+		handleTabClick(null, 1);
+	}, []); // Run this effect only once, on initial render
+
 	const generatePostBoxes = () => {
 		if (!Array.isArray(posts) || posts.length === 0) {
 			return <div>No posts found.</div>;
@@ -17,7 +22,7 @@ function Feed() {
 		return posts.map((post) => (
 			<div className="post-box" key={post.eventID}>
 				<div className="post-header">
-					<h4 onClick={() => handlePostNameClick(post)}>{post.eventName}</h4>
+					<h4>{post.eventName}</h4>
 					<h4>{post.eventTime}</h4>
 					<h4>{post.eventAddress}</h4>
 				</div>
@@ -26,7 +31,10 @@ function Feed() {
 				</div>
 				<div className="post-footer">
 					<p>
-						<strong>{post.eventEmail}</strong>
+						Host:{" "}
+						<strong onClick={() => handlePostNameClick(post)}>
+							{post.eventEmail}
+						</strong>
 					</p>
 					<Link to="/feedback">
 						<button>Feedback</button>
@@ -39,7 +47,7 @@ function Feed() {
 	};
 
 	const handleTabClick = async (e, tabNumber) => {
-		e.preventDefault();
+		e && e.preventDefault();
 		setActiveTab(tabNumber);
 		try {
 			let response;
