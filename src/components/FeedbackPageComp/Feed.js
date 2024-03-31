@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import "../../css/FeedbackPageStyles.css";
@@ -14,12 +14,7 @@ const FeedbackPage = () => {
 	let eventName;
 	let eventID;
 
-	useEffect(() => {
-		// Read cookie data on load
-		hostName = Cookies.get("hName");
-		eventName = Cookies.get("eName");
-		eventID = Cookies.get("eID");
-
+	useLayoutEffect(() => {
 		loadReviews();
 	}, []);
 
@@ -32,7 +27,7 @@ const FeedbackPage = () => {
 			});
 
 			//response.data.eventReviews.{key}
-			//comment
+			//comments
 			//eventID
 			//reviewRating
 			//userID
@@ -202,7 +197,7 @@ const FeedbackPage = () => {
 					))}
 				</ul>
 			</div>
-			{console.log(Cookies.get())} {/* This encourages the cookies to update */}
+			{/*console.log(Cookies.get())*/} {/* This encourages the cookies to update */}
 		</div>
 	);
 };

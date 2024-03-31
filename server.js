@@ -737,23 +737,39 @@ app.put("/leave-rso-board", (req, res) => {
 // FOLLOW RSO API/////////////
 //////////////////////////////
 app.post("/follow-rso", (req, res) => {
-  const { userID, rsoID } = req.body;
-
-  console.log("User following RSO: ", userID, rsoID);
-
-  // Insert the user into RSO_Members table
-  const insertQuery = "INSERT INTO RSO_Members (rsoID, userID) VALUES (?, ?)";
-  db.query(insertQuery, [rsoID, userID], (insertErr, insertResults) => {
-    if (insertErr) {
-      console.error(insertErr);
-      res.status(500).json({ message: "Internal Server Error" });
-      return;
-    } else {
-      res.status(200).json({ message: "User successfully followed the RSO" });
-      return;
-    }
+	const { userID, rsoID } = req.body;
+  
+	console.log("User following RSO: ", userID, rsoID);
+  
+	// Check if the user is already following the RSO
+	const checkFollowQuery = "SELECT * FROM RSO_Members WHERE rsoID = ? AND userID = ?";
+	db.query(checkFollowQuery, [rsoID, userID], (checkErr, checkResults) => {
+	  if (checkErr) {
+		console.error(checkErr);
+		res.status(500).json({ message: "Internal Server Error" });
+		return;
+	  } else {
+		if (checkResults.length > 0) {
+		  // User is already following the RSO, send a message indicating that
+		  res.status(400).json({ message: "User is already following the RSO" });
+		  return;
+		} else {
+		  // User is not following the RSO, insert the user into RSO_Members table
+		  const insertQuery = "INSERT INTO RSO_Members (rsoID, userID) VALUES (?, ?)";
+		  db.query(insertQuery, [rsoID, userID], (insertErr, insertResults) => {
+			if (insertErr) {
+			  console.error(insertErr);
+			  res.status(500).json({ message: "Internal Server Error" });
+			  return;
+			} else {
+			  res.status(200).json({ message: "User successfully followed the RSO" });
+			  return;
+			}
+		  });
+		}
+	  }
+	});
   });
-});
 
 //////////////////////////////
 // UNFOLLOW RSO API///////////
