@@ -193,7 +193,22 @@ function Feed() {
 		}
 	};
 
-	const unfollowRSO = async (selectedHost) => {};
+	const unfollowRSO = async (selectedHost) => {
+		const userID = Cookies.get("uID");
+		const rsoID = selectedHost.id;
+		try {
+			const response = await axios.post("http://localhost:3001/unfollow-rso", {
+				userID,
+				rsoID,
+			});
+
+			if (response.status == 200) {
+				console.log("User successfully unfollowed RSO");
+			}
+		} catch (error) {
+			console.log("Error: ", error);
+		}
+	};
 
 	const editEvent = (post) => {
 		console.log("Edit event:", post);
@@ -250,13 +265,13 @@ function Feed() {
 										<div className="modal-buttons">
 											<button
 												className="modal-follow"
-												onClick={followRSO(selectedHost)}
+												onClick={() => followRSO(selectedHost)}
 											>
 												Follow
 											</button>
 											<button
 												className="modal-unfollow"
-												onClick={unfollowRSO(selectedHost)}
+												onClick={() => unfollowRSO(selectedHost)}
 											>
 												Unfollow
 											</button>
