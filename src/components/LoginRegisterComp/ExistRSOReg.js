@@ -16,11 +16,11 @@ function ExistRSOUserReg() {
 	const [university, setSelectedUniversity] = useState("");
 	const navigate = useNavigate();
 
-	const adminCode = "default"; //Unused: Field in rso table. rsoCode has taken its place
+	let adminCode = "default"; //Unused: Field in rso table. rsoCode has taken its place
 
-	let rsoId;
-	let userId;
-	let adminId;
+	let rsoID;
+	let userID;
+	let adminID;
 
 	const register_ExistingRSO = async (e) => {
 		e.preventDefault();
@@ -43,7 +43,7 @@ function ExistRSOUserReg() {
 			);
 			if (response.status == 200) {
 				console.log("Admin code exists for RSO with ID: ", response.data.rsoID);
-				rsoId = response.data.rsoID;
+				rsoID = response.data.rsoID;
 			} else {
 				console.error("Error: RSO with code does not exit");
 				return;
@@ -65,7 +65,7 @@ function ExistRSOUserReg() {
 			console.log("Register into exisitng RSO API Response:", response);
 			if (response.status == 200) {
 				//Get message if needed
-				userId = response.data.userID;
+				userID = response.data.userID;
 			} else {
 				console.error("Registration error: ", response.data.message);
 			}
@@ -77,12 +77,12 @@ function ExistRSOUserReg() {
 		//Now try to make the user an admin
 		try {
 			const response = await axios.post("http://localhost:3001/add-rso-admin", {
-				userId,
+				userID,
 			});
 			console.log("Admin addition response:", response);
 			if (response.status == 200) {
 				//Get message if needed
-				adminId = response.data.adminID;
+				adminID = response.data.adminID;
 			} else {
 				console.error("Admin addition error: ", response.data.message);
 			}
@@ -96,9 +96,9 @@ function ExistRSOUserReg() {
 			const response = await axios.post(
 				"http://localhost:3001/join-rso-board",
 				{
-					adminId,
-					rsoId,
-					rsoCode,
+					adminID,
+					rsoID,
+					adminCode,
 				}
 			);
 			console.log("Admin joining RSO response:", response);

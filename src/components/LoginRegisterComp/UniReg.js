@@ -5,7 +5,7 @@ import "../../css/LoginRegisterStyles.css";
 import logo from "../../images/Campus Connect Logo.png";
 
 function UniReg() {
-	const [uniUsername, setUniUsername] = useState("");
+	const [username, setUniUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [phone, setPhoneNumber] = useState("");
 	const [email, setEmail] = useState("");
@@ -15,8 +15,8 @@ function UniReg() {
 
 	let uniLat = 0; //Default
 	let uniLong = 0; //Default
-	let userId;
-	let superId;
+	let userID;
+	let superID;
 
 	const register_Superadmin = async (e) => {
 		e.preventDefault();
@@ -25,7 +25,7 @@ function UniReg() {
 			const response = await axios.post(
 				"http://localhost:3001/register-superadmin",
 				{
-					uniUsername,
+					username,
 					password,
 					phone,
 					email,
@@ -38,8 +38,8 @@ function UniReg() {
 			console.log("Superadmin register Response:", response);
 			if (response.status == 200) {
 				//Get message if needed
-				userId = response.data.userID;
-				superId = response.data.superID;
+				userID = response.data.userID;
+				superID = response.data.superID;
 				navigate("/");
 			} else {
 				console.error("Registration error: ", response.data.message);
