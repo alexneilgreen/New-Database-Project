@@ -419,7 +419,7 @@ app.post("/create-rso", (req, res) => {
 				// RSO successfully created
 				const rsoID = insertResults.insertId;
 				res
-					.status(201)
+					.status(200)
 					.json({ message: "RSO created successfully", rsoID: rsoID });
 				return;
 			}
@@ -1610,6 +1610,24 @@ app.put("/delete-review", (req, res) => {
 		}
 	);
 });
+
+//////////////////////////////
+////AUTOLOAD EVENT REVIEWS API
+//////////////////////////////
+app.post("/load-event-reviews", (req, res) => {
+  const { eventID } = req.body;
+
+  const query = "SELECT * FROM Event_Reviews WHERE eventID = ?";
+  db.query(query, [eventID], (err, results) => {
+    if (err) {
+      console.error("Error fetching event reviews:", err);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    }
+    res.status(200).json({ eventReviews: results });
+  });
+});
+
 
 //////////////////////////////
 //AUTOLOAD SCHEDULED EVENT API
