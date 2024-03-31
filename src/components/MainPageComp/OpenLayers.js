@@ -22,6 +22,7 @@ const OpenLayers = () => {
   const [longitude, setLongitude] = useState("");
 
   const universityCoordinates = {
+	"Test University": { lat: 28.6024, long: -81.2001 },
     FAU: { lat: 26.3705, long: -80.1024 },
     FGCU: { lat: 26.4643, long: -81.7737 },
     FIU: { lat: 25.7579, long: -80.3735 },
@@ -53,9 +54,14 @@ const OpenLayers = () => {
           userID
         });
         console.log("University: ", response.data.university);
-		if (response.data.university){
-			setLatitude(universityCoordinates[response.data.university].lat);
-			setLongitude(universityCoordinates[response.data.university].long);
+		if (response.data.university) {
+			const universityName = response.data.university;
+			const universityCoords = universityCoordinates[universityName];
+			console.log("Coords: ", universityCoords);
+			if (universityCoords) {
+			  setLatitude(universityCoords.lat);
+			  setLongitude(universityCoords.long);
+			}
 		}
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -67,6 +73,8 @@ const OpenLayers = () => {
 
   useLayoutEffect(() => {
     // Create the map only if it hasn't been created yet
+	console.log("Map center coords... Long " + longitude + " || Lat: " + latitude);
+
     if (!mapRef.current) {
       console.log("Generating map");
       let mainMap = new Map({
@@ -108,7 +116,7 @@ const OpenLayers = () => {
 
       setMap(mainMap);
     }
-  }, [iconLayer, iconFeatures]);
+  }, [iconLayer, iconFeatures, longitude, latitude]);
 
   const addIconToMap = (long, lat) => {
     const iconFeature = new Feature({

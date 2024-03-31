@@ -32,9 +32,9 @@ class FullScreen extends React.Component {
 
 	render() {
 		return (
-			<div class="map-content-box" id="mapContainer">
+			<div className="map-content-box" id="mapContainer">
 				<OpenLayers />
-				<button class="map-button" id="mapbtn" onClick={this.toggleFullscreen}>
+				<button className="map-button" id="mapbtn" onClick={this.toggleFullscreen}>
 					<img id="map-btn-image" src={fullscreenLogo} alt="Fullscreen" />
 				</button>
 			</div>
