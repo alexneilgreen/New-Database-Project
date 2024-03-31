@@ -29,7 +29,7 @@ function NewUserReg() {
 			if (response.status == 200) {
 				//Get message if needed
 				userId = response.data.userID;
-				// navigate("/");
+				navigate("/");
 			} else {
 				console.error("Registration error: ", response.data.message);
 				document.getElementById("ErrorMessage").innerText =
@@ -37,6 +37,7 @@ function NewUserReg() {
 			}
 		} catch (error) {
 			console.error("Error:", error.message);
+			// document.getElementById("ErrorMessage").innerText = error.message;
 			return;
 		}
 	};
