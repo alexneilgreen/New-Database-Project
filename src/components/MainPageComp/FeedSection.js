@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 function Feed() {
 	const [activeTab, setActiveTab] = useState(1);
 	const [modalPost, setModalPost] = useState(null);
-	const [selectedPost, setSelectedPost] = useState(null);
+	const [selectedHost, setSelectedHost] = useState(null);
 	const [posts, setPosts] = useState([]);
 
 	useEffect(() => {
@@ -31,9 +31,10 @@ function Feed() {
 				</div>
 				<div className="post-footer">
 					<p>
-						Host:{" "} 
+						Host:{" "}
 						<strong onClick={() => handlePostNameClick(post)}>
-							{post.hostName} {/* Get host name. Uniquely generated varaible from API */}
+							{post.eventName} {/* {post.hostName}{" "} */}
+							{/* Get host name. Uniquely generated varaible from API */}
 						</strong>
 					</p>
 					<Link to="/feedback">
@@ -89,13 +90,16 @@ function Feed() {
 	};
 
 	const handlePostNameClick = (post) => {
-		setSelectedPost(post);
 		//Note: "source" is a uniquely generated variable from the autoloading APIs
 		//If it is a university event, search by superadmin
-		if(post.source == "university"){
+		if (post.source == "university") {
+			// API to return university info here
+			setSelectedHost(post);
 		}
 		//If it is an rso event, search by rso
-		else if(post.source == "RSO"){	
+		else if (post.source == "RSO") {
+			// API to retuen RSO info here
+			setSelectedHost(post);
 		}
 		setModalPost(true);
 	};
@@ -110,7 +114,7 @@ function Feed() {
 
 	const closeModal = () => {
 		setModalPost(false);
-		setSelectedPost(null);
+		setSelectedHost(null);
 	};
 
 	return (
@@ -147,10 +151,10 @@ function Feed() {
 				<div className="modal-background">
 					<div className="modal">
 						<div className="modal-content">
-							{selectedPost && (
+							{selectedHost && (
 								<>
-									<h2 className="modal-header">{selectedPost.eventName}</h2>
-									<p className="modal-description">{selectedPost.eventDescr}</p>
+									<h2 className="modal-header">{selectedHost.eventName}</h2>
+									<p className="modal-description">{selectedHost.eventDescr}</p>
 									<div className="modal-buttons">
 										<button className="modal-follow">Follow</button>
 									</div>
