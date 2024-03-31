@@ -58,9 +58,9 @@ function ExistRSOUserReg() {
 			const response = await axios.post("http://localhost:3001/register-user", {
 				username,
 				password,
-				phoneNumber,
+				phone,
 				email,
-				selectedUniversity,
+				university,
 			});
 			console.log("Register into exisitng RSO API Response:", response);
 			if (response.status == 200) {
