@@ -7,7 +7,7 @@ function Feed() {
   const [activeTab, setActiveTab] = useState(1);
   const [modalPost, setModalPost] = useState(null); // State to manage modal post-box
 
-  useEffect(() => {
+  /*useEffect(() => {
     const fetchPublicEvents = async () => {
       try {
         const response = await axios.post("/autoload-public-events", {});
@@ -18,7 +18,7 @@ function Feed() {
     };
 
     fetchPublicEvents(); // Call the API when the component mounts
-  }, []); // Empty dependency array ensures the effect runs only once
+  }, []); // Empty dependency array ensures the effect runs only once*/
 
   const handleTabClick = async (e, tabNumber) => {
     e.preventDefault();
