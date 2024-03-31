@@ -267,7 +267,7 @@ app.post("/register-superadmin", (req, res) => {
 									return;
 								} else {
 									const superID = insertSuperadminResults.insertId;
-									res.status(201).json({
+									res.status(200).json({
 										message: "Superadmin registered successfully",
 										userID: userID,
 										superID: superID,

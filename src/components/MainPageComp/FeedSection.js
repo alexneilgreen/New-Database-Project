@@ -7,10 +7,24 @@ function Feed() {
   const [activeTab, setActiveTab] = useState(1);
   const [modalPost, setModalPost] = useState(null); // State to manage modal post-box
 
+  useEffect(() => {
+    const fetchPublicEvents = async () => {
+      try {
+        const response = await axios.post("/autoload-public-events", {});
+        console.log("Loaded public events:", response.data);
+      } catch (error) {
+        console.log("API error:", error.response);
+      }
+    };
+
+    fetchPublicEvents(); // Call the API when the component mounts
+  }, []); // Empty dependency array ensures the effect runs only once
+
   const handleTabClick = async (e, tabNumber) => {
     e.preventDefault();
     let currentTab = activeTab;
     setActiveTab(tabNumber);
+	console.log("Active tab: ", currentTab);
     //If selected tab is first tab and if tab is not already active
     if (activeTab == 1) {
       //Autoload public events
