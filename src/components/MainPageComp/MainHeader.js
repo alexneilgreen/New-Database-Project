@@ -44,11 +44,18 @@ function MainHeader() {
 					{showDropdown && (
 						<div className="dropdown-content">
 							<Link
-								to="/createEvent"
+								to="/createRSOEvent"
 								className="dropdown-link"
 								onClick={toggleDropdown}
 							>
-								Create Event
+								Create RSO Event
+							</Link>
+							<Link
+								to="/createUniEvent"
+								className="dropdown-link"
+								onClick={toggleDropdown}
+							>
+								Create Uni Event
 							</Link>
 							<Link
 								to="/reviewEvent"

@@ -1,6 +1,6 @@
 import React from "react";
 
-import FormBox from "../components/EventPageComp/CreateFormBox.js";
+import FormBox from "../components/EventPageComp/CreateUniFormBox.js";
 
 const CreateEventPage = () => {
 	return (
