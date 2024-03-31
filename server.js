@@ -44,7 +44,7 @@ app.use(express.json());
 //=======================================
 
 //////////////////////////////
-//////////////////// Login API
+// Login API//////////////////
 //////////////////////////////
 app.post("/login", (req, res) => {
 	const { username, password } = req.body;
@@ -149,7 +149,7 @@ app.post("/login", (req, res) => {
 });
 
 //////////////////////////////
-///////Basic User Register API
+//Basic User Register API/////
 //////////////////////////////
 app.post("/register-user", (req, res) => {
 	const { username, password, phone, email, university } = req.body;
@@ -201,7 +201,7 @@ app.post("/register-user", (req, res) => {
 });
 
 //////////////////////////////
-///////Superadmin Register API
+//Superadmin Register API/////
 //////////////////////////////
 app.post("/register-superadmin", (req, res) => {
 	const {
@@ -358,7 +358,7 @@ app.put("/delete-university", (req, res) => {
 });
 
 //////////////////////////////
-//////////// User Deletion API
+// User Deletion API//////////
 //////////////////////////////
 app.put("/delete-user", (req, res) => {
 	const { userID } = req.body; // Assuming userID is sent in the request body
@@ -397,34 +397,34 @@ app.put("/delete-user", (req, res) => {
 });
 
 //////////////////////////////
-///////GET USER UNIVERSITY API
+//GET USER UNIVERSITY API/////
 //////////////////////////////
 app.post("/get-user-university", (req, res) => {
 	const { userID } = req.body; // Assuming userId is sent in the request body
-  
+
 	// Query to fetch the user's university based on their ID
 	const query = "SELECT university FROM Users WHERE userID = ?";
-  
+
 	db.query(query, [userID], (err, results) => {
-	  if (err) {
-		console.error(err);
-		res.status(500).json({ message: "Internal Server Error" });
-		return;
-	  }
-  
-	  if (results.length === 0) {
-		// User not found
-		res.status(404).json({ message: "User not found" });
-		return;
-	  }
-  
-	  const university = results[0].university;
-	  res.status(200).json({ university: university });
+		if (err) {
+			console.error(err);
+			res.status(500).json({ message: "Internal Server Error" });
+			return;
+		}
+
+		if (results.length === 0) {
+			// User not found
+			res.status(404).json({ message: "User not found" });
+			return;
+		}
+
+		const university = results[0].university;
+		res.status(200).json({ university: university });
 	});
-  });
+});
 
 //////////////////////////////
-///////////// RSO CREATION API
+// RSO CREATION API///////////
 //////////////////////////////
 app.post("/create-rso", (req, res) => {
 	const { rsoCode, adminCode, rsoName, rsoDescr, university } = req.body;
@@ -455,7 +455,7 @@ app.post("/create-rso", (req, res) => {
 });
 
 //////////////////////////////
-///////////////// RSO EDIT API
+// RSO EDIT API///////////////
 //////////////////////////////
 app.put("/edit-rso", (req, res) => {
 	const { adminID, rsoID, rsoName, rsoDescr } = req.body;
@@ -505,7 +505,7 @@ app.put("/edit-rso", (req, res) => {
 });
 
 //////////////////////////////
-///////////// RSO DELETION API
+// RSO DELETION API///////////
 //////////////////////////////
 app.put("/delete-rso", (req, res) => {
 	const { adminID, rsoID } = req.body;
@@ -545,7 +545,7 @@ app.put("/delete-rso", (req, res) => {
 });
 
 //////////////////////////////
-//////////// ADD RSO ADMIN API
+// ADD RSO ADMIN API//////////
 //////////////////////////////
 app.post("/add-rso-admin", (req, res) => {
 	const { userID } = req.body;
@@ -572,7 +572,7 @@ app.post("/add-rso-admin", (req, res) => {
 });
 
 //////////////////////////////
-///////// REMOVE RSO ADMIN API
+// REMOVE RSO ADMIN API///////
 //////////////////////////////
 app.put("/remove-rso-admin", (req, res) => {
 	const { adminID } = req.body;
@@ -600,7 +600,7 @@ app.put("/remove-rso-admin", (req, res) => {
 });
 
 //////////////////////////////
-/////////// JOIN RSO BOARD API
+// JOIN RSO BOARD API/////////
 //////////////////////////////
 app.post("/join-rso-board", (req, res) => {
 	const { adminID, rsoID, adminCode } = req.body;
@@ -703,7 +703,7 @@ app.post("/check-last-admin", (req, res) => {
 });
 
 //////////////////////////////
-////////// LEAVE RSO BOARD API
+// LEAVE RSO BOARD API////////
 //////////////////////////////
 app.put("/leave-rso-board", (req, res) => {
 	const { adminID, rsoID } = req.body;
@@ -734,7 +734,7 @@ app.put("/leave-rso-board", (req, res) => {
 });
 
 //////////////////////////////
-/////////////// FOLLOW RSO API
+// FOLLOW RSO API/////////////
 //////////////////////////////
 app.post("/follow-rso", (req, res) => {
 	const { userID, rsoID, rsoCode } = req.body;
@@ -775,7 +775,7 @@ app.post("/follow-rso", (req, res) => {
 });
 
 //////////////////////////////
-///////////// UNFOLLOW RSO API
+// UNFOLLOW RSO API///////////
 //////////////////////////////
 app.post("/unfollow-rso", (req, res) => {
 	const { userID, rsoID } = req.body;
@@ -806,7 +806,7 @@ app.post("/unfollow-rso", (req, res) => {
 });
 
 //////////////////////////////
-///////// CREATE RSO EVENT API
+// CREATE RSO EVENT API///////
 //////////////////////////////
 app.post("/create-rso-event", (req, res) => {
 	const {
@@ -922,7 +922,7 @@ app.post("/create-rso-event", (req, res) => {
 });
 
 //////////////////////////////
-/////////////// EDIT EVENT API
+// EDIT EVENT API/////////////
 //////////////////////////////
 app.put("/edit-event", (req, res) => {
 	const {
@@ -1046,7 +1046,7 @@ app.put("/edit-event", (req, res) => {
 });
 
 //////////////////////////////
-///////// DELETE RSO EVENT API
+// DELETE RSO EVENT API///////
 //////////////////////////////
 app.put("/delete-rso-event", (req, res) => {
 	const { adminID, eventID } = req.body;
@@ -1093,7 +1093,7 @@ app.put("/delete-rso-event", (req, res) => {
 });
 
 //////////////////////////////
-//////// PROPOSE UNI EVENT API
+// PROPOSE UNI EVENT API//////
 //////////////////////////////
 app.post("/propose-university-event", (req, res) => {
 	const {
@@ -1183,7 +1183,7 @@ app.post("/propose-university-event", (req, res) => {
 });
 
 //////////////////////////////
-//////// APPROVE UNI EVENT API
+// APPROVE UNI EVENT API//////
 //////////////////////////////
 app.post("/approve-university-event", (req, res) => {
 	const { superID, eventID } = req.body;
@@ -1269,7 +1269,7 @@ app.post("/approve-university-event", (req, res) => {
 });
 
 //////////////////////////////
-///////// DELETE UNI EVENT API
+// DELETE UNI EVENT API///////
 //////////////////////////////
 app.put("/delete-university-event", (req, res) => {
 	const { eventID, adminID, superID } = req.body;
@@ -1402,7 +1402,7 @@ app.put("/delete-university-event", (req, res) => {
 });
 
 //////////////////////////////
-/////////// SCHEDULE EVENT API
+// SCHEDULE EVENT API/////////
 //////////////////////////////
 app.post("/schedule-event", (req, res) => {
 	const { userID, eventID } = req.body;
@@ -1447,7 +1447,7 @@ app.post("/schedule-event", (req, res) => {
 });
 
 //////////////////////////////
-///////// UNSCHEDULE EVENT API
+// UNSCHEDULE EVENT API///////
 //////////////////////////////
 app.post("/unschedule-event", (req, res) => {
 	const { userID, eventID } = req.body;
@@ -1492,7 +1492,7 @@ app.post("/unschedule-event", (req, res) => {
 });
 
 //////////////////////////////
-///////////// WRITE REVIEW API
+// WRITE REVIEW API///////////
 //////////////////////////////
 app.post("/review-event", (req, res) => {
 	const { userID, eventID, comment, reviewRating } = req.body;
@@ -1535,7 +1535,7 @@ app.post("/review-event", (req, res) => {
 });
 
 //////////////////////////////
-////////////// EDIT REVIEW API
+// EDIT REVIEW API////////////
 //////////////////////////////
 app.put("/edit-review", (req, res) => {
 	const { userID, eventID, comment, reviewRating } = req.body;
@@ -1587,7 +1587,7 @@ app.put("/edit-review", (req, res) => {
 });
 
 //////////////////////////////
-//////////// DELETE REVIEW API
+// DELETE REVIEW API//////////
 //////////////////////////////
 app.put("/delete-review", (req, res) => {
 	const { userID, eventID } = req.body;
@@ -1639,68 +1639,67 @@ app.put("/delete-review", (req, res) => {
 });
 
 //////////////////////////////
-////AUTOLOAD EVENT REVIEWS API
+//AUTOLOAD EVENT REVIEWS API//
 //////////////////////////////
 app.post("/load-event-reviews", (req, res) => {
-  const { eventID } = req.body;
+	const { eventID } = req.body;
 
-  const query = "SELECT * FROM Event_Reviews WHERE eventID = ?";
-  db.query(query, [eventID], (err, results) => {
-    if (err) {
-      console.error("Error fetching event reviews:", err);
-      res.status(500).json({ message: "Internal Server Error" });
-      return;
-    }
-    res.status(200).json({ eventReviews: results });
-  });
+	const query = "SELECT * FROM Event_Reviews WHERE eventID = ?";
+	db.query(query, [eventID], (err, results) => {
+		if (err) {
+			console.error("Error fetching event reviews:", err);
+			res.status(500).json({ message: "Internal Server Error" });
+			return;
+		}
+		res.status(200).json({ eventReviews: results });
+	});
 });
-
 
 //////////////////////////////
 //AUTOLOAD SCHEDULED EVENT API
 //////////////////////////////
 app.post("/autoload-scheduled-events", (req, res) => {
-    const { userID } = req.body;
+	const { userID } = req.body;
 
-    console.log("Autoloading scheduled events for user: ", userID);
+	console.log("Autoloading scheduled events for user: ", userID);
 
-    // Check if the provided user ID exists
-    const checkUserQuery = "SELECT * FROM Users WHERE userID = ?";
-    db.query(checkUserQuery, [userID], (checkErr, checkResults) => {
-        if (checkErr) {
-            console.error(checkErr);
-            res.status(500).json({ message: "Internal Server Error" });
-            return;
-        } else {
-            if (checkResults.length > 0) {
-                // User found, proceed to load scheduled events within the specified range
-                const loadEventsQuery = `
+	// Check if the provided user ID exists
+	const checkUserQuery = "SELECT * FROM Users WHERE userID = ?";
+	db.query(checkUserQuery, [userID], (checkErr, checkResults) => {
+		if (checkErr) {
+			console.error(checkErr);
+			res.status(500).json({ message: "Internal Server Error" });
+			return;
+		} else {
+			if (checkResults.length > 0) {
+				// User found, proceed to load scheduled events within the specified range
+				const loadEventsQuery = `
                     SELECT s.*, e.* 
                     FROM Scheduled_Events s
                     INNER JOIN events e ON s.eventID = e.eventID
                     WHERE s.userID = ?
                 `;
-                db.query(loadEventsQuery, [userID], (loadErr, loadResults) => {
-                    if (loadErr) {
-                        console.error(loadErr);
-                        res.status(500).json({ message: "Internal Server Error" });
-                        return;
-                    } else {
-                        res.status(200).json({ events: loadResults });
-                        return;
-                    }
-                });
-            } else {
-                // User not found
-                res.status(404).json({ message: "User not found" });
-                return;
-            }
-        }
-    });
+				db.query(loadEventsQuery, [userID], (loadErr, loadResults) => {
+					if (loadErr) {
+						console.error(loadErr);
+						res.status(500).json({ message: "Internal Server Error" });
+						return;
+					} else {
+						res.status(200).json({ events: loadResults });
+						return;
+					}
+				});
+			} else {
+				// User not found
+				res.status(404).json({ message: "User not found" });
+				return;
+			}
+		}
+	});
 });
 
 //////////////////////////////
-////AUTOLOAD PUBLIC EVENTS API
+//AUTOLOAD PUBLIC EVENTS API//
 //////////////////////////////
 app.post("/autoload-public-events", (req, res) => {
 	const query = `
@@ -1721,7 +1720,7 @@ app.post("/autoload-public-events", (req, res) => {
 });
 
 //////////////////////////////
-///////AUTOLOAD UNI EVENTS API
+//AUTOLOAD UNI EVENTS API/////
 //////////////////////////////
 app.post("/autoload-university-events", (req, res) => {
 	const { university } = req.body;
@@ -1744,7 +1743,7 @@ app.post("/autoload-university-events", (req, res) => {
 });
 
 //////////////////////////////
-///////AUTOLOAD RSO EVENTS API
+//AUTOLOAD RSO EVENTS API/////
 //////////////////////////////
 app.post("/autoload-rso-events", (req, res) => {
 	const { userID } = req.body;
@@ -1769,7 +1768,7 @@ app.post("/autoload-rso-events", (req, res) => {
 });
 
 //////////////////////////////
-////AUTOLOAD UNAPPROVED EVENTS
+//AUTOLOAD UNAPPROVED EVENTS//
 //////////////////////////////
 app.get("/unapproved-university-events", (req, res) => {
 	// SQL query to retrieve unapproved university events
@@ -1791,7 +1790,7 @@ app.get("/unapproved-university-events", (req, res) => {
 });
 
 //////////////////////////////
-////////////GENERAL SEARCH API
+//GENERAL SEARCH API//////////
 //////////////////////////////
 app.post("/search-events", (req, res) => {
 	const { userID, searchString } = req.body;
