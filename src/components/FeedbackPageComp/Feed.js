@@ -5,155 +5,183 @@ import "../../css/FeedbackPageStyles.css";
 import Cookies from "js-cookie";
 
 const FeedbackPage = () => {
-	const [comments, setComments] = useState([]);
-	const [rating, setRating] = useState(0);
-	const [newComment, setNewComment] = useState("");
-	const [editIndex, setEditIndex] = useState(null); // State to store the index of the comment being edited
+  const [comments, setComments] = useState([]);
+  const [rating, setRating] = useState(0);
+  const [newComment, setNewComment] = useState("");
+  const [editIndex, setEditIndex] = useState(null); // State to store the index of the comment being edited
 
+  let hostName;
+  let eventName;
+  let eventID;
 
-	const handleCommentChange = (event) => {
-		setNewComment(event.target.value);
-	};
+  useEffect(() => {
+    // Read cookie data on load
+    hostName = Cookies.get("hName");
+    eventName = Cookies.get("eName");
+    eventID = Cookies.get("eID");
+  }, []);
 
-	const handleRatingChange = (event) => {
-		setRating(event.target.value);
-	};
+  const handleCommentChange = (event) => {
+    setNewComment(event.target.value);
+  };
 
-	const submitReview = async (event) => {
-		event.preventDefault();
-		const userID = Cookies.get("uID");
-		setComments([...comments, { comment: newComment, rating: rating }]);
-		setNewComment("");
-		setRating(0);
+  const handleRatingChange = (event) => {
+    setRating(event.target.value);
+  };
 
-		try {
-			const eventID = "123"; // Replace with actual event ID
-			const response = await axios.post("http://localhost:3001/review-event", {
-				userID: userID,
-				eventID: eventID,
-				comment: newComment,
-				reviewRating: rating,
-			});
-			console.log(response.data);
-		} catch (error) {
-			console.error("Error submitting review:", error);
-		}
-	};
+  const submitReview = async (event) => {
+    event.preventDefault();
+    const userID = Cookies.get("uID");
+    setComments([...comments, { comment: newComment, rating: rating }]);
+    setNewComment("");
+    setRating(0);
 
-	const handleEdit = (index) => {
-		setEditIndex(index);
-	};
+    try {
+      const eventID = Cookies.get("eID");
+      const response = await axios.post("http://localhost:3001/review-event", {
+        userID: userID,
+        eventID: eventID,
+        comment: newComment,
+        reviewRating: rating,
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error submitting review:", error);
+    }
+  };
 
-	const handleEditSubmit = async (index) => {
-		const userID = Cookies.get("uID");
-		const eventID = "123"; // Replace with actual event ID
-		const updatedComment = comments[index].comment;
-		const updatedRating = comments[index].rating;
+  const handleEdit = (index) => {
+    setEditIndex(index);
+  };
 
-		try {
-			const response = await axios.put("http://localhost:3001/edit-review", {
-				userID: userID,
-				eventID: eventID,
-				comment: updatedComment,
-				reviewRating: updatedRating,
-			});
-			console.log(response.data);
-			setEditIndex(null);
-		} catch (error) {
-			console.error("Error editing review:", error);
-		}
-	};
+  const handleEditSubmit = async (index) => {
+    const userID = Cookies.get("uID");
+    const eventID = Cookies.get("eID");
+    const updatedComment = comments[index].comment;
+    const updatedRating = comments[index].rating;
 
-	return (
-		<div className="feedback-page">
-			<Link to="/main" className="link-btn">
-				Back to Main
-			</Link>
-			<div className="feedback-form">
-				<div className="feedback-header">
-					<h2>Event Name</h2>
-					<h3>Host Name</h3>
-				</div>
-				<form onSubmit={submitReview}>
-					<div className="form-group">
-						<textarea
-							value={newComment}
-							onChange={handleCommentChange}
-							className="feedback-input"
-							placeholder="Add your comment (200 characters max)"
-							maxLength="200"
-							required
-						></textarea>
-						<input
-							type="number"
-							value={rating}
-							onChange={handleRatingChange}
-							className="feedback-rating"
-							placeholder="Rating (1-5)"
-							min="1"
-							max="5"
-							required
-						/>
-					</div>
-					<button type="submit" className="submit-btn">
-						Submit
-					</button>
-				</form>
-			</div>
-			<div className="feedback-feed">
-				<h3>Feedback from Others</h3>
-				<br />
-				<ul>
-					{comments.map((item, index) => (
-						<li key={index}>
-							<div className="review-item">
-								{editIndex === index ? (
-									<>
-										<input
-											type="text"
-											value={item.comment}
-											onChange={(e) => {
-												const newComments = [...comments];
-												newComments[index].comment = e.target.value;
-												setComments(newComments);
-											}}
-										/>
-										<input
-											type="number"
-											value={item.rating}
-											onChange={(e) => {
-												const newComments = [...comments];
-												newComments[index].rating = e.target.value;
-												setComments(newComments);
-											}}
-										/>
-										<button
-											className="edit-button"
-											onClick={() => handleEditSubmit(index)}
-										>
-											Save
-										</button>
-									</>
-								) : (
-									<>
-										<div className="review-comment">{item.comment}</div>
-										<div className="review-rating">Rating: {item.rating}</div>
-										<button
-											className="edit-button"
-											onClick={() => handleEdit(index)}
-										>
-											Edit
-										</button>
-									</>
-								)}
-								<button className="delete-button">Delete</button>
-							</div>
-						</li>
-					))}
-				</ul>
-			</div>
-		</div>
-	);
+    try {
+      const response = await axios.put("http://localhost:3001/edit-review", {
+        userID: userID,
+        eventID: eventID,
+        comment: updatedComment,
+        reviewRating: updatedRating,
+      });
+      console.log(response.data);
+      setEditIndex(null);
+    } catch (error) {
+      console.error("Error editing review:", error);
+    }
+  };
+
+  const handleDeleteReview = async () => {
+    const userID = Cookies.get("uID");
+    const eventID = Cookies.get("eID");
+
+    try {
+      const response = await axios.put("http://localhost:3001/delete-review", {
+        userID: userID,
+        eventID: eventID,
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error editing review:", error);
+    }
+  };
+
+  return (
+    <div className="feedback-page">
+      <Link to="/main" className="link-btn">
+        Back to Main
+      </Link>
+      <div className="feedback-form">
+        <div className="feedback-header">
+          <h2>{Cookies.get("eName")}</h2>
+          <h3>{Cookies.get("hName")}</h3>
+        </div>
+        <form>
+          <div className="form-group">
+            <textarea
+              value={newComment}
+              onChange={handleCommentChange}
+              className="feedback-input"
+              placeholder="Add your comment (200 characters max)"
+              maxLength="200"
+              required
+            ></textarea>
+            <input
+              type="number"
+              value={rating}
+              onChange={handleRatingChange}
+              className="feedback-rating"
+              placeholder="Rating (1-5)"
+              min="1"
+              max="5"
+              required
+            />
+          </div>
+          <button type="submit" className="submit-btn" onClick={submitReview}>
+            Submit
+          </button>
+        </form>
+      </div>
+      <div className="feedback-feed">
+        <h3>Feedback from Others</h3>
+        <br />
+        <ul>
+          {comments.map((item, index) => (
+            <li key={index}>
+              <div className="review-item">
+                {editIndex === index ? (
+                  <>
+                    <input
+                      type="text"
+                      value={item.comment}
+                      onChange={(e) => {
+                        const newComments = [...comments];
+                        newComments[index].comment = e.target.value;
+                        setComments(newComments);
+                      }}
+                    />
+                    <input
+                      type="number"
+                      value={item.rating}
+                      onChange={(e) => {
+                        const newComments = [...comments];
+                        newComments[index].rating = e.target.value;
+                        setComments(newComments);
+                      }}
+                    />
+                    <button
+                      className="edit-button"
+                      onClick={() => handleEditSubmit(index)}
+                    >
+                      Save
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div className="review-comment">{item.comment}</div>
+                    <div className="review-rating">Rating: {item.rating}</div>
+                    <button
+                      className="edit-button"
+                      onClick={() => handleEdit(index)}
+                    >
+                      Edit
+                    </button>
+                  </>
+                )}
+                <button className="delete-button" onClick={handleDeleteReview}>
+                  Delete
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+      {console.log(Cookies.get())} {/* This encourages the cookies to update */}
+    </div>
+  );
 };
 
 export default FeedbackPage;

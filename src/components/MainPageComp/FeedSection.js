@@ -157,13 +157,22 @@ function Feed() {
     //setModalPost(true);
   };
 
-  const goToFeedback = (post) => {
+  const goToFeedback = async (post) => {
 	console.log(post);
-	//host name, event name, eventID
-	Cookies.set("hName", post.hostName);
-	Cookies.set("eName", post.eventName);
-	Cookies.set("eID", post.eventID);
-
+	// Create a Promise to ensure cookies are set
+	const setCookiesPromise = new Promise((resolve, reject) => {
+	  Cookies.set("hName", post.hostName);
+	  Cookies.set("eName", post.eventName);
+	  Cookies.set("eID", post.eventID);
+  
+	  // Resolve the Promise
+	  resolve();
+	});
+  
+	// Wait for the Promise to resolve before navigating
+	await setCookiesPromise;
+  
+	// Navigate to the new page
 	navigate("/feedback");
   };
 

@@ -110,7 +110,7 @@ CREATE TABLE Event_Reviews (
     userID INT NOT NULL,
     eventID INT NOT NULL,
     comment VARCHAR(200),
-    reviewRating INT CHECK (reviewRating >= 1 AND reviewRating <= 5),
+    reviewRating INT CHECK (reviewRating >= 0 AND reviewRating <= 5),
     PRIMARY KEY (userID, eventID),
     FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE,
     FOREIGN KEY (eventID) REFERENCES Events(eventID) ON DELETE CASCADE
