@@ -31,9 +31,9 @@ function Feed() {
 				</div>
 				<div className="post-footer">
 					<p>
-						Host:{" "}
+						Host:{" "} 
 						<strong onClick={() => handlePostNameClick(post)}>
-							{post.eventEmail}
+							{post.hostName} {/* Get host name. Uniquely generated varaible from API */}
 						</strong>
 					</p>
 					<Link to="/feedback">
@@ -90,6 +90,13 @@ function Feed() {
 
 	const handlePostNameClick = (post) => {
 		setSelectedPost(post);
+		//Note: "source" is a uniquely generated variable from the autoloading APIs
+		//If it is a university event, search by superadmin
+		if(post.source == "university"){
+		}
+		//If it is an rso event, search by rso
+		else if(post.source == "RSO"){	
+		}
 		setModalPost(true);
 	};
 

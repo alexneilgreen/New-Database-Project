@@ -283,8 +283,7 @@ app.post("/register-superadmin", (req, res) => {
 	});
 });
 
-// Insert University API
-// Used when superadmin registers
+// For maintenance use only
 app.post("/add-university", (req, res) => {
 	const { universityName } = req.body;
 
@@ -323,6 +322,7 @@ app.post("/add-university", (req, res) => {
 	});
 });
 
+// For maintenance use only
 app.put("/delete-university", (req, res) => {
 	const { uniID } = req.body;
 
@@ -1674,7 +1674,15 @@ app.post("/autoload-scheduled-events", (req, res) => {
 			if (checkResults.length > 0) {
 				// User found, proceed to load scheduled events within the specified range
 				const loadEventsQuery = `
-                    SELECT s.*, e.* 
+                    SELECT s.*, e.*, 
+                    CASE 
+                        WHEN e.eventID IN (SELECT eventID FROM University_Events) THEN 'university'
+                        WHEN e.eventID IN (SELECT eventID FROM RSO_Events) THEN 'RSO'
+                    END AS source,
+                    CASE 
+                        WHEN e.eventID IN (SELECT eventID FROM University_Events) THEN (SELECT university FROM University_Events WHERE eventID = e.eventID)
+                        WHEN e.eventID IN (SELECT eventID FROM RSO_Events) THEN (SELECT rsoName FROM RSOs JOIN RSO_Events ON RSOs.rsoID = RSO_Events.rsoID WHERE RSO_Events.eventID = e.eventID)
+                    END AS hostName
                     FROM Scheduled_Events s
                     INNER JOIN events e ON s.eventID = e.eventID
                     WHERE s.userID = ?
@@ -1703,11 +1711,12 @@ app.post("/autoload-scheduled-events", (req, res) => {
 //////////////////////////////
 app.post("/autoload-public-events", (req, res) => {
 	const query = `
-  SELECT events.*, university_events.isPrivate, university_events.isApproved
-  FROM Events events
-  INNER JOIN University_Events university_events ON events.eventID = university_events.eventID
-  WHERE university_events.isPrivate = 0 AND university_events.isApproved = 1
-  `;
+	SELECT events.*, university_events.isPrivate, university_events.isApproved, 'university' AS source, universities.university AS hostName
+	FROM Events events
+	INNER JOIN University_Events university_events ON events.eventID = university_events.eventID
+	INNER JOIN Universities universities ON university_events.university = universities.university
+	WHERE university_events.isPrivate = 0 AND university_events.isApproved = 1
+	`;
 
 	db.query(query, (err, results) => {
 		if (err) {
@@ -1726,13 +1735,20 @@ app.post("/autoload-university-events", (req, res) => {
 	const { university } = req.body;
 
 	const query = `
-    SELECT events.*
+	SELECT events.*, 'university' AS source, Universities.university AS hostName
     FROM Events events
     INNER JOIN University_Events university_events ON events.eventID = university_events.eventID
+    INNER JOIN Universities ON university_events.university = Universities.university
     WHERE university_events.university = ? AND university_events.isApproved = 1
+    UNION
+    SELECT events.*, 'RSO' AS source, RSOs.rsoName AS hostName
+    FROM Events events
+    INNER JOIN RSO_Events rso_events ON events.eventID = rso_events.eventID
+    INNER JOIN RSOs ON rso_events.rsoID = RSOs.rsoID
+    WHERE RSOs.university = ?
   `;
 
-	db.query(query, [university], (err, results) => {
+	db.query(query, [university, university], (err, results) => {
 		if (err) {
 			console.error(err);
 			res.status(500).json({ message: "Internal Server Error" });
@@ -1750,10 +1766,11 @@ app.post("/autoload-rso-events", (req, res) => {
 
 	// SQL query to select all events of all RSOs that the user follows
 	const query = `
-    SELECT e.*
+    SELECT e.*, 'RSO' AS source, rso.rsoName AS hostName
     FROM Events e
     INNER JOIN RSO_Events rsoe ON e.eventID = rsoe.eventID
-    INNER JOIN RSO_Members rsm ON rsoe.rsoID = rsm.rsoID
+    INNER JOIN RSOs rso ON rsoe.rsoID = rso.rsoID
+    INNER JOIN RSO_Members rsm ON rso.rsoID = rsm.rsoID
     WHERE rsm.userID = ?
   `;
 
@@ -1790,7 +1807,68 @@ app.get("/unapproved-university-events", (req, res) => {
 });
 
 //////////////////////////////
-//GENERAL SEARCH API//////////
+/////////SEARCH SUPERADMIN API
+//////////////////////////////
+app.post("/find-superadmin", (req, res) => {
+	const { university } = req.body;
+
+	// SQL query to retrieve superadmin information based on the provided university name
+	const query = `
+        SELECT u.userID, u.username, u.email, s.uniDescr, s.uniLat, s.uniLong
+        FROM Superadmins s
+        INNER JOIN Users u ON s.userID = u.userID
+        WHERE s.university = ?
+    `;
+
+	// Execute the SQL query
+	db.query(query, [university], (err, results) => {
+		if (err) {
+			console.error(err);
+			res.status(500).json({ message: "Internal Server Error" });
+			return;
+		}
+		if (results.length === 0) {
+			res
+				.status(404)
+				.json({ message: "Superadmin not found for the specified university" });
+			return;
+		}
+		res.status(200).json({ superadmin: results[0] });
+	});
+});
+
+//////////////////////////////
+////////////////SEARCH RSO API
+//////////////////////////////
+app.post("/find-rso", (req, res) => {
+	const { rsoID } = req.body;
+
+	// SQL query to retrieve RSO information based on the provided rsoID
+	const query = `
+        SELECT *
+        FROM RSOs
+        WHERE rsoID = ?
+    `;
+
+	// Execute the SQL query
+	db.query(query, [rsoID], (err, results) => {
+		if (err) {
+			console.error(err);
+			res.status(500).json({ message: "Internal Server Error" });
+			return;
+		}
+		if (results.length === 0) {
+			res
+				.status(404)
+				.json({ message: "RSO not found for the specified rsoID" });
+			return;
+		}
+		res.status(200).json({ rso: results[0] });
+	});
+});
+
+//////////////////////////////
+////////////GENERAL SEARCH API
 //////////////////////////////
 app.post("/search-events", (req, res) => {
 	const { userID, searchString } = req.body;
