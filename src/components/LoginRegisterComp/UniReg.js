@@ -13,6 +13,19 @@ function UniReg() {
 	const [uniDescr, setUniDescr] = useState("");
 	const navigate = useNavigate();
 
+	const universityCoordinates = {
+		FAU: { lat: 26.3705, long: -80.1024 },
+		FGCU: { lat: 26.4643, long: -81.7737 },
+		FIU: { lat: 25.7579, long: -80.3735 },
+		FSU: { lat: 30.4426, long: -84.2984 },
+		RC: { lat: 28.5924, long: -81.3481 },
+		UCF: { lat: 28.6013, long: -81.2001 },
+		UF: { lat: 29.6436, long: -82.3549 },
+		UM: { lat: 25.7215, long: -80.2793 },
+		UNF: { lat: 30.2697, long: -81.5113 },
+		USF: { lat: 28.0587, long: -82.4131 },
+	};
+
 	let uniLat = 0; //Default
 	let uniLong = 0; //Default
 	let userID;
@@ -20,6 +33,13 @@ function UniReg() {
 
 	const register_Superadmin = async (e) => {
 		e.preventDefault();
+		// Set university latitude and longitude based on the selected university
+		const coordinates = universityCoordinates[university];
+		if (coordinates) {
+			uniLat = coordinates.lat;
+			uniLong = coordinates.long;
+		}
+
 		//Register user
 		try {
 			const response = await axios.post(
