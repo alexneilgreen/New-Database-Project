@@ -31,9 +31,9 @@ function Feed() {
 				</div>
 				<div className="post-footer">
 					<p>
-						Host:{post.hostName} {/* Get host name. Uniquely generated varaible from API */}
+						Host:{" "} 
 						<strong onClick={() => handlePostNameClick(post)}>
-							{post.eventEmail}
+							{post.hostName} {/* Get host name. Uniquely generated varaible from API */}
 						</strong>
 					</p>
 					<Link to="/feedback">
