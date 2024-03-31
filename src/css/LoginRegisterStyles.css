@@ -151,3 +151,9 @@ select.log-input-field {
 	background: #bdbdbd;
 	box-shadow: 0 0 8px 4px #dadada;
 }
+
+.errorText {
+	color: red;
+	padding-top: 12px;
+	padding-bottom: 0px;
+}

@@ -7,7 +7,24 @@ function Feed() {
 	const [modalPost, setModalPost] = useState(null); // State to manage modal post-box
 
 	const handleTabClick = (tabNumber) => {
+		let currentTab = activeTab;
 		setActiveTab(tabNumber);
+		//If selected tab is first tab and if tab is not already active
+		if (activeTab == 1 && currentTab!=activeTab){
+
+		}
+		else if (activeTab == 2 && currentTab!=activeTab){
+
+		}
+		else if (activeTab == 3 && currentTab!=activeTab){
+
+		}
+		else if (activeTab == 4 && currentTab!=activeTab){
+
+		}
+		else {
+			console.error("Unidentified tab value active: ", activeTab);
+		}
 	};
 
 	const handleHostNameClick = (postId) => {

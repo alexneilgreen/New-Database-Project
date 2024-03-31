@@ -1724,6 +1724,29 @@ app.post("/autoload-rso-events", (req, res) => {
 });
 
 //////////////////////////////
+////AUTOLOAD UNAPPROVED EVENTS
+//////////////////////////////
+app.get("/unapproved-university-events", (req, res) => {
+  // SQL query to retrieve unapproved university events
+  const query = `
+    SELECT e.*, ue.university
+    FROM University_Events ue
+    JOIN Events e ON ue.eventID = e.eventID
+    WHERE ue.isApproved = 0
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    }
+    res.status(200).json({ events: results });
+  });
+});
+
+
+//////////////////////////////
 ////////////GENERAL SEARCH API
 //////////////////////////////
 app.post("/search-events", (req, res) => {

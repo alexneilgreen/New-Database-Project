@@ -92,7 +92,7 @@ CREATE TABLE University_Events (
     university VARCHAR(100),
     isPrivate TINYINT NOT NULL,
     isApproved TINYINT DEFAULT 0,
-    FOREIGN KEY (eventID) REFERENCES Events(eventID) ON DELETE CASCADE
+    FOREIGN KEY (eventID) REFERENCES Events(eventID) ON DELETE CASCADE,
     FOREIGN KEY (adminID) REFERENCES RSO_Admins(adminID) ON DELETE CASCADE
 );
 
