@@ -33,7 +33,7 @@ function Feed() {
           <p>
             Host:{" "}
             <strong onClick={() => handlePostNameClick(post)}>
-              {post.eventName} {/* {post.hostName}{" "} */}
+              {post.hostName}
               {/* Get host name. Uniquely generated varaible from API */}
             </strong>
           </p>
