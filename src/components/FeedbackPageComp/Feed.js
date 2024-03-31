@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import "../../css/FeedbackPageStyles.css";
@@ -9,6 +9,7 @@ const FeedbackPage = () => {
 	const [rating, setRating] = useState(0);
 	const [newComment, setNewComment] = useState("");
 	const [editIndex, setEditIndex] = useState(null); // State to store the index of the comment being edited
+
 
 	const handleCommentChange = (event) => {
 		setNewComment(event.target.value);

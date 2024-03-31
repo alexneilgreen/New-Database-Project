@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../../css/MainPageStyles.css";
 import Cookies from "js-cookie";
@@ -9,6 +9,7 @@ function Feed() {
   const [modalPost, setModalPost] = useState(null);
   const [selectedHost, setSelectedHost] = useState(null);
   const [posts, setPosts] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Set the default active tab to 1 before the first tab is clicked
@@ -37,9 +38,7 @@ function Feed() {
               {/* Get host name. Uniquely generated varaible from API */}
             </strong>
           </p>
-          <Link to="/feedback">
-            <button>Feedback</button>
-          </Link>
+          <button onClick={() =>goToFeedback(post)}>Feedback</button>
           <button onClick={() => editEvent(post)}>Edit</button>
           <button onClick={() => populateMap(post)}>Map</button>
         </div>
@@ -156,6 +155,16 @@ function Feed() {
       }
     }
     //setModalPost(true);
+  };
+
+  const goToFeedback = (post) => {
+	console.log(post);
+	//host name, event name, eventID
+	Cookies.set("hName", post.hostName);
+	Cookies.set("eName", post.eventName);
+	Cookies.set("eID", post.eventID);
+
+	navigate("/feedback");
   };
 
   const followRSO = async () => {
