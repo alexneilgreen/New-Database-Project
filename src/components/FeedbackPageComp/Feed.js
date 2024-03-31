@@ -10,7 +10,6 @@ const FeedbackPage = () => {
 	const [newComment, setNewComment] = useState("");
 	const [editIndex, setEditIndex] = useState(null); // State to store the index of the comment being edited
 
-
 	const handleCommentChange = (event) => {
 		setNewComment(event.target.value);
 	};

@@ -314,6 +314,7 @@ body {
 
 .modal-follow {
 	font-weight: 600;
+	min-width: 80px;
 	width: 20%;
 	height: 30px;
 	cursor: pointer;
@@ -328,6 +329,7 @@ body {
 
 .modal-unfollow {
 	font-weight: 600;
+	min-width: 80px;
 	width: 20%;
 	height: 30px;
 	cursor: pointer;
@@ -338,6 +340,7 @@ body {
 	transition: 0.5s;
 	color: rgb(100, 100, 100);
 	text-shadow: 0 0 3px darkgray;
+	margin-left: 10%;
 }
 
 .modal-follow:hover {
