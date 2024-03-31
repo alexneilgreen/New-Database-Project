@@ -19,6 +19,19 @@ const OpenLayers = () => {
 	const [latitude, setLatitude] = useState("");
 	const [longitude, setLongitude] = useState("");
 
+	const universityCoordinates = {
+		FAU: { lat: 26.3705, long: -80.1024 },
+		FGCU: { lat: 26.4643, long: -81.7737 },
+		FIU: { lat: 25.7579, long: -80.3735 },
+		FSU: { lat: 30.4426, long: -84.2984 },
+		RC: { lat: 28.5924, long: -81.3481 },
+		UCF: { lat: 28.6024, long: -81.2001 },
+		UF: { lat: 29.6436, long: -82.3549 },
+		UM: { lat: 25.7215, long: -80.2793 },
+		UNF: { lat: 30.2697, long: -81.5113 },
+		USF: { lat: 28.0587, long: -82.4131 },
+	};
+
 	const [iconFeatures, setIconFeatures] = useState([]); // Initialize iconFeatures as an empty array
 	const [iconSource, setIconSource] = useState(
 		new VectorSource({ features: iconFeatures })
@@ -38,7 +51,7 @@ const OpenLayers = () => {
 				layers: [new TileLayer({ source: new OSM() }), iconLayer],
 				interactions: defaultInteractions({ doubleClickZoom: false }),
 				view: new View({
-					center: fromLonLat([-81.2001, 28.6024]),
+					center: fromLonLat([longitude, latitude]),
 					zoom: 16,
 				}),
 			});
