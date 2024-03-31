@@ -7,12 +7,12 @@ import logo from "../../images/Campus Connect Logo.png";
 function NewRSOUserReg() {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
-	const [phoneNumber, setPhoneNumber] = useState("");
+	const [phone, setPhoneNumber] = useState("");
 	const [email, setEmail] = useState("");
 	const [rsoCode, setRsoCode] = useState("");
 	const [rsoName, setRsoName] = useState("");
 	const [rsoDescr, setRsoDescr] = useState("");
-	const [selectedUniversity, setSelectedUniversity] = useState("");
+	const [university, setSelectedUniversity] = useState("");
 	const navigate = useNavigate();
 
 	const adminCode = "default"; //Unused: Field in rso table. rsoCode has taken its place
@@ -28,12 +28,12 @@ function NewRSOUserReg() {
 			"Registering with the following info: ",
 			username,
 			password,
-			phoneNumber,
+			phone,
 			email,
 			rsoCode,
 			rsoName,
 			rsoDescr,
-			selectedUniversity
+			university
 		);
 
 		//Register user
@@ -41,9 +41,9 @@ function NewRSOUserReg() {
 			const response = await axios.post("http://localhost:3001/register-user", {
 				username,
 				password,
-				phoneNumber,
+				phone,
 				email,
-				selectedUniversity,
+				university,
 			});
 			console.log("Register into exisitng RSO API Response:", response);
 			if (response.status == 200) {
@@ -81,7 +81,7 @@ function NewRSOUserReg() {
 				adminCode,
 				rsoName,
 				rsoDescr,
-				selectedUniversity,
+				university,
 			});
 			console.log("RSO creation response:", response);
 			if (response.status == 200) {

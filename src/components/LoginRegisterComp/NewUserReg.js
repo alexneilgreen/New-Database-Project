@@ -7,9 +7,9 @@ import logo from "../../images/Campus Connect Logo.png";
 function NewUserReg() {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
-	const [phoneNumber, setPhoneNumber] = useState("");
+	const [phone, setPhoneNumber] = useState("");
 	const [email, setEmail] = useState("");
-	const [selectedUniversity, setSelectedUniversity] = useState("");
+	const [university, setSelectedUniversity] = useState("");
 	const navigate = useNavigate();
 
 	let userId;
@@ -21,9 +21,9 @@ function NewUserReg() {
 			const response = await axios.post("http://localhost:3001/register-user", {
 				username,
 				password,
-				phoneNumber,
+				phone,
 				email,
-				selectedUniversity,
+				university,
 			});
 			console.log("Register into exisitng RSO API Response:", response);
 			if (response.status == 200) {

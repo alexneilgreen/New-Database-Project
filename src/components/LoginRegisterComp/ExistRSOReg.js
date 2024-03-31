@@ -10,10 +10,10 @@ import logo from "../../images/Campus Connect Logo.png";
 function ExistRSOUserReg() {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
-	const [phoneNumber, setPhoneNumber] = useState("");
+	const [phone, setPhoneNumber] = useState("");
 	const [email, setEmail] = useState("");
 	const [rsoCode, setRsoCode] = useState("");
-	const [selectedUniversity, setSelectedUniversity] = useState("");
+	const [university, setSelectedUniversity] = useState("");
 	const navigate = useNavigate();
 
 	const adminCode = "default"; //Unused: Field in rso table. rsoCode has taken its place
@@ -29,10 +29,10 @@ function ExistRSOUserReg() {
 			"Registering with the following info: ",
 			username,
 			password,
-			phoneNumber,
+			phone,
 			email,
 			rsoCode,
-			selectedUniversity
+			university
 		);
 
 		//Check if RSO code is correct
