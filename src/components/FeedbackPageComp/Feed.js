@@ -19,7 +19,30 @@ const FeedbackPage = () => {
 		hostName = Cookies.get("hName");
 		eventName = Cookies.get("eName");
 		eventID = Cookies.get("eID");
+
+		loadReviews();
 	}, []);
+
+	const loadReviews = async () => {
+		eventID = Cookies.get("eID");
+		try {
+			const eventID = Cookies.get("eID");
+			const response = await axios.post("http://localhost:3001/load-event-reviews", {
+				eventID: eventID,
+			});
+
+			//response.data.eventReviews.{key}
+			//comment
+			//eventID
+			//reviewRating
+			//userID
+
+
+			console.log(response.data);
+		} catch (error) {
+			console.error("Error submitting review:", error);
+		}
+	}
 
 	const handleCommentChange = (event) => {
 		setNewComment(event.target.value);
