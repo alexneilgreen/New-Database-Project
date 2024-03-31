@@ -312,7 +312,7 @@ app.post("/add-university", (req, res) => {
 				} else {
 					// University successfully inserted
 					const uniID = insertResults.insertId;
-					res.status(201).json({
+					res.status(200).json({
 						message: "University inserted successfully",
 						uniID: uniID,
 					});
@@ -1497,7 +1497,7 @@ app.post("/review-event", (req, res) => {
 							return;
 						} else {
 							// Review successfully written
-							res.status(201).json({ message: "Review written successfully" });
+							res.status(200).json({ message: "Review written successfully" });
 							return;
 						}
 					}
