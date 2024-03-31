@@ -2,10 +2,25 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../../images/Campus Connect Logo.png";
 import "../../css/MainPageStyles.css";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 function MainHeader() {
 	const [showDropdown, setShowDropdown] = useState(false);
 	const [buttonBorderRadius, setButtonBorderRadius] = useState("10px");
+
+	const navigate = useNavigate();
+
+	const handleLogout = () => {
+		// Remove all cookies
+		Cookies.remove("uID");
+		Cookies.remove("aID");
+		Cookies.remove("sID");
+		Cookies.remove("uni");
+
+		// Redirect to the login page after logout
+		navigate("/");
+	};
 
 	const toggleDropdown = () => {
 		setShowDropdown(!showDropdown);
@@ -59,9 +74,9 @@ function MainHeader() {
 						</div>
 					)}
 				</div>
-				<Link to="/" className="header-link" style={{ textDecoration: "none" }}>
+				<div className="header-link" onClick={handleLogout}>
 					Log Out
-				</Link>
+				</div>
 			</div>
 		</div>
 	);
