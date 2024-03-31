@@ -4,50 +4,7 @@ import "../../css/ReviewEventPageStyles.css";
 import Cookies from "js-cookie";
 
 function Feed() {
-	const [activeTab, setActiveTab] = useState(1);
 	const [posts, setPosts] = useState([]);
-
-	const handleTabClick = async (e, tabNumber) => {
-		e && e.preventDefault();
-		setActiveTab(tabNumber);
-		try {
-			let response;
-			switch (tabNumber) {
-				case 1:
-					response = await axios.post(
-						"http://localhost:3001/autoload-public-events",
-						{}
-					);
-					break;
-				case 2:
-					response = await axios.post(
-						"http://localhost:3001/autoload-university-events",
-						{}
-					);
-					break;
-				case 3:
-					const userID = Cookies.get("uID");
-					response = await axios.post(
-						"http://localhost:3001/autoload-scheduled-events",
-						{ userID }
-					);
-					break;
-				case 4:
-					response = await axios.post(
-						"http://localhost:3001/autoload-rso-events",
-						{}
-					);
-					break;
-				default:
-					console.error("Unidentified tab value active: ", activeTab);
-					return;
-			}
-			console.log(`Loaded results Tab ${tabNumber}: `, response.data);
-			setPosts(response.data.events || []);
-		} catch (error) {
-			console.log("API error:", error.response);
-		}
-	};
 
 	const approveEvent = () => {};
 
@@ -91,23 +48,6 @@ function Feed() {
 	return (
 		<div className="rev-feed-section">
 			<div className="rev-feed-content-box">
-				<div className="rev-tabs">
-					{[1, 2, 3, 4].map((tabNumber) => (
-						<div
-							key={tabNumber}
-							className={`rev-tab ${activeTab === tabNumber && "active"}`}
-							onClick={(e) => handleTabClick(e, tabNumber)}
-						>
-							{tabNumber === 1
-								? "Public Events"
-								: tabNumber === 2
-								? "University Events"
-								: tabNumber === 3
-								? "Followed Events"
-								: "Followed RSOs"}
-						</div>
-					))}
-				</div>
 				<div className="rev-search-bar">
 					<input
 						className="rev-search-bar-text"

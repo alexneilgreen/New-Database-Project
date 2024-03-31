@@ -145,3 +145,18 @@
 	width: 100%;
 	height: auto;
 }
+
+.private-checkbox {
+	display: flex;
+	align-items: center; /* Align items vertically in the center */
+}
+
+.private-checkbox input {
+	max-width: 10%;
+}
+
+.private-checkbox label {
+	max-width: 100%;
+	margin-left: 10px; /* Add some space between the checkbox and label */
+	margin-bottom: 10px;
+}
