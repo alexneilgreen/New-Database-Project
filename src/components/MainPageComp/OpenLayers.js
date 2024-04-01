@@ -1,4 +1,12 @@
-import React, { useState, useLayoutEffect, useEffect, useContext, useRef } from "react";
+// NO LONGER IN USE
+
+import React, {
+	useState,
+	useLayoutEffect,
+	useEffect,
+	useContext,
+	useRef,
+} from "react";
 import "ol/ol.css";
 import Map from "ol/Map";
 import View from "ol/View";
@@ -98,7 +106,7 @@ const OpenLayers = () => {
 			mapRef.current = mainMap; // Store the map instance in the ref
 
 			// Add double-click event listener to the map
-		      /*mapRef.current.on("dblclick", function (event) {
+			/*mapRef.current.on("dblclick", function (event) {
 				const coordinates = event.coordinate;
 				const lonLat = toLonLat(coordinates);
 				console.log("Double-clicked at Lon/Lat:", lonLat);
@@ -119,8 +127,12 @@ const OpenLayers = () => {
 
 			setMap(mainMap);
 
-			console.log("Setting context value [mapRef, iconlayer]: ", mapRef, iconLayer);
-        	MapContext.Provider.value = { mapRef: mapRef, iconLayer: iconLayer };
+			console.log(
+				"Setting context value [mapRef, iconlayer]: ",
+				mapRef,
+				iconLayer
+			);
+			MapContext.Provider.value = { mapRef: mapRef, iconLayer: iconLayer };
 		} else {
 			// If map exists, update its center
 			mapRef.current.getView().setCenter(fromLonLat([longitude, latitude]));
@@ -128,7 +140,7 @@ const OpenLayers = () => {
 	}, [iconLayer, iconFeatures, longitude, latitude]);
 
 	// Dynamically update context value when map or iconLayer changes
-    /*useEffect(() => {
+	/*useEffect(() => {
 		console.log("Setting context value: ", map, iconLayer);
         MapContext.Provider.value = { map, iconLayer };
     }, [map, iconLayer]);*/
@@ -157,17 +169,17 @@ const OpenLayers = () => {
 		}
 	};
 
-  const centerMap = (long, lat) => {
-    if (map) {
-      map
-        .getView()
-        .animate({ center: fromLonLat([long, lat]), duration: 500 });
-    }
-  };
+	const centerMap = (long, lat) => {
+		if (map) {
+			map.getView().animate({ center: fromLonLat([long, lat]), duration: 500 });
+		}
+	};
 
-  return <MapContext.Provider value={{ map, iconLayer }}>
-            <div id="map"></div>
-         </MapContext.Provider>
+	return (
+		<MapContext.Provider value={{ map, iconLayer }}>
+			<div id="map"></div>
+		</MapContext.Provider>
+	);
 };
 
 export default OpenLayers;

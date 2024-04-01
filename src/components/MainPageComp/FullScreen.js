@@ -1,3 +1,5 @@
+// NO LONGER IN USE
+
 import React from "react";
 
 import OpenLayers from "./OpenLayers";
@@ -34,7 +36,11 @@ class FullScreen extends React.Component {
 		return (
 			<div className="map-content-box" id="mapContainer">
 				<OpenLayers />
-				<button className="map-button" id="mapbtn" onClick={this.toggleFullscreen}>
+				<button
+					className="map-button"
+					id="mapbtn"
+					onClick={this.toggleFullscreen}
+				>
 					<img id="map-btn-image" src={fullscreenLogo} alt="Fullscreen" />
 				</button>
 			</div>
