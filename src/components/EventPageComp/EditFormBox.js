@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import logo from "../../images/Campus Connect Logo.png";
 import "../../css/EventPageStyles.css";
 
+//TODO: API hookup, inital population, and data colleciton before submit
+
 /* Required Cookies
     Cookies.get("eID");
     Cookies.get("aID")
@@ -23,8 +25,29 @@ import "../../css/EventPageStyles.css";
 function FormBox() {
   const navigate = useNavigate();
 
-  //Get updated info from info or cookies
+  const deleteEvent = async (adminID, eventID) => {
+    let adminID = Cookies.get("aID");
+    let eventID = Cookies.get("eID");
+    try {
+      const response = await axios.put("http://localhost:3001/delete-event", {
+        adminID,
+        eventID,
+      });
+
+      if (response.status === 200) {
+        console.log("Event deleted successfully");
+        navigate("/main");
+      }
+    } catch (error) {
+      console.log("Error: ", error);
+      // Handle error scenarios
+    }
+  };
+
   const editEvent = async (post) => {
+    //Get updated info from inputs or cookies
+    let adminID = Cookies.get("aID");
+    let eventID = Cookies.get("eID");
     try {
       const response = await axios.post("http://localhost:3001/unfollow-rso", {
         eventID,

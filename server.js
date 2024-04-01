@@ -1103,6 +1103,90 @@ app.put("/delete-rso-event", (req, res) => {
 });
 
 //////////////////////////////
+// GENERAL EVENT DELETION API/
+//////////////////////////////
+app.put("/delete-event", (req, res) => {
+  const { adminID, eventID } = req.body;
+
+  console.log("Admin deleting event: ", eventID, adminID);
+
+  // Check if the event is an RSO event
+  const checkRSOEventQuery = "SELECT * FROM RSO_Events WHERE eventID = ?";
+  db.query(checkRSOEventQuery, [eventID], (checkRSOErr, checkRSOResults) => {
+    if (checkRSOErr) {
+      console.error(checkRSOErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (checkRSOResults.length > 0) {
+        // Event is an RSO event, check if the admin is in the RSO that owns the event
+        const rsoID = checkRSOResults[0].rsoID;
+        const checkRSOAdminQuery = `
+          SELECT * FROM RSO_Admins 
+          WHERE adminID = ? 
+          AND EXISTS (SELECT * FROM RSO_Board WHERE rsoID = ? AND adminID = ?)
+        `;
+        db.query(checkRSOAdminQuery, [adminID, rsoID, adminID], (checkRSOAdminErr, checkRSOAdminResults) => {
+          if (checkRSOAdminErr) {
+            console.error(checkRSOAdminErr);
+            res.status(500).json({ message: "Internal Server Error" });
+            return;
+          } else {
+            if (checkRSOAdminResults.length > 0) {
+              // Admin is in the RSO that owns the event, proceed to delete the event
+              const deleteRSOEventQuery = "DELETE FROM Events WHERE eventID = ?";
+              db.query(deleteRSOEventQuery, [eventID], (deleteRSOErr, deleteRSOResults) => {
+                if (deleteRSOErr) {
+                  console.error(deleteRSOErr);
+                  res.status(500).json({ message: "Internal Server Error" });
+                  return;
+                } else {
+                  res.status(200).json({ message: "RSO event deleted successfully" });
+                  return;
+                }
+              });
+            } else {
+              // Admin is not in the RSO that owns the event
+              res.status(403).json({ message: "You are not authorized to delete this RSO event" });
+              return;
+            }
+          }
+        });
+      } else {
+        // Event is not an RSO event, check if the admin is associated with the event (assuming it's a university event)
+        const checkUniEventQuery = "SELECT * FROM University_Events WHERE eventID = ?";
+        db.query(checkUniEventQuery, [eventID], (checkUniErr, checkUniResults) => {
+          if (checkUniErr) {
+            console.error(checkUniErr);
+            res.status(500).json({ message: "Internal Server Error" });
+            return;
+          } else {
+            if (checkUniResults.length > 0) {
+              // Admin is associated with the university event, proceed to delete the event
+              const deleteUniEventQuery = "DELETE FROM Events WHERE eventID = ?";
+              db.query(deleteUniEventQuery, [eventID], (deleteUniErr, deleteUniResults) => {
+                if (deleteUniErr) {
+                  console.error(deleteUniErr);
+                  res.status(500).json({ message: "Internal Server Error" });
+                  return;
+                } else {
+                  res.status(200).json({ message: "University event deleted successfully" });
+                  return;
+                }
+              });
+            } else {
+              // Event not found or not associated with any type of event
+              res.status(404).json({ message: "Event not found" });
+              return;
+            }
+          }
+        });
+      }
+    }
+  });
+});
+
+//////////////////////////////
 // PROPOSE UNI EVENT API//////
 //////////////////////////////
 app.post("/propose-university-event", (req, res) => {
