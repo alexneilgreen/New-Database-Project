@@ -4,7 +4,7 @@ import "../../css/MainPageStyles.css";
 
 import FullScreen from "./FullScreen.js";
 
-function Map() {
+function MapSect() {
 	return (
 		<div className="map-section">
 			<FullScreen />
@@ -12,4 +12,4 @@ function Map() {
 	);
 }
 
-export default Map;
+export default MapSect;

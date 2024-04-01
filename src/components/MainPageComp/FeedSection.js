@@ -1,9 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../../css/MainPageStyles.css";
 import Cookies from "js-cookie";
-//import OpenLayers, { addIconToMap, centerMapOn } from './OpenLayers';
+
+import "ol/ol.css";
+import Feature from "ol/Feature";
+import Point from "ol/geom/Point";
+import { Icon, Style } from "ol/style";
+import { fromLonLat, toLonLat } from "ol/proj";
+import pin from "../../images/pin.png";
+
+import MapContext from "./MapContext";
 
 function Feed() {
 	const [activeTab, setActiveTab] = useState(1);
@@ -11,6 +19,8 @@ function Feed() {
 	const [selectedHost, setSelectedHost] = useState(null);
 	const [posts, setPosts] = useState([]);
 	const navigate = useNavigate();
+
+	const { mapRef, iconLayer } = useContext(MapContext);
 
 	useEffect(() => {
 		// Set the default active tab to 1 before the first tab is clicked
@@ -219,13 +229,17 @@ function Feed() {
 		console.log("Populate map:", post);
 		//addIconToMap(post.long, post.lat);
 		//centerMapOn(post.long, post.lat)
+
+		//Context Debugging
+		console.log("MAP: ", mapRef);
+		console.log("ICON LAYER: ", iconLayer);
 	};
 
 	const closeModal = () => {
 		setModalPost(false);
 		setSelectedHost(null);
 	};
-
+	
 	return (
 		<div className="feed-section">
 			<div className="feed-content-box">
