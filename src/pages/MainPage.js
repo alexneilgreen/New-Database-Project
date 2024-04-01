@@ -19,7 +19,7 @@ import revFullscreenLogo from "../images/rev_fullscreen.png";
 import MainHeader from "../components/MainPageComp/MainHeader.js";
 import Feed from "../components/MainPageComp/FeedSection.js";
 import "../css/MainPageStyles.css";
-import MapContext from "../components/MainPageComp/MapContext";
+import MapContext from "../components/MainPageComp/MapContext.js";
 
 const MainPage = () => {
 	const [latitude, setLatitude] = useState("");
