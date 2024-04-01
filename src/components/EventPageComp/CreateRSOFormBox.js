@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios"; // Import Axios for making HTTP requests
 import logo from "../../images/Campus Connect Logo.png";
 import "../../css/EventPageStyles.css";
@@ -17,6 +17,8 @@ function FormBox() {
 	const [eventEmail, setEventEmail] = useState("");
 	const [latitude, setLatitude] = useState("");
 	const [longitude, setLongitude] = useState("");
+
+	const navigate = useNavigate();
 
 	// async function geocode(location) {
 	//   try {

@@ -1417,6 +1417,8 @@ app.put("/delete-university-event", (req, res) => {
 app.post("/load-unapproved-events", (req, res) => {
   const { university, superID, adminID } = req.body;
 
+  //console.log("Loading unapproved events with details: " , university, superID, adminID);
+
   // Check if the provided superadmin ID is valid
   const checkSuperadminQuery = "SELECT * FROM Superadmins WHERE superID = ?";
   db.query(checkSuperadminQuery, [superID], (checkErr, checkResults) => {

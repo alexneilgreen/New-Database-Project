@@ -217,8 +217,32 @@ function Feed({addIconToMap, centerMapOn}) {
     }
   };
 
-  const editEvent = (post) => {
-    console.log("Edit event:", post);
+  const editEvent = async (post) => {
+
+    console.log(post);
+    // Create a Promise to ensure cookies are set
+    const setCookiesPromise = new Promise((resolve, reject) => {
+      console.log("Edit event:", post);
+      Cookies.set("eID", post.eventID);
+      //adminID cookie already set
+      Cookies.set("eName", post.eventName);
+      Cookies.set("eDescr", post.eventDescr);
+      Cookies.set("eTime", post.eventTime);
+      Cookies.set("eLat", post.eventLat);
+      Cookies.set("eLong", post.eventLong);
+      Cookies.set("eAddr", post.eventAddress);
+      Cookies.set("ePhone", post.eventPhone);
+      Cookies.set("eEmail", post.eventEmail);
+
+      // Resolve the Promise
+      resolve();
+    });
+
+    // Wait for the Promise to resolve before navigating
+    await setCookiesPromise;
+
+    // reoute to "/editEvent"
+    navigate("/editEvent");
   };
 
   const populateMap = (post) => {

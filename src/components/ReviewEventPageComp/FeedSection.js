@@ -22,7 +22,7 @@ function Feed() {
         superID: superID,
         adminID: adminID,
       });
-      response.data.unapprovedEvents;
+      console.log(response.data);
 
       //Populate posts
       setPosts(response.data.events || []);
