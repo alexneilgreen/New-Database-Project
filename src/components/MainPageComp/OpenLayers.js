@@ -125,22 +125,11 @@ const OpenLayers = () => {
 
       setMap(mainMap);
 
-      console.log(
-        "Setting context value [mapRef, iconlayer]: ",
-        mapRef,
-        iconLayer
-      );
     } else {
       // If map exists, update its center
       mapRef.current.getView().setCenter(fromLonLat([longitude, latitude]));
     }
   }, [iconLayer, iconFeatures, longitude, latitude]);
-
-  // Dynamically update context value when map or iconLayer changes
-  /*useEffect(() => {
-		console.log("Setting context value: ", map, iconLayer);
-        MapContext.Provider.value = { map, iconLayer };
-    }, [map, iconLayer]);*/
 
   const addIconToMap = (long, lat) => {
     const iconFeature = new Feature({

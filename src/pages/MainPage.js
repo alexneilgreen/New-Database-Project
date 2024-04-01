@@ -113,11 +113,6 @@ const MainPage = () => {
 
       setMap(mainMap);
 
-      console.log(
-        "Setting context value [mapRef, iconlayer]: ",
-        mapRef,
-        iconLayer
-      );
     } else {
       if (!isCenteredOnIcon) {
         mapRef.current.getView().setCenter(fromLonLat([longitude, latitude]));
@@ -150,7 +145,7 @@ const MainPage = () => {
 
   function centerMapOn(long, lat) {
     if (map) {
-      //console.log("Map found");
+      console.log("Map found");
       //console.log(fromLonLat([long, lat]));
 	  setIsCenteredOnIcon(true);
       map.getView().setCenter(fromLonLat([long, lat]));

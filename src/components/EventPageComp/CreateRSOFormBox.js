@@ -5,6 +5,8 @@ import logo from "../../images/Campus Connect Logo.png";
 import "../../css/EventPageStyles.css";
 import Cookies from "js-cookie";
 
+//TODO: Check API validity and implement geocoding
+
 function FormBox() {
 	const [adminCode, setAdminCode] = useState("");
 	const [eventName, setEventName] = useState("");
@@ -61,7 +63,10 @@ function FormBox() {
 				}
 			);
 			console.log(response.data);
-			// Handle success
+			if (response.status == 200){
+				console.log("Event created successfully");
+				navigate("/main");
+			}
 		} catch (error) {
 			console.error("Error creating event:", error);
 			// Handle error

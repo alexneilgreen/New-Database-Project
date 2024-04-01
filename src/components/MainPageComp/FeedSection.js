@@ -222,8 +222,8 @@ function Feed({addIconToMap, centerMapOn}) {
   };
 
   const populateMap = (post) => {
-    console.log("Populate map:", post);
-	console.log("Long and Lat: ", post.eventLong, post.eventLat);
+    //console.log("Populate map:", post);
+	//console.log("Long and Lat: ", post.eventLong, post.eventLat);
     addIconToMap(post.eventLong, post.eventLat);
     centerMapOn(post.eventLong, post.eventLat);
 

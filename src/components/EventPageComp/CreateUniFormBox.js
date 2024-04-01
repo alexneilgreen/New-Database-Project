@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios"; // Import Axios for making HTTP requests
 import logo from "../../images/Campus Connect Logo.png";
 import "../../css/EventPageStyles.css";
 import Cookies from "js-cookie";
+
+//TODO: Check API validity and implement geocoding
 
 function FormBox() {
 	const [eventName, setEventName] = useState("");
@@ -15,6 +17,8 @@ function FormBox() {
 	const [isPrivate, setIsPrivate] = useState("");
 	const [latitude, setLatitude] = useState("");
 	const [longitude, setLongitude] = useState("");
+
+	const navigate = useNavigate();
 
 	// async function geocode(location) {
 	//   try {
@@ -51,7 +55,7 @@ function FormBox() {
 		setLongitude(0);
 		try {
 			const response = await axios.post(
-				"http://localhost:3001/create-rso-event",
+				"http://localhost:3001/propose-university-event",
 				{
 					adminID: adminID,
 					eventName: eventName,
@@ -67,7 +71,10 @@ function FormBox() {
 				}
 			);
 			console.log(response.data);
-			// Handle success
+			if (response.status == 200){
+				console.log("Event proposed successfully");
+				navigate("/main");
+			}
 		} catch (error) {
 			console.error("Error creating event:", error);
 			// Handle error

@@ -1412,6 +1412,76 @@ app.put("/delete-university-event", (req, res) => {
 });
 
 //////////////////////////////
+// UNAPPROVED EVENT LOAD API//
+//////////////////////////////
+app.post("/load-unapproved-events", (req, res) => {
+  const { university, superID, adminID } = req.body;
+
+  // Check if the provided superadmin ID is valid
+  const checkSuperadminQuery = "SELECT * FROM Superadmins WHERE superID = ?";
+  db.query(checkSuperadminQuery, [superID], (checkErr, checkResults) => {
+    if (checkErr) {
+      console.error(checkErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (checkResults.length > 0) {
+        // Superadmin found, load unapproved events for the university
+        const loadUnapprovedQuery = `
+          SELECT *
+          FROM University_Events
+          WHERE university = ? AND isApproved = 0
+        `;
+        db.query(loadUnapprovedQuery, [university], (loadErr, loadResults) => {
+          if (loadErr) {
+            console.error(loadErr);
+            res.status(500).json({ message: "Internal Server Error" });
+            return;
+          } else {
+            res.status(200).json({ unapprovedEvents: loadResults });
+            return;
+          }
+        });
+      } else {
+        // Check if the provided admin ID is an RSO admin
+        const checkRSOAdminQuery = "SELECT * FROM RSO_Admins WHERE adminID = ?";
+        db.query(checkRSOAdminQuery, [adminID], (adminErr, adminResults) => {
+          if (adminErr) {
+            console.error(adminErr);
+            res.status(500).json({ message: "Internal Server Error" });
+            return;
+          } else {
+            if (adminResults.length > 0) {
+              // Admin is an RSO admin, load university events proposed by the admin
+              const loadProposedQuery = `
+                SELECT *
+                FROM University_Events
+                WHERE adminID = ? AND isApproved = 0
+              `;
+              db.query(loadProposedQuery, [adminID], (loadProposedErr, loadProposedResults) => {
+                if (loadProposedErr) {
+                  console.error(loadProposedErr);
+                  res.status(500).json({ message: "Internal Server Error" });
+                  return;
+                } else {
+                  res.status(200).json({ unapprovedEvents: loadProposedResults });
+                  return;
+                }
+              });
+            } else {
+              // Invalid superadmin and not an RSO admin
+              res.status(403).json({ message: "Unauthorized access" });
+              return;
+            }
+          }
+        });
+      }
+    }
+  });
+});
+
+
+//////////////////////////////
 // SCHEDULE EVENT API/////////
 //////////////////////////////
 app.post("/schedule-event", (req, res) => {
