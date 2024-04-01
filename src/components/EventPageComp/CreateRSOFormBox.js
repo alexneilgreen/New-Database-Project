@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios"; // Import Axios for making HTTP requests
 import logo from "../../images/Campus Connect Logo.png";
 import "../../css/EventPageStyles.css";
+import Cookies from "js-cookie";
 
 function FormBox() {
 	const [adminCode, setAdminCode] = useState("");
@@ -25,8 +26,7 @@ function FormBox() {
 	//           key: "ADD KEY HERE",
 	//         },
 	//       }
-	//     );
-
+	//     )
 	//  console.log(response);
 	//  let coords = {
 	//    lat: response.data.results[0].geometry.location.lat,
@@ -34,18 +34,21 @@ function FormBox() {
 	//  };
 	//  console.log("Coords:", coords);
 	//  //Add pin to map
-	//  addIconToMap(coords.long, coords.lat);
 	//} catch (error) {
 	//  console.log(error);
 	//}
 	//}
 
 	const createEvent = async () => {
+		const adminID = Cookies.get("aID");
+		//Geocode address to coords
+		setLatitude(0);
+		setLongitude(0);
 		try {
 			const response = await axios.post(
 				"http://localhost:3001/create-rso-event",
 				{
-					adminID: "adminID", // Replace with the actual admin ID
+					adminID: adminID,
 					adminCode: adminCode,
 					eventName: eventName,
 					eventDescr: eventDescription,

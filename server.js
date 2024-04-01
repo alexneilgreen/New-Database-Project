@@ -806,117 +806,130 @@ app.post("/unfollow-rso", (req, res) => {
 // CREATE RSO EVENT API///////
 //////////////////////////////
 app.post("/create-rso-event", (req, res) => {
-  const {
-    adminID,
-    rsoID,
-    eventName,
-    eventDescr,
-    eventTime,
-    eventLat,
-    eventLong,
-    eventAddress,
-    eventPhone,
-    eventEmail,
-  } = req.body;
-
-  console.log(
-    "RSO board member creating RSO event: ",
-    adminID,
-    rsoID,
-    eventName,
-    eventDescr,
-    eventTime,
-    eventLat,
-    eventLong,
-    eventAddress,
-    eventPhone,
-    eventEmail
-  );
-
-  // Check if the provided admin ID is an RSO admin and board member
-  const checkAdminQuery =
-    "SELECT * FROM RSO_Admins WHERE adminID = ? AND EXISTS (SELECT * FROM RSO_Board WHERE rsoID = ? AND adminID = ?)";
-  db.query(
-    checkAdminQuery,
-    [adminID, rsoID, adminID],
-    (checkErr, checkResults) => {
-      if (checkErr) {
-        console.error(checkErr);
-        res.status(500).json({ message: "Internal Server Error" });
-        return;
-      } else {
-        if (checkResults.length > 0) {
-          // Admin is an RSO admin and board member, proceed to create the RSO event
-          const insertEventQuery =
-            "INSERT INTO Events (eventName, eventDescr, eventTime, eventLat, eventLong, eventAddress, eventPhone, eventEmail) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-          db.query(
-            insertEventQuery,
-            [
-              eventName,
-              eventDescr,
-              eventTime,
-              eventLat,
-              eventLong,
-              eventAddress,
-              eventPhone,
-              eventEmail,
-            ],
-            (insertErr, insertResults) => {
-              if (insertErr) {
-                console.error(insertErr);
-                res.status(500).json({ message: "Internal Server Error" });
-                return;
-              } else {
-                const eventID = insertResults.insertId;
-                // Insert the event into the RSO_Events table
-                const insertRsoEventQuery =
-                  "INSERT INTO RSO_Events (eventID, rsoID) VALUES (?, ?)";
-                db.query(
-                  insertRsoEventQuery,
-                  [eventID, rsoID],
-                  (insertRsoErr, insertRsoResults) => {
-                    if (insertRsoErr) {
-                      console.error(insertRsoErr);
-                      // Rollback the event creation in the Events table if the RSO event insertion fails
-                      const deleteEventQuery =
-                        "DELETE FROM Events WHERE eventID = ?";
-                      db.query(
-                        deleteEventQuery,
-                        [eventID],
-                        (deleteErr, deleteResults) => {
-                          if (deleteErr) {
-                            console.error(deleteErr);
-                          }
-                        }
-                      );
-                      res
-                        .status(500)
-                        .json({ message: "Internal Server Error" });
-                      return;
-                    } else {
-                      res.status(200).json({
-                        message: "RSO event created successfully",
-                        eventID: eventID,
-                      });
-                      return;
-                    }
-                  }
-                );
-              }
-            }
-          );
-        } else {
-          // Admin is not an RSO admin or board member
-          res.status(403).json({
-            message:
-              "You are not authorized to create an RSO event for this RSO",
-          });
-          return;
-        }
-      }
-    }
-  );
-});
+	const {
+	  adminID,
+	  adminCode,
+	  eventName,
+	  eventDescr,
+	  eventTime,
+	  eventLat,
+	  eventLong,
+	  eventAddress,
+	  eventPhone,
+	  eventEmail,
+	} = req.body;
+  
+	console.log(
+	  "RSO board member creating RSO event: ",
+	  adminID,
+	  adminCode,
+	  eventName,
+	  eventDescr,
+	  eventTime,
+	  eventLat,
+	  eventLong,
+	  eventAddress,
+	  eventPhone,
+	  eventEmail
+	);
+  
+	// Query to retrieve the rsoID based on the provided adminCode
+	const getRSOIDQuery = "SELECT rsoID FROM RSOs WHERE adminCode = ?";
+	db.query(getRSOIDQuery, [adminCode], (rsoidErr, rsoidResults) => {
+	  if (rsoidErr) {
+		console.error(rsoidErr);
+		res.status(500).json({ message: "Internal Server Error" });
+		return;
+	  } else {
+		if (rsoidResults.length === 0) {
+		  // No RSO found for the provided adminCode
+		  res.status(404).json({ message: "RSO not found for the provided adminCode" });
+		  return;
+		}
+		const rsoID = rsoidResults[0].rsoID;
+  
+		// Check if the provided admin ID is an RSO admin and board member
+		const checkAdminQuery =
+		  "SELECT * FROM RSO_Admins WHERE adminID = ? AND EXISTS (SELECT * FROM RSO_Board WHERE rsoID = ? AND adminID = ?)";
+		db.query(checkAdminQuery, [adminID, rsoID, adminID], (checkErr, checkResults) => {
+		  if (checkErr) {
+			console.error(checkErr);
+			res.status(500).json({ message: "Internal Server Error" });
+			return;
+		  } else {
+			if (checkResults.length > 0) {
+			  // Admin is an RSO admin and board member, proceed to create the RSO event
+			  const insertEventQuery =
+				"INSERT INTO Events (eventName, eventDescr, eventTime, eventLat, eventLong, eventAddress, eventPhone, eventEmail) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+			  db.query(
+				insertEventQuery,
+				[
+				  eventName,
+				  eventDescr,
+				  eventTime,
+				  eventLat,
+				  eventLong,
+				  eventAddress,
+				  eventPhone,
+				  eventEmail,
+				],
+				(insertErr, insertResults) => {
+				  if (insertErr) {
+					console.error(insertErr);
+					res.status(500).json({ message: "Internal Server Error" });
+					return;
+				  } else {
+					const eventID = insertResults.insertId;
+					// Insert the event into the RSO_Events table
+					const insertRsoEventQuery =
+					  "INSERT INTO RSO_Events (eventID, rsoID) VALUES (?, ?)";
+					db.query(
+					  insertRsoEventQuery,
+					  [eventID, rsoID],
+					  (insertRsoErr, insertRsoResults) => {
+						if (insertRsoErr) {
+						  console.error(insertRsoErr);
+						  // Rollback the event creation in the Events table if the RSO event insertion fails
+						  const deleteEventQuery =
+							"DELETE FROM Events WHERE eventID = ?";
+						  db.query(
+							deleteEventQuery,
+							[eventID],
+							(deleteErr, deleteResults) => {
+							  if (deleteErr) {
+								console.error(deleteErr);
+							  }
+							}
+						  );
+						  res
+							.status(500)
+							.json({ message: "Internal Server Error" });
+						  return;
+						} else {
+						  res.status(200).json({
+							message: "RSO event created successfully",
+							eventID: eventID,
+						  });
+						  return;
+						}
+					  }
+					);
+				  }
+				}
+			  );
+			} else {
+			  // Admin is not an RSO admin or board member
+			  res.status(403).json({
+				message:
+				  "You are not authorized to create an RSO event for this RSO",
+			  });
+			  return;
+			}
+		  }
+		});
+	  }
+	});
+  });
 
 //////////////////////////////
 // EDIT EVENT API/////////////

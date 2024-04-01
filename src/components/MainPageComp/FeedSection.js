@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../../css/MainPageStyles.css";
 import Cookies from "js-cookie";
+//import OpenLayers, { addIconToMap, centerMapOn } from './OpenLayers';
 
 function Feed() {
 	const [activeTab, setActiveTab] = useState(1);
@@ -216,6 +217,8 @@ function Feed() {
 
 	const populateMap = (post) => {
 		console.log("Populate map:", post);
+		//addIconToMap(post.long, post.lat);
+		//centerMapOn(post.long, post.lat)
 	};
 
 	const closeModal = () => {
