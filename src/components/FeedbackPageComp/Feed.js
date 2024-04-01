@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import "../../css/FeedbackPageStyles.css";
@@ -8,36 +8,24 @@ const FeedbackPage = () => {
 	const [comments, setComments] = useState([]);
 	const [rating, setRating] = useState(0);
 	const [newComment, setNewComment] = useState("");
-	const [editIndex, setEditIndex] = useState(null); // State to store the index of the comment being edited
-
-	let hostName;
-	let eventName;
-	let eventID;
-
-	useLayoutEffect(() => {
-		loadReviews();
-	}, []);
+	const [editIndex, setEditIndex] = useState(null);
 
 	const loadReviews = async () => {
-		eventID = Cookies.get("eID");
 		try {
 			const eventID = Cookies.get("eID");
-			const response = await axios.post("http://localhost:3001/load-event-reviews", {
-				eventID: eventID,
-			});
-
-			//response.data.eventReviews.{key}
-			//comments
-			//eventID
-			//reviewRating
-			//userID
-
+			const response = await axios.post(
+				"http://localhost:3001/load-event-reviews",
+				{
+					eventID: eventID,
+				}
+			);
 
 			console.log(response.data);
+			setComments(response.data.eventReviews || []);
 		} catch (error) {
-			console.error("Error submitting review:", error);
+			console.error("Error loading reviews:", error);
 		}
-	}
+	};
 
 	const handleCommentChange = (event) => {
 		setNewComment(event.target.value);
@@ -63,6 +51,7 @@ const FeedbackPage = () => {
 				reviewRating: rating,
 			});
 			console.log(response.data);
+			loadReviews(); // Reload comments after submitting a review
 		} catch (error) {
 			console.error("Error submitting review:", error);
 		}
@@ -87,6 +76,7 @@ const FeedbackPage = () => {
 			});
 			console.log(response.data);
 			setEditIndex(null);
+			loadReviews(); // Reload comments after editing
 		} catch (error) {
 			console.error("Error editing review:", error);
 		}
@@ -102,10 +92,15 @@ const FeedbackPage = () => {
 				eventID: eventID,
 			});
 			console.log(response.data);
+			loadReviews(); // Reload comments after deletion
 		} catch (error) {
-			console.error("Error editing review:", error);
+			console.error("Error deleting review:", error);
 		}
 	};
+
+	useEffect(() => {
+		loadReviews();
+	}, []);
 
 	return (
 		<div className="feedback-page">
@@ -132,8 +127,8 @@ const FeedbackPage = () => {
 							value={rating}
 							onChange={handleRatingChange}
 							className="feedback-rating"
-							placeholder="Rating (1-5)"
-							min="1"
+							placeholder="Rating (0-5)"
+							min="0"
 							max="5"
 							required
 						/>
@@ -147,57 +142,61 @@ const FeedbackPage = () => {
 				<h3>Feedback from Others</h3>
 				<br />
 				<ul>
-					{comments.map((item, index) => (
-						<li key={index}>
-							<div className="review-item">
-								{editIndex === index ? (
-									<>
-										<input
-											type="text"
-											value={item.comment}
-											onChange={(e) => {
-												const newComments = [...comments];
-												newComments[index].comment = e.target.value;
-												setComments(newComments);
-											}}
-										/>
-										<input
-											type="number"
-											value={item.rating}
-											onChange={(e) => {
-												const newComments = [...comments];
-												newComments[index].rating = e.target.value;
-												setComments(newComments);
-											}}
-										/>
-										<button
-											className="edit-button"
-											onClick={() => handleEditSubmit(index)}
-										>
-											Save
-										</button>
-									</>
-								) : (
-									<>
-										<div className="review-comment">{item.comment}</div>
-										<div className="review-rating">Rating: {item.rating}</div>
-										<button
-											className="edit-button"
-											onClick={() => handleEdit(index)}
-										>
-											Edit
-										</button>
-									</>
-								)}
-								<button className="delete-button" onClick={handleDeleteReview}>
-									Delete
-								</button>
-							</div>
-						</li>
-					))}
+					{comments.map((item, index) => {
+						return (
+							<li key={index}>
+								<div className="review-item">
+									{editIndex === index ? (
+										<>
+											<input
+												type="text"
+												value={item.comment}
+												onChange={(e) => {
+													const newComments = [...comments];
+													newComments[index].comment = e.target.value;
+													setComments(newComments);
+												}}
+											/>
+											<input
+												type="number"
+												value={item.rating}
+												onChange={(e) => {
+													const newComments = [...comments];
+													newComments[index].rating = e.target.value;
+													setComments(newComments);
+												}}
+											/>
+											<button
+												className="edit-button"
+												onClick={() => handleEditSubmit(index)}
+											>
+												Save
+											</button>
+										</>
+									) : (
+										<>
+											<div className="review-comment">{item.comment}</div>
+											<div className="review-rating">Rating: {item.rating}</div>
+											<button
+												className="edit-button"
+												onClick={() => handleEdit(index)}
+											>
+												Edit
+											</button>
+										</>
+									)}
+									<button
+										className="delete-button"
+										onClick={handleDeleteReview}
+									>
+										Delete
+									</button>
+								</div>
+							</li>
+						);
+					})}
 				</ul>
 			</div>
-			{/*console.log(Cookies.get())*/} {/* This encourages the cookies to update */}
 		</div>
 	);
 };
