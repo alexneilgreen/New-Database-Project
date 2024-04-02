@@ -37,7 +37,6 @@ function FormBox() {
 	//    long: response.data.results[0].geometry.location.lng,
 	//  };
 	//  console.log("Coords:", coords);
-	//  //Add pin to map
 	//} catch (error) {
 	//  console.log(error);
 	//}

@@ -960,20 +960,17 @@ app.put("/edit-event", (req, res) => {
 
 	console.log("Admin editing event with ID: ", eventID);
 
-	// Check if the provided admin ID matches the admin associated with the event
-	const checkAdminQuery = "SELECT rsoID FROM RSO_Events WHERE eventID = ?";
-	db.query(checkAdminQuery, [eventID], (checkAdminErr, checkAdminResults) => {
-		if (checkAdminErr) {
-			console.error(checkAdminErr);
+	// Check if the provided admin ID matches the admin associated with the event in RSO_Events table
+	const checkRSOQuery = "SELECT rsoID FROM RSO_Events WHERE eventID = ?";
+	db.query(checkRSOQuery, [eventID], (checkRSOErr, checkRSOResults) => {
+		if (checkRSOErr) {
+			console.error(checkRSOErr);
 			res.status(500).json({ message: "Internal Server Error" });
 			return;
 		} else {
-			if (checkAdminResults.length === 0) {
-				res.status(404).json({ message: "Event not found" });
-				return;
-			} else {
-				const rsoID = checkAdminResults[0].rsoID;
-				// Check if the provided admin is a board member of the associated RSO
+			if (checkRSOResults.length !== 0) {
+				// If it's an RSO event, check if the provided admin is a board member of the associated RSO
+				const rsoID = checkRSOResults[0].rsoID;
 				const checkAdminBoardQuery =
 					"SELECT * FROM RSO_Board WHERE rsoID = ? AND adminID = ?";
 				db.query(
@@ -991,40 +988,7 @@ app.put("/edit-event", (req, res) => {
 								});
 								return;
 							} else {
-								// Update the event details
-
-								const checkIsUniEventQuery =
-									"SELECT * FROM University_Events WHERE eventID = ?";
-								db.query(
-									checkIsUniEventQuery,
-									[eventID],
-									(updateEventErr, updateEventResults) => {
-										if (updateEventErr) {
-											console.error(updateEventErr);
-											res
-												.status(500)
-												.json({ message: "Internal Server Error" });
-											return;
-										} else {
-											const updateApprovalQuery =
-												"UPDATE University_Events SET isApproved = 0 WHERE eventID = ?";
-											db.query(
-												updateApprovalQuery,
-												[eventID],
-												(updateErr, updateResults) => {
-													if (updateErr) {
-														console.error(updateErr);
-														res
-															.status(500)
-															.json({ message: "Internal Server Error" });
-														return;
-													}
-												}
-											);
-										}
-									}
-								);
-
+								// Update the event details in the Events table
 								const updateEventQuery =
 									"UPDATE Events SET eventName = ?, eventDescr = ?, eventTime = ?, eventLat = ?, eventLong = ?, eventAddress = ?, eventPhone = ?, eventEmail = ? WHERE eventID = ?";
 								db.query(
@@ -1057,6 +1021,55 @@ app.put("/edit-event", (req, res) => {
 									}
 								);
 							}
+						}
+					}
+				);
+			} else {
+				// If it's not an RSO event, update the event details including setting isApproved to false in University_Events table
+				const updateUniEventQuery =
+					"UPDATE University_Events SET isApproved = ? WHERE eventID = ?";
+				db.query(
+					updateUniEventQuery,
+					[0, eventID], // Set isApproved to false (or 0)
+					(updateUniEventErr, updateUniEventResults) => {
+						if (updateUniEventErr) {
+							console.error(updateUniEventErr);
+							res.status(500).json({ message: "Internal Server Error" });
+							return;
+						} else {
+							// University event is unapproved
+							// Now, update the event details in the Events table
+							const updateEventDetailsQuery =
+								"UPDATE Events SET eventName = ?, eventDescr = ?, eventTime = ?, eventLat = ?, eventLong = ?, eventAddress = ?, eventPhone = ?, eventEmail = ? WHERE eventID = ?";
+							db.query(
+								updateEventDetailsQuery,
+								[
+									eventName,
+									eventDescr,
+									eventTime,
+									eventLat,
+									eventLong,
+									eventAddress,
+									eventPhone,
+									eventEmail,
+									eventID,
+								],
+								(updateEventDetailsErr, updateEventDetailsResults) => {
+									if (updateEventDetailsErr) {
+										console.error(updateEventDetailsErr);
+										res.status(500).json({ message: "Internal Server Error" });
+										return;
+									} else {
+										// Event details successfully updated
+										res
+											.status(200)
+											.json({
+												message: "University event updated successfully",
+											});
+										return;
+									}
+								}
+							);
 						}
 					}
 				);
