@@ -14,9 +14,9 @@ function FormBox() {
 	const [eventDescription, setEventDescription] = useState("");
 	const [eventPhone, setEventPhone] = useState("");
 	const [eventEmail, setEventEmail] = useState("");
-	const [isPrivate, setIsPrivate] = useState("");
-	const [latitude, setLatitude] = useState("");
-	const [longitude, setLongitude] = useState("");
+	const [isPrivate, setIsPrivate] = useState(false);
+	const [latitude, setLatitude] = useState(0);
+	const [longitude, setLongitude] = useState(0);
 
 	const navigate = useNavigate();
 
@@ -51,8 +51,8 @@ function FormBox() {
 		const adminID = Cookies.get("aID");
 		const university = Cookies.get("uni");
 		//Geocode address to coords
-		setLatitude(0);
-		setLongitude(0);
+		setLatitude(1.0);
+		setLongitude(1.0);
 		try {
 			const response = await axios.post(
 				"http://localhost:3001/propose-university-event",
@@ -71,7 +71,7 @@ function FormBox() {
 				}
 			);
 			console.log(response.data);
-			if (response.status == 200){
+			if (response.status == 200) {
 				console.log("Event proposed successfully");
 				navigate("/main");
 			}
