@@ -1953,132 +1953,168 @@ app.post("/load-event-reviews", (req, res) => {
 });
 
 //////////////////////////////
-//AUTOLOAD SCHEDULED EVENT API
-//////////////////////////////
-app.post("/autoload-scheduled-events", (req, res) => {
-	const { userID } = req.body;
-
-	//console.log("Autoloading scheduled events for user: ", userID);
-
-	// Check if the provided user ID exists
-	const checkUserQuery = "SELECT * FROM Users WHERE userID = ?";
-	db.query(checkUserQuery, [userID], (checkErr, checkResults) => {
-		if (checkErr) {
-			console.error(checkErr);
-			res.status(500).json({ message: "Internal Server Error" });
-			return;
-		} else {
-			if (checkResults.length > 0) {
-				// User found, proceed to load scheduled events within the specified range
-				const loadEventsQuery = `
-                    SELECT s.*, e.*, 
-                    CASE 
-                        WHEN e.eventID IN (SELECT eventID FROM University_Events) THEN 'university'
-                        WHEN e.eventID IN (SELECT eventID FROM RSO_Events) THEN 'RSO'
-                    END AS source,
-                    CASE 
-                        WHEN e.eventID IN (SELECT eventID FROM University_Events) THEN (SELECT university FROM University_Events WHERE eventID = e.eventID)
-                        WHEN e.eventID IN (SELECT eventID FROM RSO_Events) THEN (SELECT rsoName FROM RSOs JOIN RSO_Events ON RSOs.rsoID = RSO_Events.rsoID WHERE RSO_Events.eventID = e.eventID)
-                    END AS hostName
-                    FROM Scheduled_Events s
-                    INNER JOIN events e ON s.eventID = e.eventID
-                    WHERE s.userID = ?
-                `;
-				db.query(loadEventsQuery, [userID], (loadErr, loadResults) => {
-					if (loadErr) {
-						console.error(loadErr);
-						res.status(500).json({ message: "Internal Server Error" });
-						return;
-					} else {
-						res.status(200).json({ events: loadResults });
-						return;
-					}
-				});
-			} else {
-				// User not found
-				res.status(404).json({ message: "User not found" });
-				return;
-			}
-		}
-	});
-});
-
-//////////////////////////////
 //AUTOLOAD PUBLIC EVENTS API//
 //////////////////////////////
 app.post("/autoload-public-events", (req, res) => {
-	const query = `
-	SELECT events.*, university_events.isPrivate, university_events.isApproved, 'university' AS source, universities.university AS hostName
-	FROM Events events
-	INNER JOIN University_Events university_events ON events.eventID = university_events.eventID
-	INNER JOIN Universities universities ON university_events.university = universities.university
-	WHERE university_events.isPrivate = 0 AND university_events.isApproved = 1
-	`;
-
-	db.query(query, (err, results) => {
-		if (err) {
-			console.error(err);
-			res.status(500).json({ message: "Internal Server Error" });
-			return;
-		}
-		res.status(200).json({ events: results });
-	});
+  const { adminID } = req.body;
+  console.log("Loading public events with admin ID: ", adminID);
+  const query = `
+    SELECT 
+      events.*, university_events.isPrivate, university_events.isApproved, 'university' AS source, universities.university AS hostName,
+      (CASE
+        WHEN EXISTS (
+          SELECT 1 FROM University_Events WHERE eventID = events.eventID AND adminID = ?
+        ) THEN 1
+        ELSE 0
+      END) AS isOwner
+    FROM Events events
+    INNER JOIN University_Events university_events ON events.eventID = university_events.eventID
+    INNER JOIN Universities universities ON university_events.university = universities.university
+    WHERE university_events.isPrivate = 0 AND university_events.isApproved = 1
+  `;
+  db.query(query, [adminID], (err, results) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    }
+    console.log(results);
+    res.status(200).json({ events: results });
+  });
 });
-
 //////////////////////////////
 //AUTOLOAD UNI EVENTS API/////
 //////////////////////////////
 app.post("/autoload-university-events", (req, res) => {
-	const { university } = req.body;
-
-	const query = `
-	SELECT events.*, 'university' AS source, Universities.university AS hostName
+  const { university, adminID } = req.body;
+  console.log("Loading uni events with details: ", university, adminID);
+  const query = `
+    SELECT 
+      events.*, 'university' AS source, Universities.university AS hostName,
+      (CASE
+        WHEN EXISTS (
+          SELECT 1 FROM University_Events WHERE eventID = events.eventID AND adminID = ?
+        ) THEN 1
+        ELSE 0
+      END) AS isOwner
     FROM Events events
     INNER JOIN University_Events university_events ON events.eventID = university_events.eventID
     INNER JOIN Universities ON university_events.university = Universities.university
     WHERE university_events.university = ? AND university_events.isApproved = 1
     UNION
-    SELECT events.*, 'RSO' AS source, RSOs.rsoName AS hostName
+    SELECT 
+      events.*, 'RSO' AS source, RSOs.rsoName AS hostName,
+      (CASE
+        WHEN EXISTS (
+          SELECT 1 FROM RSO_Events WHERE eventID = events.eventID AND EXISTS (SELECT 1 FROM RSO_Members WHERE rsoID = RSOs.rsoID AND userID = ?)
+        ) THEN 1
+        ELSE 0
+      END) AS isOwner
     FROM Events events
     INNER JOIN RSO_Events rso_events ON events.eventID = rso_events.eventID
     INNER JOIN RSOs ON rso_events.rsoID = RSOs.rsoID
     WHERE RSOs.university = ?
   `;
-
-	db.query(query, [university, university], (err, results) => {
-		if (err) {
-			console.error(err);
-			res.status(500).json({ message: "Internal Server Error" });
-			return;
-		}
-		res.status(200).json({ universityEvents: results });
-	});
+  db.query(query, [adminID, university, adminID, university], (err, results) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    }
+    console.log(results);
+    res.status(200).json({ events: results });
+  });
 });
+
 
 //////////////////////////////
 //AUTOLOAD RSO EVENTS API/////
 //////////////////////////////
 app.post("/autoload-rso-events", (req, res) => {
-	const { userID } = req.body;
-
-	// SQL query to select all events of all RSOs that the user follows
-	const query = `
-    SELECT e.*, 'RSO' AS source, rso.rsoName AS hostName
+  const { userID, adminID } = req.body;
+  console.log("Loading rso events with details: ", university, adminID);
+  const query = `
+    SELECT 
+      e.*, 'RSO' AS source, rso.rsoName AS hostName,
+      (CASE
+        WHEN EXISTS (
+          SELECT 1 FROM RSO_Board WHERE rsoID IN (SELECT rsoID FROM RSO_Events WHERE eventID = e.eventID) AND adminID = ?
+        ) THEN 1
+        ELSE 0
+      END) AS isOwner
     FROM Events e
     INNER JOIN RSO_Events rsoe ON e.eventID = rsoe.eventID
     INNER JOIN RSOs rso ON rsoe.rsoID = rso.rsoID
     INNER JOIN RSO_Members rsm ON rso.rsoID = rsm.rsoID
     WHERE rsm.userID = ?
   `;
+  db.query(query, [adminID, userID], (err, results) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    }
+    console.log(results);
+    res.status(200).json({ events: results });
+  });
+});
 
-	db.query(query, [userID], (err, results) => {
-		if (err) {
-			console.error(err);
-			res.status(500).json({ message: "Internal Server Error" });
-			return;
-		}
-		res.status(200).json({ userRSOEvents: results });
-	});
+
+//////////////////////////////
+//AUTOLOAD SCHEDULED EVENT API
+//////////////////////////////
+app.post("/autoload-scheduled-events", (req, res) => {
+  const { userID, adminID } = req.body;
+  console.log("Loading scheduled events with details: ", userID, adminID);
+  // Check if the provided user ID exists
+  const checkUserQuery = "SELECT * FROM Users WHERE userID = ?";
+  db.query(checkUserQuery, [userID], (checkErr, checkResults) => {
+    if (checkErr) {
+      console.error(checkErr);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    } else {
+      if (checkResults.length > 0) {
+        // User found, proceed to load scheduled events within the specified range
+        const loadEventsQuery = `
+          SELECT 
+            s.*, e.*, 
+            CASE 
+              WHEN e.eventID IN (SELECT eventID FROM University_Events) THEN 'university'
+              WHEN e.eventID IN (SELECT eventID FROM RSO_Events) THEN 'RSO'
+            END AS source,
+            CASE 
+              WHEN e.eventID IN (SELECT eventID FROM University_Events) THEN (SELECT university FROM University_Events WHERE eventID = e.eventID)
+              WHEN e.eventID IN (SELECT eventID FROM RSO_Events) THEN (SELECT rsoName FROM RSOs JOIN RSO_Events ON RSOs.rsoID = RSO_Events.rsoID WHERE RSO_Events.eventID = e.eventID)
+            END AS hostName,
+            (CASE
+              WHEN EXISTS (
+                SELECT 1 FROM RSO_Board WHERE rsoID IN (SELECT rsoID FROM RSO_Events WHERE eventID = e.eventID) AND adminID = ?
+              ) THEN 1
+              ELSE 0
+            END) AS isOwner
+          FROM Scheduled_Events s
+          INNER JOIN events e ON s.eventID = e.eventID
+          WHERE s.userID = ?
+        `;
+        db.query(loadEventsQuery, [adminID, userID], (loadErr, results) => {
+          if (loadErr) {
+            console.error(loadErr);
+            res.status(500).json({ message: "Internal Server Error" });
+            return;
+          } else {
+            console.log(results);
+            res.status(200).json({ events: results });
+            return;
+          }
+        });
+      } else {
+        // User not found
+        res.status(404).json({ message: "User not found" });
+        return;
+      }
+    }
+  });
 });
 
 //////////////////////////////

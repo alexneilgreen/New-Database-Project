@@ -6,7 +6,7 @@ import Cookies from "js-cookie";
 
 const FeedbackPage = () => {
 	const [comments, setComments] = useState([]);
-	const [rating, setRating] = useState(0);
+	const [reviewRating, setReviewRating] = useState(0);
 	const [newComment, setNewComment] = useState("");
 	const [editIndex, setEditIndex] = useState(null);
 
@@ -32,15 +32,15 @@ const FeedbackPage = () => {
 	};
 
 	const handleRatingChange = (event) => {
-		setRating(event.target.value);
+		setReviewRating(event.target.value);
 	};
 
 	const submitReview = async (event) => {
 		event.preventDefault();
 		const userID = Cookies.get("uID");
-		setComments([...comments, { comment: newComment, rating: rating }]);
+		setComments([...comments, { comment: newComment, reviewRating: reviewRating }]);
 		setNewComment("");
-		setRating(0);
+		setReviewRating(0);
 
 		try {
 			const eventID = Cookies.get("eID");
@@ -48,7 +48,7 @@ const FeedbackPage = () => {
 				userID: userID,
 				eventID: eventID,
 				comment: newComment,
-				reviewRating: rating,
+				reviewRating: reviewRating,
 			});
 			console.log(response.data);
 			loadReviews(); // Reload comments after submitting a review
@@ -65,7 +65,7 @@ const FeedbackPage = () => {
 		const userID = Cookies.get("uID");
 		const eventID = Cookies.get("eID");
 		const updatedComment = comments[index].comment;
-		const updatedRating = comments[index].rating;
+		const updatedRating = comments[index].reviewRating;
 
 		try {
 			const response = await axios.put("http://localhost:3001/edit-review", {
@@ -124,7 +124,7 @@ const FeedbackPage = () => {
 						></textarea>
 						<input
 							type="number"
-							value={rating}
+							value={reviewRating}
 							onChange={handleRatingChange}
 							className="feedback-rating"
 							placeholder="Rating (0-5)"
@@ -159,10 +159,10 @@ const FeedbackPage = () => {
 											/>
 											<input
 												type="number"
-												value={item.rating}
+												value={item.reviewRating}
 												onChange={(e) => {
 													const newComments = [...comments];
-													newComments[index].rating = e.target.value;
+													newComments[index].reviewRating = e.target.value;
 													setComments(newComments);
 												}}
 											/>
@@ -176,7 +176,7 @@ const FeedbackPage = () => {
 									) : (
 										<>
 											<div className="review-comment">{item.comment}</div>
-											<div className="review-rating">Rating: {item.rating}</div>
+											<div className="review-rating">Rating: {item.reviewRating}</div>
 											<button
 												className="edit-button"
 												onClick={() => handleEdit(index)}
