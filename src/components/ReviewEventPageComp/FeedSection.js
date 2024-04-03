@@ -17,16 +17,18 @@ function Feed() {
     let superID = Cookies.get("sID");
     let university = Cookies.get("uni");
     try {
-      const response = await axios.post("http://localhost:3001/load-unapproved-events", {
-        university: university,
-        superID: superID,
-        adminID: adminID,
-      });
+      const response = await axios.post(
+        "http://localhost:3001/load-unapproved-events",
+        {
+          university: university,
+          superID: superID,
+          adminID: adminID,
+        }
+      );
       console.log(response.data);
 
       //Populate posts
-      setPosts(response.data.events || []);
-
+      setPosts(response.data.unapprovedEvents || []);
     } catch (error) {
       console.error("Error loading unapproved events:", error);
     }
@@ -43,6 +45,7 @@ function Feed() {
       console.log(response.data);
       if (response.status == 200) {
         console.log("Event approved successfully");
+        loadUnapprovedEvents();
       }
     } catch (error) {
       console.error("Error approving university event:", error);
@@ -50,6 +53,7 @@ function Feed() {
   };
 
   const throwOutEvent = async (post) => {
+    console.log("post info: ", post);
     let adminID = Cookies.get("aID");
     let superID = Cookies.get("sID");
     let eventID = post.eventID;
@@ -57,13 +61,16 @@ function Feed() {
       //Only a valid adminID or a superID is needed
       const response = await axios.put(
         "http://localhost:3001/delete-university-event",
-        eventID,
-        adminID,
-        superID
+        {
+          eventID: eventID,
+          adminID: adminID,
+          superID: superID,
+        }
       );
       console.log(response.data);
       if (response.status == 200) {
         console.log("Event deleted successfully");
+        loadUnapprovedEvents();
       }
     } catch (error) {
       console.error("Error deleting university event:", error);
@@ -86,9 +93,9 @@ function Feed() {
         </div>
         <div className="post-footer">
           <p>
-            Host:{" "}
+            Proposer:{" "}
             <strong>
-              {post.hostName}
+              {post.adminUsername}
               {/* Get host name. Uniquely generated varaible from API */}
             </strong>
           </p>

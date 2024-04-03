@@ -11,7 +11,7 @@ import { Icon, Style } from "ol/style";
 import { fromLonLat, toLonLat } from "ol/proj";
 import pin from "../../images/pin.png";
 
-function Feed({addIconToMap, centerMapOn}) {
+function Feed({ addIconToMap, centerMapOn }) {
   const [activeTab, setActiveTab] = useState(1);
   const [modalPost, setModalPost] = useState(null);
   const [selectedHost, setSelectedHost] = useState(null);
@@ -62,26 +62,25 @@ function Feed({addIconToMap, centerMapOn}) {
         case 1:
           response = await axios.post(
             "http://localhost:3001/autoload-public-events",
-            {}
+            { adminID: Cookies.get("aID") }
           );
           break;
         case 2:
           response = await axios.post(
             "http://localhost:3001/autoload-university-events",
-            {}
+            { university: Cookies.get("uni"), adminID: Cookies.get("aID") }
           );
           break;
         case 3:
-          const userID = Cookies.get("uID");
           response = await axios.post(
             "http://localhost:3001/autoload-scheduled-events",
-            { userID }
+            { userID: Cookies.get("uID"), adminID: Cookies.get("aID") }
           );
           break;
         case 4:
           response = await axios.post(
             "http://localhost:3001/autoload-rso-events",
-            {}
+            { userID: Cookies.get("uID"), adminID: Cookies.get("aID") }
           );
           break;
         default:
@@ -218,7 +217,6 @@ function Feed({addIconToMap, centerMapOn}) {
   };
 
   const editEvent = async (post) => {
-
     console.log(post);
     // Create a Promise to ensure cookies are set
     const setCookiesPromise = new Promise((resolve, reject) => {
@@ -247,7 +245,7 @@ function Feed({addIconToMap, centerMapOn}) {
 
   const populateMap = (post) => {
     //console.log("Populate map:", post);
-	//console.log("Long and Lat: ", post.eventLong, post.eventLat);
+    //console.log("Long and Lat: ", post.eventLong, post.eventLat);
     addIconToMap(post.eventLong, post.eventLat);
     centerMapOn(post.eventLong, post.eventLat);
 
