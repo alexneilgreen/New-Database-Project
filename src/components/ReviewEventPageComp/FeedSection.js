@@ -121,12 +121,12 @@ function Feed() {
 		<div className="rev-feed-section">
 			<div className="rev-feed-content-box">
 				<div className="rev-search-bar">
-					<input
+					{/* <input
 						className="rev-search-bar-text"
 						type="text"
 						placeholder="Search..."
 					/>
-					<button type="rev-search-bar-button">Search</button>
+					<button type="rev-search-bar-button">Search</button> */}
 				</div>
 				<div className="rev-posts-container">{generatePostBoxes()}</div>
 			</div>
