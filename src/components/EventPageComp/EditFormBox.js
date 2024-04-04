@@ -53,27 +53,29 @@ function FormBox() {
     Cookies.remove("eEmail");
   };
 
-  // async function geocode(location) {
-  //   try {
-  //     const response = await axios.get(
-  //       "https://maps.googleapis.com/maps/api/geocode/json?",
-  //       {
-  //         params: {
-  //           address: location,
-  //           key: "ADD KEY HERE",
-  //         },
-  //       }
-  //     )
-  //  console.log(response);
-  //  let coords = {
-  //    lat: response.data.results[0].geometry.location.lat,
-  //    long: response.data.results[0].geometry.location.lng,
-  //  };
-  //  console.log("Coords:", coords);
-  //} catch (error) {
-  //  console.log(error);
-  //}
-  //}
+  async function geocode(eventLocation) {
+    try {
+      const response = await axios.get(
+        "https://maps.googleapis.com/maps/api/geocode/json?",
+        {
+          params: {
+            address: eventLocation,
+            key: "ADD KEY HERE",
+          },
+        }
+      );
+      console.log(response);
+      let coords = {
+        lat: response.data.results[0].geometry.location.lat,
+        long: response.data.results[0].geometry.location.lng,
+      };
+      console.log("Coords:", coords);
+      setLatitude(coords.lat);
+      setLongitude(coords.long);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const deleteEvent = async () => {
     let adminID = Cookies.get("aID");
@@ -99,7 +101,7 @@ function FormBox() {
     let adminID = Cookies.get("aID");
     let eventID = Cookies.get("eID");
     console.log("Attempting to edit event of ID: ", eventID);
-    //Geocode address
+    geocode(eventLocation);
     try {
       const response = await axios.put("http://localhost:3001/edit-event", {
         eventID: eventID,

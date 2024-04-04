@@ -2032,7 +2032,7 @@ app.post("/autoload-university-events", (req, res) => {
 //////////////////////////////
 app.post("/autoload-rso-events", (req, res) => {
   const { userID, adminID } = req.body;
-  console.log("Loading rso events with details: ", university, adminID);
+  console.log("Loading rso events with details: ", userID, adminID);
   const query = `
     SELECT 
       e.*, 'RSO' AS source, rso.rsoName AS hostName,
