@@ -1,11 +1,21 @@
--- Insert Superadmin
+-- Insert Superadmins
 INSERT INTO Users (username, password, phone, email, university)
-VALUES ('superadmin', 'superadminpassword', '352-123-4567', 'superadmin@uf.edu.net', 'UF');
+VALUES ('superadmin', 'superadminpassword', '407-123-4567', 'superadmin@ucf.edu', 'UCF');
+
+SET @superadmin_id = LAST_INSERT_ID();
+
+INSERT INTO Superadmins (userID, uniDescr, uniLat, uniLong)
+VALUES (@superadmin_id, 'University of Florida Description', 28.6016, -81.2005);
+
+INSERT INTO Users (username, password, phone, email, university)
+VALUES ('superadmin_uf', 'superadminpassword', '352-123-4567', 'superadmin@uf.edu', 'UF');
 
 SET @superadmin_id = LAST_INSERT_ID();
 
 INSERT INTO Superadmins (userID, uniDescr, uniLat, uniLong)
 VALUES (@superadmin_id, 'University of Florida Description', 29.6516, -82.3248);
+
+-- // UCF ADMIN // --
 
 -- Insert RSO Admin
 INSERT INTO Users (username, password, phone, email, university)
@@ -20,7 +30,7 @@ SET @rsoadmin_id = LAST_INSERT_ID();
 
 -- Create RSO
 INSERT INTO RSOs (rsoCode, adminCode, rsoName, rsoDescr, university)
-VALUES ('rso123', 'admin123', 'Test RSO', 'Test RSO Description', 'UF');
+VALUES ('rso123', 'admin123', 'UCF Student Union', 'Student Union Administration Body', 'UCF');
 
 SET @rso_id = LAST_INSERT_ID();
 
@@ -31,6 +41,36 @@ VALUES (@rso_id, @rsoadmin_id);
 -- Insert RSO admin into RSO Members
 INSERT INTO RSO_Members (rsoID, userID)
 VALUES (@rso_id, @rsoadmin_id);
+
+-- -- -- -- --
+
+-- // UF ADMIN // --
+-- Insert RSO Admin
+INSERT INTO Users (username, password, phone, email, university)
+VALUES ('rsoadmin_uf', 'rsoadminpassword', '352-237-3643', 'rsoadmin@uf.edu', 'UF');
+
+SET @rsoadmin_userid = LAST_INSERT_ID();
+
+INSERT INTO RSO_Admins (userID)
+VALUES (@rsoadmin_userid);
+
+SET @rsoadmin_id = LAST_INSERT_ID();
+
+-- Create RSO
+INSERT INTO RSOs (rsoCode, adminCode, rsoName, rsoDescr, university)
+VALUES ('rso321', 'admin321', 'UF Student Union', 'Student Union Administration Body', 'UF');
+
+SET @rso_id = LAST_INSERT_ID();
+
+-- Insert RSO admin into RSO Board
+INSERT INTO RSO_Board (rsoID, adminID)
+VALUES (@rso_id, @rsoadmin_id);
+
+-- Insert RSO admin into RSO Members
+INSERT INTO RSO_Members (rsoID, userID)
+VALUES (@rso_id, @rsoadmin_id);
+
+-- -- -- -- --
 
 -- Insert Normal Users
 INSERT INTO Users (username, password, phone, email, university)
