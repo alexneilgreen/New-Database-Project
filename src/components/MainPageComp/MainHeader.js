@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 function MainHeader() {
 	const [showDropdown, setShowDropdown] = useState(false);
 	const [buttonBorderRadius, setButtonBorderRadius] = useState("10px");
+	const aid = Cookies.get("aID");
+	const sid = Cookies.get("sID");
 
 	const navigate = useNavigate();
 
@@ -33,54 +35,47 @@ function MainHeader() {
 		<div className="header-banner">
 			<img src={logo} className="header-logo" alt="Logo" />
 			<div className="header-button-container">
-				<div className="dropdown">
-					<div
-						className="header-button"
-						onClick={toggleDropdown}
-						style={{ borderRadius: buttonBorderRadius }}
-					>
-						Admin Functions
-					</div>
-					{showDropdown && (
-						<div className="dropdown-content">
-							<Link
-								to="/createRSOEvent"
-								className="dropdown-link"
-								onClick={toggleDropdown}
-							>
-								Create RSO Event
-							</Link>
-							<Link
-								to="/createUniEvent"
-								className="dropdown-link"
-								onClick={toggleDropdown}
-							>
-								Create Uni Event
-							</Link>
-							<Link
-								to="/reviewEvent"
-								className="dropdown-link"
-								onClick={toggleDropdown}
-							>
-								Review Events
-							</Link>
-							{/* <Link
-								to="/createRSO"
-								className="dropdown-link"
-								onClick={toggleDropdown}
-							>
-								Create RSO
-							</Link>
-							<Link
-								to="/joinRSO"
-								className="dropdown-link"
-								onClick={toggleDropdown}
-							>
-								Join RSO
-							</Link> */}
+				{(aid != -1 || sid != -1) && ( // Check if aid cookie is not -1
+					<div className="dropdown">
+						<div
+							className="header-button"
+							onClick={toggleDropdown}
+							style={{ borderRadius: buttonBorderRadius }}
+						>
+							Admin Functions
 						</div>
-					)}
-				</div>
+						{showDropdown && (
+							<div className="dropdown-content">
+								{aid != -1 && (
+									<>
+										<Link
+											to="/createRSOEvent"
+											className="dropdown-link"
+											onClick={toggleDropdown}
+										>
+											Create RSO Event
+										</Link>
+										<Link
+											to="/createUniEvent"
+											className="dropdown-link"
+											onClick={toggleDropdown}
+										>
+											Create Uni Event
+										</Link>
+									</>
+								)}
+								{/* Always show the review events link */}
+								<Link
+									to="/reviewEvent"
+									className="dropdown-link"
+									onClick={toggleDropdown}
+								>
+									Review Events
+								</Link>
+							</div>
+						)}
+					</div>
+				)}
 				<div className="header-link" onClick={handleLogout}>
 					Log Out
 				</div>

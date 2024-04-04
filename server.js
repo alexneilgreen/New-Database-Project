@@ -1061,11 +1061,9 @@ app.put("/edit-event", (req, res) => {
 										return;
 									} else {
 										// Event details successfully updated
-										res
-											.status(200)
-											.json({
-												message: "University event updated successfully",
-											});
+										res.status(200).json({
+											message: "University event updated successfully",
+										});
 										return;
 									}
 								}
@@ -1956,9 +1954,9 @@ app.post("/load-event-reviews", (req, res) => {
 //AUTOLOAD PUBLIC EVENTS API//
 //////////////////////////////
 app.post("/autoload-public-events", (req, res) => {
-  const { adminID } = req.body;
-  console.log("Loading public events with admin ID: ", adminID);
-  const query = `
+	const { adminID } = req.body;
+	console.log("Loading public events with admin ID: ", adminID);
+	const query = `
     SELECT 
       events.*, university_events.isPrivate, university_events.isApproved, 'university' AS source, universities.university AS hostName,
       (CASE
@@ -1972,23 +1970,23 @@ app.post("/autoload-public-events", (req, res) => {
     INNER JOIN Universities universities ON university_events.university = universities.university
     WHERE university_events.isPrivate = 0 AND university_events.isApproved = 1
   `;
-  db.query(query, [adminID], (err, results) => {
-    if (err) {
-      console.error(err);
-      res.status(500).json({ message: "Internal Server Error" });
-      return;
-    }
-    console.log(results);
-    res.status(200).json({ events: results });
-  });
+	db.query(query, [adminID], (err, results) => {
+		if (err) {
+			console.error(err);
+			res.status(500).json({ message: "Internal Server Error" });
+			return;
+		}
+		console.log(results);
+		res.status(200).json({ events: results });
+	});
 });
 //////////////////////////////
 //AUTOLOAD UNI EVENTS API/////
 //////////////////////////////
 app.post("/autoload-university-events", (req, res) => {
-  const { university, adminID } = req.body;
-  console.log("Loading uni events with details: ", university, adminID);
-  const query = `
+	const { university, adminID } = req.body;
+	console.log("Loading uni events with details: ", university, adminID);
+	const query = `
     SELECT 
       events.*, 'university' AS source, Universities.university AS hostName,
       (CASE
@@ -2015,25 +2013,28 @@ app.post("/autoload-university-events", (req, res) => {
     INNER JOIN RSOs ON rso_events.rsoID = RSOs.rsoID
     WHERE RSOs.university = ?
   `;
-  db.query(query, [adminID, university, adminID, university], (err, results) => {
-    if (err) {
-      console.error(err);
-      res.status(500).json({ message: "Internal Server Error" });
-      return;
-    }
-    console.log(results);
-    res.status(200).json({ events: results });
-  });
+	db.query(
+		query,
+		[adminID, university, adminID, university],
+		(err, results) => {
+			if (err) {
+				console.error(err);
+				res.status(500).json({ message: "Internal Server Error" });
+				return;
+			}
+			console.log(results);
+			res.status(200).json({ events: results });
+		}
+	);
 });
-
 
 //////////////////////////////
 //AUTOLOAD RSO EVENTS API/////
 //////////////////////////////
 app.post("/autoload-rso-events", (req, res) => {
-  const { userID, adminID } = req.body;
-  console.log("Loading rso events with details: ", university, adminID);
-  const query = `
+	const { userID, adminID } = req.body;
+	//   console.log("Loading rso events with details: ", university, adminID);
+	const query = `
     SELECT 
       e.*, 'RSO' AS source, rso.rsoName AS hostName,
       (CASE
@@ -2048,35 +2049,34 @@ app.post("/autoload-rso-events", (req, res) => {
     INNER JOIN RSO_Members rsm ON rso.rsoID = rsm.rsoID
     WHERE rsm.userID = ?
   `;
-  db.query(query, [adminID, userID], (err, results) => {
-    if (err) {
-      console.error(err);
-      res.status(500).json({ message: "Internal Server Error" });
-      return;
-    }
-    console.log(results);
-    res.status(200).json({ events: results });
-  });
+	db.query(query, [adminID, userID], (err, results) => {
+		if (err) {
+			console.error(err);
+			res.status(500).json({ message: "Internal Server Error" });
+			return;
+		}
+		console.log(results);
+		res.status(200).json({ events: results });
+	});
 });
-
 
 //////////////////////////////
 //AUTOLOAD SCHEDULED EVENT API
 //////////////////////////////
 app.post("/autoload-scheduled-events", (req, res) => {
-  const { userID, adminID } = req.body;
-  console.log("Loading scheduled events with details: ", userID, adminID);
-  // Check if the provided user ID exists
-  const checkUserQuery = "SELECT * FROM Users WHERE userID = ?";
-  db.query(checkUserQuery, [userID], (checkErr, checkResults) => {
-    if (checkErr) {
-      console.error(checkErr);
-      res.status(500).json({ message: "Internal Server Error" });
-      return;
-    } else {
-      if (checkResults.length > 0) {
-        // User found, proceed to load scheduled events within the specified range
-        const loadEventsQuery = `
+	const { userID, adminID } = req.body;
+	console.log("Loading scheduled events with details: ", userID, adminID);
+	// Check if the provided user ID exists
+	const checkUserQuery = "SELECT * FROM Users WHERE userID = ?";
+	db.query(checkUserQuery, [userID], (checkErr, checkResults) => {
+		if (checkErr) {
+			console.error(checkErr);
+			res.status(500).json({ message: "Internal Server Error" });
+			return;
+		} else {
+			if (checkResults.length > 0) {
+				// User found, proceed to load scheduled events within the specified range
+				const loadEventsQuery = `
           SELECT 
             s.*, e.*, 
             CASE 
@@ -2097,24 +2097,24 @@ app.post("/autoload-scheduled-events", (req, res) => {
           INNER JOIN events e ON s.eventID = e.eventID
           WHERE s.userID = ?
         `;
-        db.query(loadEventsQuery, [adminID, userID], (loadErr, results) => {
-          if (loadErr) {
-            console.error(loadErr);
-            res.status(500).json({ message: "Internal Server Error" });
-            return;
-          } else {
-            console.log(results);
-            res.status(200).json({ events: results });
-            return;
-          }
-        });
-      } else {
-        // User not found
-        res.status(404).json({ message: "User not found" });
-        return;
-      }
-    }
-  });
+				db.query(loadEventsQuery, [adminID, userID], (loadErr, results) => {
+					if (loadErr) {
+						console.error(loadErr);
+						res.status(500).json({ message: "Internal Server Error" });
+						return;
+					} else {
+						console.log(results);
+						res.status(200).json({ events: results });
+						return;
+					}
+				});
+			} else {
+				// User not found
+				res.status(404).json({ message: "User not found" });
+				return;
+			}
+		}
+	});
 });
 
 //////////////////////////////
