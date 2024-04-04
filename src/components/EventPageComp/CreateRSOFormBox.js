@@ -18,6 +18,9 @@ function FormBox() {
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
 
+  let geocoded_lat = 0;
+  let geocoded_long = 0;
+
   const navigate = useNavigate();
 
   async function geocode(location) {
@@ -27,7 +30,7 @@ function FormBox() {
         {
           params: {
             address: location,
-            key: "ADD KEY HERE",
+            key: "[API KEY HERE]",
           },
         }
       );
@@ -38,6 +41,8 @@ function FormBox() {
       };
       setLatitude(coords.lat);
       setLongitude(coords.long);
+      geocoded_lat = coords.lat;
+      geocoded_long = coords.long;
       console.log("Coords:", coords);
     } catch (error) {
       console.log(error);
@@ -56,8 +61,8 @@ function FormBox() {
           eventName: eventName,
           eventDescr: eventDescription,
           eventTime: eventTime,
-          eventLat: latitude, // Add Latitude value
-          eventLong: longitude, // Add Longitude value
+          eventLat: geocoded_lat, // Add Latitude value
+          eventLong: geocoded_long, // Add Longitude value
           eventAddress: eventLocation,
           eventPhone: eventPhone,
           eventEmail: eventEmail,

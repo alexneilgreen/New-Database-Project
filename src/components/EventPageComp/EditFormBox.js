@@ -21,6 +21,9 @@ function FormBox() {
   const [longitude, setLongitude] = useState(Cookies.get("eLong"));
   const navigate = useNavigate();
 
+  let geocoded_lat = 0;
+  let geocoded_long = 0;
+
   useEffect(() => {
     // Required event Cookies to populate fields
     console.log("Cookie value [name] ", Cookies.get("eName"));
@@ -60,7 +63,7 @@ function FormBox() {
         {
           params: {
             address: location,
-            key: "ADD KEY HERE",
+            key: "[API KEY HERE]",
           },
         }
       );
@@ -71,6 +74,8 @@ function FormBox() {
       };
       setLatitude(coords.lat);
       setLongitude(coords.long);
+      geocoded_lat = coords.lat;
+      geocoded_long = coords.long;
       console.log("Coords:", coords);
     } catch (error) {
       console.log(error);
@@ -109,8 +114,8 @@ function FormBox() {
         eventName: eventName,
         eventDescr: eventDescription,
         eventTime: eventTime,
-        eventLat: latitude,
-        eventLong: longitude,
+        eventLat: geocoded_lat, // Add Latitude value
+        eventLong: geocoded_long, // Add Longitude value
         eventAddress: eventLocation,
         eventPhone: eventPhone,
         eventEmail: eventEmail,
