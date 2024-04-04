@@ -20,33 +20,33 @@ function FormBox() {
 
   const navigate = useNavigate();
 
-  // async function geocode(location) {
-  //   try {
-  //     const response = await axios.get(
-  //       "https://maps.googleapis.com/maps/api/geocode/json?",
-  //       {
-  //         params: {
-  //           address: location,
-  //           key: "ADD KEY HERE",
-  //         },
-  //       }
-  //     )
-  //  console.log(response);
-  //  let coords = {
-  //    lat: response.data.results[0].geometry.location.lat,
-  //    long: response.data.results[0].geometry.location.lng,
-  //  };
-  //  console.log("Coords:", coords);
-  //} catch (error) {
-  //  console.log(error);
-  //}
-  //}
+  async function geocode(location) {
+    try {
+      const response = await axios.get(
+        "https://maps.googleapis.com/maps/api/geocode/json?",
+        {
+          params: {
+            address: location,
+            key: "ADD KEY HERE",
+          },
+        }
+      );
+      console.log(response);
+      let coords = {
+        lat: response.data.results[0].geometry.location.lat,
+        long: response.data.results[0].geometry.location.lng,
+      };
+      setLatitude(coords.lat);
+      setLongitude(coords.long);
+      console.log("Coords:", coords);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const createEvent = async () => {
     const adminID = Cookies.get("aID");
-    //Geocode address to coords
-    setLatitude(0);
-    setLongitude(0);
+    await geocode(eventLocation);
     try {
       const response = await axios.post(
         "http://localhost:3001/create-rso-event",
