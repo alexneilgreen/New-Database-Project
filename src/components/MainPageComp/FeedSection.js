@@ -270,21 +270,24 @@ function Feed({ addIconToMap, centerMapOn }) {
 		<div className="feed-section">
 			<div className="feed-content-box">
 				<div className="tabs">
-					{[1, 2, 3, 4].map((tabNumber) => (
-						<div
-							key={tabNumber}
-							className={`tab ${activeTab === tabNumber && "active"}`}
-							onClick={(e) => handleTabClick(e, tabNumber)}
-						>
-							{tabNumber === 1
-								? "Public Events"
-								: tabNumber === 2
-								? "University Events"
-								: tabNumber === 3
-								? "Followed Events"
-								: "Followed RSOs"}
-						</div>
-					))}
+					{[1, 2, 4].map(
+						(
+							tabNumber // Removed 3 from the array
+						) => (
+							<div
+								key={tabNumber}
+								className={`tab ${activeTab === tabNumber && "active"}`}
+								onClick={(e) => handleTabClick(e, tabNumber)}
+							>
+								{tabNumber === 1
+									? "Public Events"
+									: tabNumber === 2
+									? "University Events"
+									: "Followed RSOs"}{" "}
+								{/* Removed "Followed Events" */}
+							</div>
+						)
+					)}
 				</div>
 				<div className="search-bar">
 					<input
