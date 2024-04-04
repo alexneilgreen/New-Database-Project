@@ -290,12 +290,12 @@ function Feed({ addIconToMap, centerMapOn }) {
 					)}
 				</div>
 				<div className="search-bar">
-					<input
+					{/* <input
 						className="search-bar-text"
 						type="text"
 						placeholder="Search..."
 					/>
-					<button type="search-bar-button">Search</button>
+					<button type="search-bar-button">Search</button> */}
 				</div>
 				<div className="posts-container">{generatePostBoxes()}</div>
 			</div>
