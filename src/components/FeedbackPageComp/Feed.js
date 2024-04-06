@@ -38,10 +38,7 @@ const FeedbackPage = () => {
 	const submitReview = async (event) => {
 		event.preventDefault();
 		const userID = Cookies.get("uID");
-		setComments([
-			...comments,
-			{ comment: newComment, reviewRating: reviewRating },
-		]);
+		setComments([...comments, { comment: newComment, reviewRating: reviewRating }]);
 		setNewComment("");
 		setReviewRating(0);
 
@@ -85,7 +82,7 @@ const FeedbackPage = () => {
 		}
 	};
 
-	const handleDeleteReview = async (index) => {
+	const handleDeleteReview = async () => {
 		const userID = Cookies.get("uID");
 		const eventID = Cookies.get("eID");
 
@@ -146,7 +143,6 @@ const FeedbackPage = () => {
 				<br />
 				<ul>
 					{comments.map((item, index) => {
-						const userID = Cookies.get("uID");
 						return (
 							<li key={index}>
 								<div className="review-item">
@@ -180,27 +176,21 @@ const FeedbackPage = () => {
 									) : (
 										<>
 											<div className="review-comment">{item.comment}</div>
-											<div className="review-rating">
-												Rating: {item.reviewRating}
-											</div>
-											{userID === item.userID && (
-												<button
-													className="edit-button"
-													onClick={() => handleEdit(index)}
-												>
-													Edit
-												</button>
-											)}
+											<div className="review-rating">Rating: {item.reviewRating}</div>
+											<button
+												className="edit-button"
+												onClick={() => handleEdit(index)}
+											>
+												Edit
+											</button>
 										</>
 									)}
-									{userID === item.userID && (
-										<button
-											className="delete-button"
-											onClick={() => handleDeleteReview(index)}
-										>
-											Delete
-										</button>
-									)}
+									<button
+										className="delete-button"
+										onClick={handleDeleteReview}
+									>
+										Delete
+									</button>
 								</div>
 							</li>
 						);
