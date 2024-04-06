@@ -1,8 +1,5 @@
 USE cop4710db;
 
--- Insert Test University
-INSERT INTO Universities (university) VALUES ('Test University');
-
 -- Insert FAU
 INSERT INTO Universities (university) VALUES ('FAU');
 

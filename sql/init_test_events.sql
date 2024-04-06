@@ -3,7 +3,7 @@ SET @rso_admin_id = (SELECT adminID FROM RSO_Admins LIMIT 1);
 
 -- Create RSO event
 INSERT INTO Events (eventName, eventDescr, eventTime, eventLat, eventLong, eventAddress, eventPhone, eventEmail)
-VALUES ('RSO Event', 'Test RSO Event Description', '2024-03-06 13:00:00', 0.0, 0.0, 'RSO Event Address', '123456789', 'rso@example.com');
+VALUES ('SU Meetup', 'Student Body Meetup at the UCF Student Union', '2024-03-06 13:00:00', 28.6016, -81.2005, 'UCF Student Union', '123-456-7890', 'rso@example.com');
 
 SET @rso_event_id = LAST_INSERT_ID();
 
@@ -13,20 +13,20 @@ VALUES (@rso_event_id, (SELECT rsoID FROM RSOs WHERE rsoCode = 'rso123'));
 
 -- Create two university events (isApproved = false initially)
 INSERT INTO Events (eventName, eventDescr, eventTime, eventLat, eventLong, eventAddress, eventPhone, eventEmail)
-VALUES ('University Event 1', 'Test University Event Description 1', '2024-03-06 13:00:00', 0.0, 0.0, 'University Event Address 1', '123456789', 'uni1@example.com');
+VALUES ('UCF Meet and Greet', 'Meet and Greet the Leading Staff at UCF!', '2024-03-06 15:00:00', 28.6016, -81.2005, 'UCF Main Campus', '407-123-4567', 'UCF@ucf.edu');
 
 SET @uni_event1_id = LAST_INSERT_ID();
 
 INSERT INTO University_Events (eventID, adminID, university, isPrivate, isApproved)
-VALUES (@uni_event1_id, @rso_admin_id, 'Test University', TRUE, FALSE);
+VALUES (@uni_event1_id, @rso_admin_id, 'UCF', TRUE, FALSE);
 
 INSERT INTO Events (eventName, eventDescr, eventTime, eventLat, eventLong, eventAddress, eventPhone, eventEmail)
-VALUES ('University Event 2', 'Test University Event Description 2', '2024-03-06 13:00:00', 0.0, 0.0, 'University Event Address 2', '123456789', 'uni2@example.com');
+VALUES ('UF Meet and Greet', 'Meet and Greet the Leading Staff at UF!', '2024-03-06 15:00:00', 29.6516, -82.3248, 'UF Main Campus', '352-123-4567', 'UCF@ucf.edu');
 
 SET @uni_event2_id = LAST_INSERT_ID();
 
 INSERT INTO University_Events (eventID, adminID, university, isPrivate, isApproved)
-VALUES (@uni_event2_id, @rso_admin_id, 'Test University', FALSE, FALSE);
+VALUES (@uni_event2_id, 2, 'UF', FALSE, FALSE);
 
 -- Change isApproved values for university events to true
 UPDATE University_Events SET isApproved = TRUE WHERE eventID = @uni_event1_id;
