@@ -91,7 +91,5 @@ SELECT @rso_id;
 
 -- Insert RSO members
 INSERT INTO RSO_Members (rsoID, userID)
-VALUES (@rso_id, (SELECT userID FROM Users WHERE username = 'user1')),
-       (@rso_id, (SELECT userID FROM Users WHERE username = 'user2')),
-       (@rso_id, (SELECT userID FROM Users WHERE username = 'user3')),
+VALUES (@rso_id, (SELECT userID FROM Users WHERE username = 'user2')),
        (@rso_id, (SELECT userID FROM Users WHERE username = 'user4'));

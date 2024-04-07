@@ -11,6 +11,11 @@ SET @rso_event_id = LAST_INSERT_ID();
 INSERT INTO RSO_Events (eventID, rsoID)
 VALUES (@rso_event_id, (SELECT rsoID FROM RSOs WHERE rsoCode = 'rso123'));
 
+set @rso_admin_userID = (SELECT userID FROM RSO_Admins WHERE adminID = @rso_admin_id);
+
+INSERT INTO Event_Reviews (userID, eventID, comment, reviewRating)
+VALUES (@rso_admin_userID, @rso_event_id, 'Great Event!', 5);
+
 -- Create two university events (isApproved = false initially)
 INSERT INTO Events (eventName, eventDescr, eventTime, eventLat, eventLong, eventAddress, eventPhone, eventEmail)
 VALUES ('UCF Meet and Greet', 'Meet and Greet the Leading Staff at UCF!', '2024-03-06 15:00:00', 28.6016, -81.2005, 'UCF Main Campus', '407-123-4567', 'UCF@ucf.edu');
