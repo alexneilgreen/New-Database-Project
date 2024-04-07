@@ -7,6 +7,7 @@
  - Install code into desired folder
  - Open root folder in terminal {Terminal 1}
  - (With npm and node.js installed) Run `npm install` to make sure all dependencies are installed
+ - Replace [API KEY HERE] with a valid geocoding API key from Google in each file within `src/components/EventPageComp` (This has been removed due to protection regarding sharing API keys from Google.)
  - In a new terminal `cd` to `\sql` folder {Terminal 1}
  - In the sql folder, run the sql command to enter the sql shell. I.E. `mysql --host=localhost --user=root --password=admin` (Replace `root` and `admin` with the correct username and password, respectively.) **THIS PROJECT ASSUMES YOUR SQL USERNAME IS "ROOT" AND PASSWORD IS "ADMIN"**
  - Run `source ./init_db_main.sql` to initialize the database inside the sql shell
